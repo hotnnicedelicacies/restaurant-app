@@ -1,140 +1,341 @@
 @import 'tailwindcss';
 
+/* ============================================================
+   Hot N Nice Delicacies · Walnut & Cream design system
+   Source of truth: design-explorations/brand-spec.md
+   ============================================================ */
+
 @theme {
-  --font-body: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  /* --- Typography (loaded via next/font in app/layout.tsx) --- */
+  --font-display: var(--font-cormorant), 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-body:    var(--font-cormorant), 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-sans:    var(--font-geist-sans), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono:    var(--font-geist-mono), ui-monospace, 'SF Mono', monospace;
+  --font-serif:   var(--font-cormorant), 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
 
-  --color-background: hsl(30 50% 97%);
-  --color-foreground: hsl(20 30% 12%);
+  /* --- Walnut & Cream palette (contrast-audited) --- */
+  --color-cream:        #F1E5CD;
+  --color-cream-soft:   #ECDFC0;
+  --color-walnut:       #2D1F18;
+  --color-walnut-soft:  #3D2A20;
+  --color-ink-muted:    #4a3a2c;
+  --color-bronze:       #A56F40;
+  --color-bronze-deep:  #7E5530;
 
-  --color-card: hsl(30 40% 99%);
-  --color-card-foreground: hsl(20 30% 12%);
+  /* --- Semantic role tokens (consumed by shadcn-ui components) --- */
+  --color-background:           var(--color-cream);
+  --color-foreground:           var(--color-walnut);
+  --color-card:                 var(--color-cream);
+  --color-card-foreground:      var(--color-walnut);
+  --color-popover:              var(--color-cream);
+  --color-popover-foreground:   var(--color-walnut);
+  --color-primary:              var(--color-walnut);
+  --color-primary-foreground:   var(--color-cream);
+  --color-secondary:            var(--color-bronze);
+  --color-secondary-foreground: var(--color-walnut);
+  --color-muted:                var(--color-cream-soft);
+  --color-muted-foreground:     var(--color-ink-muted);
+  --color-accent:               var(--color-bronze);
+  --color-accent-foreground:    var(--color-walnut);
+  --color-destructive:          #8B2A1A;
+  --color-destructive-foreground: var(--color-cream);
+  --color-border:               rgba(45, 31, 24, 0.18);
+  --color-input:                rgba(45, 31, 24, 0.18);
+  --color-ring:                 var(--color-bronze);
+  --color-success:              #1e7d3f;
 
-  --color-popover: hsl(30 40% 99%);
-  --color-popover-foreground: hsl(20 30% 12%);
+  /* --- Borders & radii --- */
+  --radius: 2px;
 
-  --color-primary: hsl(24 95% 53%);
-  --color-primary-foreground: hsl(0 0% 100%);
-
-  --color-secondary: hsl(140 45% 42%);
-  --color-secondary-foreground: hsl(0 0% 100%);
-
-  --color-muted: hsl(30 25% 92%);
-  --color-muted-foreground: hsl(20 10% 45%);
-
-  --color-accent: hsl(5 80% 55%);
-  --color-accent-foreground: hsl(0 0% 100%);
-
-  --color-destructive: hsl(0 84.2% 60.2%);
-  --color-destructive-foreground: hsl(210 40% 98%);
-
-  --color-border: hsl(30 20% 88%);
-  --color-input: hsl(30 20% 88%);
-  --color-ring: hsl(24 95% 53%);
-
-  --radius: 0.75rem;
-
-  --color-warm-gold: hsl(42 90% 55%);
-  --color-warm-gold-foreground: hsl(20 30% 12%);
-  --color-hero-overlay: hsl(20 60% 8%);
-
-  --color-sidebar-background: hsl(0 0% 98%);
-  --color-sidebar-foreground: hsl(240 5.3% 26.1%);
-  --color-sidebar-primary: hsl(240 5.9% 10%);
-  --color-sidebar-primary-foreground: hsl(0 0% 98%);
-  --color-sidebar-accent: hsl(240 4.8% 95.9%);
-  --color-sidebar-accent-foreground: hsl(240 5.9% 10%);
-  --color-sidebar-border: hsl(220 13% 91%);
-  --color-sidebar-ring: hsl(217.2 91.2% 59.8%);
+  /* --- Layout --- */
+  --container-max:    1240px;
+  --container-gutter: 24px;
 }
 
-* {
-  border-color: var(--color-border);
-}
-
+/* --- Base --- */
+* { border-color: var(--color-border); box-sizing: border-box; }
+html { scroll-behavior: smooth; }
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);
   font-family: var(--font-body);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -0.005em; }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-display);
-}
+/* Container override: site-wide max-width + responsive gutter */
 .container {
+  max-width: var(--container-max);
   margin-left: auto;
   margin-right: auto;
+  padding-left: var(--container-gutter);
+  padding-right: var(--container-gutter);
+}
+@media (min-width: 768px) {
+  :root { --container-gutter: 48px; }
 }
 
-.text-gradient-warm {
-  background-clip: text;
-  -webkit-background-clip: text;
-  color: transparent;
-  background-image: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+/* ============================================================
+   TYPOGRAPHY UTILITIES (heritage scale)
+   ============================================================ */
+.t-display-xl {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(38px, 6vw, 68px);
+  line-height: 1.02;
+  letter-spacing: -0.005em;
+  color: var(--color-walnut);
+  margin: 0;
+}
+.t-display-xl em { font-style: italic; font-weight: 400; }
+
+.t-display-l {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(30px, 4.2vw, 46px);
+  line-height: 1.05;
+  letter-spacing: -0.005em;
+  color: var(--color-walnut);
+  margin: 0;
+}
+.t-display-l em { font-style: italic; font-weight: 400; }
+
+.t-display-m {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1.1;
+  letter-spacing: -0.005em;
+  color: var(--color-walnut);
+  margin: 0;
+}
+.t-display-m em { font-style: italic; font-weight: 400; }
+
+.t-headline {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(20px, 2.4vw, 24px);
+  line-height: 1.2;
+  color: var(--color-walnut);
+  margin: 0;
 }
 
-.bg-gradient-warm {
-  background-image: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+.t-body-l {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.55;
+  color: var(--color-ink-muted);
+  margin: 0;
 }
 
-.bg-gradient-hero {
-  background-image: linear-gradient(
-    to bottom,
-    color-mix(in srgb, var(--color-hero-overlay) 70%, transparent),
-    color-mix(in srgb, var(--color-hero-overlay) 50%, transparent)
-  );
+.t-body { font-family: var(--font-display); font-weight: 400; font-size: 16px; line-height: 1.55; color: var(--color-walnut); margin: 0; }
+.t-body-muted { font-family: var(--font-display); font-style: italic; font-weight: 400; font-size: 14px; line-height: 1.5; color: var(--color-ink-muted); margin: 0; }
+
+.t-eyebrow {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 13px;
+  font-variant: small-caps;
+  letter-spacing: 0.2em;
+  color: var(--color-bronze-deep);
+}
+.t-eyebrow-on-dark { color: var(--color-bronze); }
+
+.t-mono {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-bronze-deep);
+}
+.t-mono-on-dark { color: var(--color-bronze); }
+
+.t-nav {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 14px;
+  font-variant: small-caps;
+  letter-spacing: 0.14em;
 }
 
-.bg-gradient-cta {
-  background-image: linear-gradient(135deg, var(--color-primary), var(--color-warm-gold));
+/* ============================================================
+   ORNAMENT (centered rule, heritage detail)
+   ============================================================ */
+.ornament {
+  display: block;
+  width: 40px;
+  height: 1px;
+  background: var(--color-bronze);
+  margin: 16px auto;
+  opacity: 0.7;
+  border: 0;
+}
+.ornament--on-dark { opacity: 0.85; }
+
+/* ============================================================
+   LINK PATTERNS
+   ============================================================ */
+.link-underline {
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--color-walnut);
+  border-bottom: 1px solid var(--color-bronze-deep);
+  padding-bottom: 2px;
+  transition: border-color 200ms ease, color 200ms ease;
+}
+.link-underline:hover { border-color: var(--color-walnut); }
+
+/* ============================================================
+   HERO GRADIENT OVERLAY (kept for any legacy refs; consumed by hero pattern)
+   ============================================================ */
+.bg-hero-overlay {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--color-walnut) 32%, transparent) 0%,
+    color-mix(in srgb, var(--color-walnut) 14%, transparent) 22%,
+    color-mix(in srgb, var(--color-walnut) 58%, transparent) 70%,
+    color-mix(in srgb, var(--color-walnut) 94%, transparent) 100%);
 }
 
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
+/* ============================================================
+   PAGE HERO (walnut band on non-home pages)
+   ============================================================ */
+.page-hero {
+  background: var(--color-walnut);
+  color: var(--color-cream);
+  padding: clamp(64px, 8vw, 104px) 0 clamp(48px, 6vw, 80px);
   text-align: center;
+  border-bottom: 1px solid rgba(241, 229, 205, 0.22);
+}
+.page-hero__eyebrow {
+  font-family: var(--font-display);
+  font-size: 11px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-bronze);
+  margin-bottom: 14px;
+  font-family: var(--font-mono);
+}
+.page-hero__title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(40px, 6vw, 64px);
+  line-height: 1.02;
+  letter-spacing: -0.005em;
+  color: var(--color-cream);
+  margin: 0 0 12px;
+}
+.page-hero__title em { font-style: italic; font-weight: 400; color: var(--color-bronze); }
+.page-hero__sub {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 17px;
+  color: rgba(241, 229, 205, 0.78);
+  margin: 0 auto;
+  max-width: 580px;
+  line-height: 1.5;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+/* ============================================================
+   LEGAL CONTENT (privacy, terms, refund, cookies)
+   ============================================================ */
+.legal-content {
+  font-family: var(--font-display);
+  font-size: 16.5px;
+  line-height: 1.7;
+  color: var(--color-walnut);
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
+.legal-content > h2 {
+  font-weight: 500;
+  font-size: 24px;
+  letter-spacing: -0.005em;
+  color: var(--color-walnut);
+  margin: 40px 0 14px;
 }
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.legal-content > h2 em { font-style: italic; font-weight: 400; }
+.legal-content > h2:first-child { margin-top: 0; }
+.legal-content h3 {
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--color-walnut);
+  margin: 28px 0 10px;
 }
+.legal-content p { margin: 0 0 1em; }
+.legal-content em { font-style: italic; }
+.legal-content b, .legal-content strong { font-weight: 500; }
+.legal-content ul, .legal-content ol { margin: 0 0 1em; padding-left: 1.4em; }
+.legal-content li { margin-bottom: 0.5em; }
+.legal-content a {
+  color: var(--color-bronze-deep);
+  border-bottom: 1px solid var(--color-bronze-deep);
+  padding-bottom: 1px;
+  transition: color 200ms ease, border-color 200ms ease;
+}
+.legal-content a:hover { color: var(--color-walnut); border-color: var(--color-walnut); }
+.legal-content code {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  background: var(--color-cream-soft);
+  padding: 2px 6px;
+  border-radius: 2px;
+  color: var(--color-walnut);
+}
+.legal-content blockquote {
+  border-left: 3px solid var(--color-bronze);
+  padding: 4px 18px;
+  margin: 18px 0;
+  font-style: italic;
+  color: var(--color-ink-muted);
+}
+.legal-content table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 18px 0;
+  font-size: 14.5px;
+}
+.legal-content th {
+  text-align: left;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-bronze-deep);
+  font-weight: 500;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-walnut);
+}
+.legal-content td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: top;
+}
+.legal-toc {
+  background: var(--color-cream-soft);
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+  padding: 20px 24px;
+  margin: 0 0 40px;
+}
+.legal-toc__title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-bronze-deep);
+  margin: 0 0 12px;
+}
+.legal-toc ol { margin: 0; padding-left: 1.2em; font-size: 15px; list-style: decimal; }
+.legal-toc li { margin-bottom: 4px; }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
+/* ============================================================
+   PRINT BASE (used by /receipt page)
+   ============================================================ */
+@media print {
+  body { background: white; }
+  @page { margin: 0; size: A4; }
 }

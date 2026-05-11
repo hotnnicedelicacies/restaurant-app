@@ -1,50 +1,91 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-import AppWrapper from "@/components/app-wrapper";
-import { siteConfig } from "@/constants/siteConfig";
+import type { Metadata, Viewport } from 'next';
+import { Geist, Geist_Mono, Cormorant_Garamond } from 'next/font/google';
+import { siteConfig } from '@/constants/siteConfig';
+import { absoluteUrl } from '@/lib/utils';
+import { Toaster } from 'sonner';
+import CookieBanner from '@/components/CookieBanner';
+import './globals.css';
+
+// --- Fonts ---
+const cormorant = Cormorant_Garamond({
+  variable: '--font-cormorant',
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  style: ['normal', 'italic'],
+  display: 'swap',
+});
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+  display: 'swap',
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+  display: 'swap',
 });
 
+// --- Viewport ---
+export const viewport: Viewport = {
+  themeColor: '#2D1F18', // walnut
+  colorScheme: 'light',
+  width: 'device-width',
+  initialScale: 1,
+};
+
+// --- Metadata (site-wide defaults; pages override individually) ---
 export const metadata: Metadata = {
+  metadataBase: new URL(absoluteUrl()),
   title: {
     default: `${siteConfig.name} — ${siteConfig.tagline}`,
-    template: `%s | ${siteConfig.name}`,
+    template: `%s · ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  metadataBase: new URL(`https://${siteConfig.domain}`),
-  keywords: [
-    "home-cooked meals Middlesbrough",
-    "food delivery Middlesbrough",
-    "jollof rice delivery UK",
-    "suya Middlesbrough",
-    "African food delivery UK",
-    "meal delivery Stockton-on-Tees",
-    "HotnNiceDelicacies",
-    "fresh food delivery Teesside",
-  ],
+  applicationName: siteConfig.name,
   authors: [{ name: siteConfig.name }],
   creator: siteConfig.name,
+  publisher: siteConfig.name,
+  generator: 'Next.js',
+  keywords: [
+    'home-cooked meals Middlesbrough',
+    'food delivery Middlesbrough',
+    'jollof rice delivery UK',
+    'suya Middlesbrough',
+    'African food delivery UK',
+    'meal delivery Stockton-on-Tees',
+    'meal delivery Teesside',
+    'Italian food delivery Middlesbrough',
+    'plantain lasagna Middlesbrough',
+    'Hot N Nice Delicacies',
+    '5 star food hygiene Middlesbrough',
+  ],
+  category: 'food',
+  alternates: {
+    canonical: absoluteUrl(),
+  },
   openGraph: {
-    type: "website",
-    locale: "en_GB",
-    url: `https://${siteConfig.domain}`,
+    type: 'website',
+    locale: 'en_GB',
+    url: absoluteUrl(),
     siteName: siteConfig.name,
     title: `${siteConfig.name} — ${siteConfig.tagline}`,
     description: siteConfig.description,
+    images: [
+      {
+        url: absoluteUrl('/og-image.jpg'),
+        width: 1200,
+        height: 630,
+        alt: `${siteConfig.name} — Italian & West African home cooking, delivered hot across Teesside.`,
+      },
+    ],
   },
   twitter: {
-    card: "summary_large_image",
+    card: 'summary_large_image',
     title: `${siteConfig.name} — ${siteConfig.tagline}`,
     description: siteConfig.description,
+    images: [absoluteUrl('/og-image.jpg')],
   },
   robots: {
     index: true,
@@ -52,23 +93,46 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      "max-image-preview": "large",
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
     },
+  },
+  formatDetection: { telephone: true, email: true, address: false },
+  manifest: '/manifest.webmanifest',
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico' },
+    ],
+    apple: '/apple-icon.png',
   },
 };
 
+// --- JSON-LD: FoodEstablishment (rendered once site-wide) ---
 const restaurantSchema = {
   '@context': 'https://schema.org',
   '@type': 'FoodEstablishment',
+  '@id': absoluteUrl('#business'),
   name: siteConfig.name,
   description: siteConfig.description,
-  url: `https://${siteConfig.domain}`,
+  url: absoluteUrl(),
   telephone: siteConfig.contact.phone,
   email: siteConfig.contact.email,
-  servesCuisine: ['African', 'International', 'World Cuisine'],
-  hasMenu: `https://${siteConfig.domain}/menu`,
+  image: absoluteUrl('/og-image.jpg'),
+  logo: absoluteUrl('/logo.png'),
   priceRange: '££',
-  areaServed: siteConfig.delivery.areas.map(area => ({
+  servesCuisine: ['Italian', 'West African', 'British', 'International'],
+  hasMenu: absoluteUrl('/menu'),
+  paymentAccepted: 'Credit Card, Debit Card, Cash',
+  currenciesAccepted: 'GBP',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Middlesbrough',
+    addressRegion: 'North Yorkshire',
+    addressCountry: 'GB',
+  },
+  areaServed: siteConfig.delivery.areas.map((area) => ({
     '@type': 'City',
     name: area,
   })),
@@ -78,22 +142,32 @@ const restaurantSchema = {
     opens: '12:00',
     closes: '20:00',
   },
-  sameAs: [siteConfig.social.instagram, siteConfig.social.facebook],
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: siteConfig.foodHygiene.rating,
+    bestRating: 5,
+    ratingCount: 1,
+    reviewCount: 1,
+    description: `${siteConfig.foodHygiene.ratingLabel} · ${siteConfig.foodHygiene.authority}`,
+  },
+  sameAs: [siteConfig.social.instagram, siteConfig.social.facebook].filter(Boolean),
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en-GB">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body
+        className={`${cormorant.variable} ${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(restaurantSchema) }}
         />
-        <AppWrapper>{children}</AppWrapper>
+        {children}
+        <CookieBanner />
+        <Toaster position="bottom-right" theme="light" richColors closeButton />
       </body>
     </html>
   );
