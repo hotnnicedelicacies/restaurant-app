@@ -85,23 +85,46 @@ export default function MenuItemForm({ categories, initial }: Props) {
   }
 
   return (
+    <>
+      <div className="admin-page-head">
+        <div className="admin-page-head__text">
+          <div className="admin-page-head__eyebrow">
+            {initial ? 'Edit menu item' : 'New menu item'}
+          </div>
+          <h1 className="admin-page-head__title">
+            {initial ? <>Edit · <em>{form.name || 'Untitled'}</em></> : <>Add a <em>menu item</em></>}
+          </h1>
+        </div>
+        <div className="admin-page-head__actions">
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={pending}
+            className="receipt-btn receipt-btn--primary"
+            style={{ cursor: pending ? 'wait' : 'pointer' }}
+          >
+            {pending ? 'Saving…' : initial ? 'Save changes' : 'Create item'}
+          </button>
+        </div>
+      </div>
+
     <div className="grid items-start gap-6 xl:grid-cols-[1fr_360px]">
-      <div className="space-y-5">
-        <Card title="Basics">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <Card title={<>Basics</>} num="№ 01">
           <Row label="Name">
             <input
               type="text"
               value={form.name}
               onChange={(e) => patch({ name: e.target.value })}
               placeholder="e.g. Sunday jollof"
-              className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[15px] text-walnut outline-none focus:border-walnut placeholder:italic placeholder:text-ink-muted"
+              className="form-field__input"
             />
           </Row>
           <Row label="Category">
             <select
               value={form.categoryId}
               onChange={(e) => patch({ categoryId: e.target.value })}
-              className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut"
+              className="form-field__input"
             >
               <option value="">— Select —</option>
               {categories.map((c) => (
@@ -115,7 +138,7 @@ export default function MenuItemForm({ categories, initial }: Props) {
               value={form.description}
               onChange={(e) => patch({ description: e.target.value })}
               placeholder="Smoky party rice with crispy bottom"
-              className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut placeholder:italic placeholder:text-ink-muted"
+              className="form-field__input"
             />
           </Row>
           <Row label="Long description (item page)">
@@ -124,7 +147,7 @@ export default function MenuItemForm({ categories, initial }: Props) {
               value={form.longDescription ?? ''}
               onChange={(e) => patch({ longDescription: e.target.value })}
               placeholder="The full story — what's in it, how it's cooked, what makes it special."
-              className="w-full resize-none rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] leading-[1.5] text-walnut outline-none focus:border-walnut placeholder:italic placeholder:text-ink-muted"
+              className="form-field__textarea"
             />
           </Row>
           <Row label="Image path (Supabase storage key)">
@@ -133,7 +156,8 @@ export default function MenuItemForm({ categories, initial }: Props) {
               value={form.imagePath ?? ''}
               onChange={(e) => patch({ imagePath: e.target.value || null })}
               placeholder="menu/jollof.jpg"
-              className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-mono text-[13px] text-walnut outline-none focus:border-walnut placeholder:italic placeholder:text-ink-muted"
+              className="form-field__input"
+              style={{ fontFamily: 'var(--font-mono)' }}
             />
             <p className="mt-1 font-mono text-[10px] italic text-ink-muted">
               Upload via the Supabase dashboard → menu-images bucket. Paste the path here (no leading slash).
@@ -141,15 +165,15 @@ export default function MenuItemForm({ categories, initial }: Props) {
           </Row>
         </Card>
 
-        <Card title="Variants" subtitle="Choice groups like Size or Spice. Each option adds (or subtracts) from the base price.">
+        <Card title={<>Variants</>} num="№ 02" subtitle="Choice groups like Size or Spice. Each option adds (or subtracts) from the base price.">
           <VariantsEditor variants={form.variants} onChange={(v) => patch({ variants: v })} />
         </Card>
 
-        <Card title="Add-ons" subtitle="Optional extras the customer can tick. Each adds to the price.">
+        <Card title={<>Add-ons</>} num="№ 03" subtitle="Optional extras the customer can tick. Each adds to the price.">
           <AddonsEditor addons={form.addons} onChange={(a) => patch({ addons: a })} />
         </Card>
 
-        <Card title="Tags & badges">
+        <Card title={<>Tags &amp; badges</>} num="№ 04">
           <Row label="Dietary">
             <TagPicker
               options={DIETARY}
@@ -170,14 +194,14 @@ export default function MenuItemForm({ categories, initial }: Props) {
               value={form.badges.join(', ')}
               onChange={(e) => patch({ badges: e.target.value.split(',').map((s) => s.trim()).filter(Boolean) })}
               placeholder="House favourite, Chef's pick"
-              className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut placeholder:italic placeholder:text-ink-muted"
+              className="form-field__input"
             />
           </Row>
         </Card>
       </div>
 
-      <aside className="space-y-4 xl:sticky xl:top-[120px]">
-        <Card title="Publishing">
+      <aside style={{ display: 'flex', flexDirection: 'column', gap: 16, position: 'sticky', top: 120, alignSelf: 'start' }}>
+        <Card title={<>Publishing</>} num="№ 05">
           <Row label="Base price (£)">
             <input
               type="number"
@@ -185,7 +209,7 @@ export default function MenuItemForm({ categories, initial }: Props) {
               min="0"
               value={form.priceGbp}
               onChange={(e) => patch({ priceGbp: Number(e.target.value) })}
-              className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[15px] text-walnut outline-none focus:border-walnut"
+              className="form-field__input"
             />
           </Row>
           <Row label="Display order">
@@ -193,23 +217,24 @@ export default function MenuItemForm({ categories, initial }: Props) {
               type="number"
               value={form.displayOrder}
               onChange={(e) => patch({ displayOrder: Number(e.target.value) })}
-              className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut"
+              className="form-field__input"
             />
           </Row>
 
-          <div className="flex flex-col gap-2 rounded-[2px] border border-rule bg-cream-soft p-3 font-serif text-[13px] italic text-ink-muted">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 4 }}>
             <Check label="Available today" value={form.isAvailableToday} onChange={(v) => patch({ isAvailableToday: v })} />
             <Check label="Cash on delivery eligible" value={form.isCodEligible} onChange={(v) => patch({ isCodEligible: v })} />
             <Check label="Featured on homepage" value={form.isFeatured} onChange={(v) => patch({ isFeatured: v })} />
             <Check label="Hidden (not shown publicly)" value={form.isHidden} onChange={(v) => patch({ isHidden: v })} />
           </div>
 
-          <div className="mt-3 flex flex-col gap-2">
+          <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 8 }}>
             <button
               type="button"
               onClick={handleSave}
               disabled={pending}
-              className="rounded-[2px] bg-walnut px-4 py-2.5 font-serif text-[12.5px] font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] hover:bg-bronze-deep disabled:opacity-60"
+              className="receipt-btn receipt-btn--primary"
+              style={{ cursor: pending ? 'wait' : 'pointer' }}
             >
               {pending ? 'Saving…' : initial ? 'Save changes' : 'Create item'}
             </button>
@@ -218,7 +243,8 @@ export default function MenuItemForm({ categories, initial }: Props) {
                 type="button"
                 onClick={handleArchive}
                 disabled={pending}
-                className="rounded-[2px] border border-danger bg-transparent px-4 py-2.5 font-serif text-[12.5px] font-semibold uppercase tracking-[0.16em] text-danger [font-variant:small-caps] hover:bg-danger hover:text-cream disabled:opacity-60"
+                className="admin-danger__btn"
+                style={{ cursor: pending ? 'wait' : 'pointer' }}
               >
                 Archive item
               </button>
@@ -227,25 +253,43 @@ export default function MenuItemForm({ categories, initial }: Props) {
         </Card>
       </aside>
     </div>
+    </>
   );
 }
 
-function Card({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
+function Card({
+  title,
+  subtitle,
+  num,
+  children,
+}: {
+  title: React.ReactNode;
+  subtitle?: string;
+  num?: string;
+  children: React.ReactNode;
+}) {
   return (
-    <section className="rounded-[2px] border border-rule bg-cream p-5">
-      <h2 className="m-0 mb-1 font-serif text-[18px] font-medium text-walnut">{title}</h2>
-      {subtitle && <p className="m-0 mb-4 font-serif text-[13px] italic text-ink-muted">{subtitle}</p>}
-      <div className="flex flex-col gap-3">{children}</div>
+    <section className="form-section">
+      <header className="form-section__head">
+        <h2 className="form-section__title">{title}</h2>
+        {num && <span className="form-section__num">{num}</span>}
+      </header>
+      {subtitle && (
+        <p className="t-body-muted" style={{ margin: '0 0 16px' }}>
+          {subtitle}
+        </p>
+      )}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>{children}</div>
     </section>
   );
 }
 
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
+function Row({ label, children }: { label: React.ReactNode; children: React.ReactNode }) {
   return (
-    <label className="flex flex-col gap-1 font-serif text-[11.5px] font-medium tracking-[0.08em] text-walnut [font-variant:small-caps]">
-      {label}
+    <div className="form-field">
+      <label className="form-field__label">{label}</label>
       {children}
-    </label>
+    </div>
   );
 }
 

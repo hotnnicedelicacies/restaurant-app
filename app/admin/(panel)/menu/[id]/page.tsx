@@ -20,16 +20,10 @@ export default async function EditMenuItemPage({ params }: { params: Promise<{ i
   if (!item) notFound();
 
   return (
-    <div>
-      <header className="mb-6 border-b border-rule pb-4">
-        <Link href="/admin/menu" className="mb-2 inline-block font-mono text-[10px] uppercase tracking-[0.2em] text-bronze-deep hover:text-walnut">
-          ← All menu items
-        </Link>
-        <h1 className="m-0 font-serif text-[clamp(24px,3vw,30px)] font-medium leading-[1.04] text-walnut">
-          Edit · <em className="italic font-normal text-bronze-deep">{item.name}</em>
-        </h1>
-      </header>
-
+    <>
+      <Link href="/admin/menu" className="admin-detail__back">
+        ← All menu items
+      </Link>
       <MenuItemForm
         categories={(categories ?? []).map((c) => ({ id: c.id, name: c.name }))}
         initial={{
@@ -52,6 +46,6 @@ export default async function EditMenuItemPage({ params }: { params: Promise<{ i
           displayOrder: item.display_order,
         }}
       />
-    </div>
+    </>
   );
 }

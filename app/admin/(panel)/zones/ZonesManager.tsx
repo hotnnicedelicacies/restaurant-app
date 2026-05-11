@@ -60,76 +60,180 @@ export default function ZonesManager({ zones }: { zones: Zone[] }) {
     if (!confirm('Archive this zone? It will no longer be selectable at checkout.')) return;
     start(async () => {
       const res = await archiveZone(id);
-      if (!res.ok) toast.error(res.error);
-      else {
-        toast.success('Zone archived.');
-        router.refresh();
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
       }
+      toast.success('Zone archived.');
+      router.refresh();
     });
   }
 
+  function toggleZoneField(zone: Zone, field: 'allowsCod' | 'isActive') {
+    start(async () => {
+      const res = await upsertZone({ ...zone, [field]: !zone[field] });
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      router.refresh();
+    });
+  }
+
+  const activeCount = zones.filter((z) => z.isActive).length;
+
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-[1fr_400px]">
-      <div className="overflow-hidden rounded-[2px] border border-rule bg-cream">
-        <table className="w-full border-collapse">
-          <thead className="bg-cream-soft">
-            <tr className="text-left font-mono text-[10px] uppercase tracking-[0.18em] text-bronze-deep">
-              <th className="px-4 py-3 font-normal">Order</th>
-              <th className="px-4 py-3 font-normal">Name</th>
-              <th className="px-4 py-3 font-normal">Postcodes</th>
-              <th className="px-4 py-3 font-normal">Fee · Min</th>
-              <th className="px-4 py-3 font-normal">Prep</th>
-              <th className="px-4 py-3 font-normal">Flags</th>
-              <th className="px-4 py-3 text-right font-normal">Actions</th>
+    <>
+      <div className="admin-page-head">
+        <div className="admin-page-head__text">
+          <div className="admin-page-head__eyebrow">{activeCount} active zones · Teesside</div>
+          <h1 className="admin-page-head__title">Delivery <em>zones</em></h1>
+        </div>
+        <div className="admin-page-head__actions">
+          <button
+            type="button"
+            onClick={() => setEditing({ ...EMPTY })}
+            className="receipt-btn receipt-btn--primary"
+            style={{ cursor: 'pointer' }}
+          >
+            + Add zone
+          </button>
+        </div>
+      </div>
+
+      <div
+        style={{
+          padding: '16px 20px',
+          background: 'var(--color-cream)',
+          borderLeft: '3px solid var(--color-bronze)',
+          marginBottom: 24,
+          borderRadius: '0 2px 2px 0',
+        }}
+      >
+        <p className="t-body" style={{ margin: '0 0 4px' }}>
+          <b style={{ fontWeight: 500, fontVariant: 'small-caps', letterSpacing: '0.08em' }}>
+            How zones work.
+          </b>
+        </p>
+        <p className="t-body-muted" style={{ margin: 0 }}>
+          Each zone covers a list of postcode prefixes. At checkout we match the customer's postcode against an active zone and apply its fee. Postcodes outside any active zone trigger the "outside our delivery area — message us on WhatsApp" fallback.
+        </p>
+      </div>
+
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>Zone</th>
+              <th>Postcodes</th>
+              <th style={{ textAlign: 'right' }}>Fee</th>
+              <th style={{ textAlign: 'right' }}>Min order</th>
+              <th>Prep time</th>
+              <th style={{ textAlign: 'center' }}>COD ok</th>
+              <th style={{ textAlign: 'center' }}>Active</th>
+              <th></th>
             </tr>
           </thead>
-          <tbody className="font-serif text-[13.5px] text-walnut">
+          <tbody>
             {zones.length === 0 ? (
               <tr>
-                <td colSpan={7} className="px-4 py-8 text-center italic text-ink-muted">
-                  No zones yet. Add one on the right.
+                <td colSpan={8} style={{ textAlign: 'center', padding: '48px 16px' }}>
+                  <p className="t-body-muted">No zones yet. Add one to start taking orders.</p>
                 </td>
               </tr>
             ) : (
               zones.map((z) => (
-                <tr key={z.id} className="border-t border-rule align-top">
-                  <td className="px-3 py-3 font-mono text-[12px] text-ink-muted">{z.displayOrder}</td>
-                  <td className="px-3 py-3">
-                    <div className="font-medium">{z.name}</div>
-                    {!z.isActive && <div className="text-[11px] italic text-danger">Inactive</div>}
-                  </td>
-                  <td className="px-3 py-3 font-mono text-[12px] text-walnut">
-                    {z.postcodes.length === 0 ? <em className="text-ink-muted">none</em> : z.postcodes.join(', ')}
-                  </td>
-                  <td className="px-3 py-3 tabular-nums">
-                    {z.isQuoted ? <em className="text-ink-muted">Quoted</em> : formatGBP(z.baseFeeGbp)}
-                    <div className="text-[11.5px] italic text-ink-muted">Min · {formatGBP(z.minOrderGbp)}</div>
-                  </td>
-                  <td className="px-3 py-3 font-mono text-[12px] text-ink-muted">
-                    {z.prepTimeMin}–{z.prepTimeMax} min
-                  </td>
-                  <td className="px-3 py-3 text-[11.5px]">
-                    {z.allowsCod ? <span className="text-walnut">COD ok</span> : <span className="text-ink-muted">No COD</span>}
-                    {z.isQuoted && <div className="text-bronze-deep">Quoted</div>}
-                  </td>
-                  <td className="px-3 py-3 text-right">
-                    <div className="inline-flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setEditing(z)}
-                        className="rounded-[2px] border border-walnut bg-transparent px-3 py-1 font-serif text-[11px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] hover:bg-walnut hover:text-cream"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleArchive(z.id)}
-                        disabled={pending}
-                        className="rounded-[2px] border border-danger bg-transparent px-3 py-1 font-serif text-[11px] font-semibold uppercase tracking-[0.16em] text-danger [font-variant:small-caps] hover:bg-danger hover:text-cream disabled:opacity-50"
-                      >
-                        Archive
-                      </button>
+                <tr key={z.id}>
+                  <td>
+                    <div className="admin-table__customer">
+                      <b>{z.name}</b>
+                      {z.isQuoted && <em>Variable-quoted</em>}
                     </div>
+                  </td>
+                  <td>
+                    <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap' }}>
+                      {z.postcodes.length === 0 ? (
+                        <em style={{ color: 'var(--color-ink-muted)', fontStyle: 'italic' }}>none</em>
+                      ) : (
+                        z.postcodes.map((pc) => (
+                          <span
+                            key={pc}
+                            style={{
+                              padding: '3px 9px',
+                              fontSize: 11,
+                              background: 'var(--color-cream)',
+                              border: '1px solid var(--color-rule)',
+                              borderRadius: 2,
+                              fontFamily: 'var(--font-mono)',
+                              letterSpacing: '0.04em',
+                              color: 'var(--color-walnut)',
+                            }}
+                          >
+                            {pc}
+                          </span>
+                        ))
+                      )}
+                    </div>
+                  </td>
+                  <td style={{ textAlign: 'right' }}>
+                    {z.isQuoted ? (
+                      <em style={{ color: 'var(--color-ink-muted)', fontStyle: 'italic' }}>Quoted</em>
+                    ) : (
+                      <b style={{ fontWeight: 600 }}>{formatGBP(z.baseFeeGbp)}</b>
+                    )}
+                  </td>
+                  <td style={{ textAlign: 'right', fontStyle: 'italic', color: 'var(--color-ink-muted)' }}>
+                    {formatGBP(z.minOrderGbp)}
+                  </td>
+                  <td>
+                    <span className="t-mono">
+                      {z.prepTimeMin}–{z.prepTimeMax} min
+                    </span>
+                  </td>
+                  <td style={{ textAlign: 'center' }}>
+                    <label className="switch" style={{ cursor: pending ? 'wait' : 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={z.allowsCod}
+                        disabled={pending}
+                        onChange={() => toggleZoneField(z, 'allowsCod')}
+                      />
+                      <span className="switch__track">
+                        <span className="switch__thumb" />
+                      </span>
+                    </label>
+                  </td>
+                  <td style={{ textAlign: 'center' }}>
+                    <label className="switch" style={{ cursor: pending ? 'wait' : 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={z.isActive}
+                        disabled={pending}
+                        onChange={() => toggleZoneField(z, 'isActive')}
+                      />
+                      <span className="switch__track">
+                        <span className="switch__thumb" />
+                      </span>
+                    </label>
+                  </td>
+                  <td className="admin-table__actions">
+                    <button
+                      type="button"
+                      onClick={() => setEditing(z)}
+                      className="admin-table__action"
+                      style={{ background: 'transparent', border: 0, cursor: 'pointer' }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleArchive(z.id)}
+                      disabled={pending}
+                      className="admin-table__action menu-admin-table__action--danger"
+                      style={{ background: 'transparent', border: 0, cursor: 'pointer' }}
+                    >
+                      Archive
+                    </button>
                   </td>
                 </tr>
               ))
@@ -138,33 +242,20 @@ export default function ZonesManager({ zones }: { zones: Zone[] }) {
         </table>
       </div>
 
-      <aside className="rounded-[2px] border border-rule bg-cream p-5">
-        <h2 className="mb-3 font-mono text-[10px] uppercase tracking-[0.24em] text-bronze-deep">
-          {editing?.id ? 'Edit zone' : editing ? 'New zone' : 'Zone editor'}
-        </h2>
-        {!editing ? (
-          <button
-            type="button"
-            onClick={() => setEditing({ ...EMPTY })}
-            className="w-full rounded-[2px] bg-walnut px-4 py-2.5 font-serif text-[12.5px] font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] hover:bg-bronze-deep"
-          >
-            New zone
-          </button>
-        ) : (
-          <ZoneForm
-            zone={editing}
-            pending={pending}
-            onChange={(patch) => setEditing({ ...editing, ...patch })}
-            onSave={handleSave}
-            onCancel={() => setEditing(null)}
-          />
-        )}
-      </aside>
-    </div>
+      {editing && (
+        <ZoneEditModal
+          zone={editing}
+          pending={pending}
+          onChange={(patch) => setEditing({ ...editing, ...patch })}
+          onSave={handleSave}
+          onCancel={() => setEditing(null)}
+        />
+      )}
+    </>
   );
 }
 
-function ZoneForm({
+function ZoneEditModal({
   zone,
   pending,
   onChange,
@@ -178,123 +269,172 @@ function ZoneForm({
   onCancel: () => void;
 }) {
   return (
-    <div className="flex flex-col gap-3">
-      <Field label="Name">
-        <input
-          type="text"
-          value={zone.name}
-          onChange={(e) => onChange({ name: e.target.value })}
-          placeholder="e.g. Middlesbrough core"
-          className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut placeholder:italic placeholder:text-ink-muted"
-        />
-      </Field>
+    <div
+      role="dialog"
+      aria-modal="true"
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(45, 31, 24, 0.55)',
+        display: 'grid',
+        placeItems: 'center',
+        zIndex: 100,
+        padding: 16,
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onCancel();
+      }}
+    >
+      <div className="form-section" style={{ width: '100%', maxWidth: 560 }}>
+        <header className="form-section__head">
+          <h2 className="form-section__title">
+            {zone.id ? <>Edit <em>zone</em></> : <>New <em>zone</em></>}
+          </h2>
+          <span className="form-section__num">{zone.id ? 'Edit' : 'New'}</span>
+        </header>
 
-      <Field label="Postcode prefixes (comma-separated)">
-        <input
-          type="text"
-          value={zone.postcodes.join(', ')}
-          onChange={(e) => onChange({ postcodes: e.target.value.split(',').map((s) => s.trim()).filter(Boolean) })}
-          placeholder="TS1, TS2, TS3"
-          className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut placeholder:italic placeholder:text-ink-muted"
-        />
-      </Field>
+        <div className="form-grid">
+          <label className="form-field full">
+            <span className="form-field__label">Zone name</span>
+            <input
+              type="text"
+              className="form-field__input"
+              value={zone.name}
+              onChange={(e) => onChange({ name: e.target.value })}
+              placeholder="e.g. Middlesbrough Central"
+            />
+          </label>
+          <label className="form-field full">
+            <span className="form-field__label">Postcode prefixes <small>· comma-separated</small></span>
+            <input
+              type="text"
+              className="form-field__input"
+              value={zone.postcodes.join(', ')}
+              onChange={(e) =>
+                onChange({
+                  postcodes: e.target.value.split(',').map((s) => s.trim().toUpperCase()).filter(Boolean),
+                })
+              }
+              placeholder="TS1, TS2, TS3"
+              style={{ fontFamily: 'var(--font-mono)', fontStyle: 'normal' }}
+            />
+          </label>
+          <label className="form-field">
+            <span className="form-field__label">Base fee (£)</span>
+            <input
+              type="number"
+              step="0.5"
+              min="0"
+              className="form-field__input"
+              value={zone.baseFeeGbp}
+              onChange={(e) => onChange({ baseFeeGbp: Number(e.target.value) })}
+              disabled={zone.isQuoted}
+            />
+          </label>
+          <label className="form-field">
+            <span className="form-field__label">Min order (£)</span>
+            <input
+              type="number"
+              step="1"
+              min="0"
+              className="form-field__input"
+              value={zone.minOrderGbp}
+              onChange={(e) => onChange({ minOrderGbp: Number(e.target.value) })}
+            />
+          </label>
+          <label className="form-field">
+            <span className="form-field__label">Prep min (mins)</span>
+            <input
+              type="number"
+              className="form-field__input"
+              value={zone.prepTimeMin}
+              onChange={(e) => onChange({ prepTimeMin: Number(e.target.value) })}
+            />
+          </label>
+          <label className="form-field">
+            <span className="form-field__label">Prep max (mins)</span>
+            <input
+              type="number"
+              className="form-field__input"
+              value={zone.prepTimeMax}
+              onChange={(e) => onChange({ prepTimeMax: Number(e.target.value) })}
+            />
+          </label>
+          <label className="form-field full">
+            <span className="form-field__label">Display order</span>
+            <input
+              type="number"
+              className="form-field__input"
+              value={zone.displayOrder}
+              onChange={(e) => onChange({ displayOrder: Number(e.target.value) })}
+            />
+          </label>
+        </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <Field label="Base fee (£)">
-          <input
-            type="number"
-            step="0.5"
-            min="0"
-            value={zone.baseFeeGbp}
-            onChange={(e) => onChange({ baseFeeGbp: Number(e.target.value) })}
-            disabled={zone.isQuoted}
-            className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut disabled:opacity-50"
-          />
-        </Field>
-        <Field label="Min order (£)">
-          <input
-            type="number"
-            step="1"
-            min="0"
-            value={zone.minOrderGbp}
-            onChange={(e) => onChange({ minOrderGbp: Number(e.target.value) })}
-            className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut"
-          />
-        </Field>
-      </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
+          <FlagToggle label="Active (shown at checkout)" checked={zone.isActive} onChange={(v) => onChange({ isActive: v })} />
+          <FlagToggle label="Allows cash on delivery" checked={zone.allowsCod} onChange={(v) => onChange({ allowsCod: v })} />
+          <FlagToggle label="Variable-quoted (no auto fee)" checked={zone.isQuoted} onChange={(v) => onChange({ isQuoted: v })} />
+        </div>
 
-      <div className="grid grid-cols-2 gap-3">
-        <Field label="Prep min (mins)">
-          <input
-            type="number"
-            min="0"
-            value={zone.prepTimeMin}
-            onChange={(e) => onChange({ prepTimeMin: Number(e.target.value) })}
-            className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut"
-          />
-        </Field>
-        <Field label="Prep max (mins)">
-          <input
-            type="number"
-            min="0"
-            value={zone.prepTimeMax}
-            onChange={(e) => onChange({ prepTimeMax: Number(e.target.value) })}
-            className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut"
-          />
-        </Field>
-      </div>
-
-      <Field label="Display order">
-        <input
-          type="number"
-          value={zone.displayOrder}
-          onChange={(e) => onChange({ displayOrder: Number(e.target.value) })}
-          className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut"
-        />
-      </Field>
-
-      <div className="flex flex-col gap-2 rounded-[2px] border border-rule bg-cream-soft p-3 font-serif text-[13px] italic text-ink-muted">
-        <label className="flex cursor-pointer items-center gap-2">
-          <input type="checkbox" checked={zone.isActive} onChange={(e) => onChange({ isActive: e.target.checked })} className="h-[16px] w-[16px] accent-walnut" />
-          Active (shown at checkout)
-        </label>
-        <label className="flex cursor-pointer items-center gap-2">
-          <input type="checkbox" checked={zone.allowsCod} onChange={(e) => onChange({ allowsCod: e.target.checked })} className="h-[16px] w-[16px] accent-walnut" />
-          Allows cash on delivery
-        </label>
-        <label className="flex cursor-pointer items-center gap-2">
-          <input type="checkbox" checked={zone.isQuoted} onChange={(e) => onChange({ isQuoted: e.target.checked })} className="h-[16px] w-[16px] accent-walnut" />
-          Variable-quoted (no auto fee; admin contacts customer)
-        </label>
-      </div>
-
-      <div className="mt-1 flex gap-2">
-        <button
-          type="button"
-          onClick={onSave}
-          disabled={pending}
-          className="flex-1 rounded-[2px] bg-walnut px-4 py-2.5 font-serif text-[12.5px] font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] hover:bg-bronze-deep disabled:opacity-50"
-        >
-          {pending ? 'Saving…' : 'Save zone'}
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          disabled={pending}
-          className="rounded-[2px] border border-walnut bg-transparent px-4 py-2.5 font-serif text-[12.5px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] hover:bg-walnut hover:text-cream"
-        >
-          Cancel
-        </button>
+        <div style={{ display: 'flex', gap: 10, marginTop: 18, justifyContent: 'flex-end' }}>
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={pending}
+            className="receipt-btn"
+            style={{ cursor: pending ? 'wait' : 'pointer' }}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onSave}
+            disabled={pending}
+            className="receipt-btn receipt-btn--primary"
+            style={{ cursor: pending ? 'wait' : 'pointer' }}
+          >
+            {pending ? 'Saving…' : zone.id ? 'Save zone' : 'Create zone'}
+          </button>
+        </div>
       </div>
     </div>
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function FlagToggle({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
   return (
-    <label className="flex flex-col gap-1 font-serif text-[12px] font-medium tracking-[0.06em] text-walnut [font-variant:small-caps]">
-      {label}
-      {children}
+    <label
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        gap: 12,
+        padding: '10px 14px',
+        border: '1px solid var(--color-rule)',
+        borderRadius: 2,
+        background: 'var(--color-cream-soft)',
+        cursor: 'pointer',
+        fontFamily: 'var(--font-serif)',
+        fontSize: 14,
+        color: 'var(--color-walnut)',
+      }}
+    >
+      <span>{label}</span>
+      <span className="switch">
+        <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+        <span className="switch__track">
+          <span className="switch__thumb" />
+        </span>
+      </span>
     </label>
   );
 }

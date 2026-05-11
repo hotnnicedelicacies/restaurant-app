@@ -43,8 +43,7 @@ export default function SettingsForm({ initial }: { initial: SettingsBlob }) {
 
   function handleSave() {
     start(async () => {
-      const entries = Object.entries(form);
-      for (const [key, value] of entries) {
+      for (const [key, value] of Object.entries(form)) {
         const res = await updateSetting(key, value);
         if (!res.ok) {
           toast.error(`Failed to save ${key}: ${res.error}`);
@@ -56,179 +55,294 @@ export default function SettingsForm({ initial }: { initial: SettingsBlob }) {
     });
   }
 
+  const hours: HoursBlob = form.hours ?? {
+    days: [],
+    open: '12:00',
+    close: '20:00',
+    sameDayCutoff: '10:00',
+  };
+  const openSet = new Set<WeekDay>(hours.days);
+
+  function setDayOpen(day: WeekDay, isOpen: boolean) {
+    const next = new Set(openSet);
+    if (isOpen) next.add(day);
+    else next.delete(day);
+    patch({ hours: { ...hours, days: ALL_DAYS.filter((d) => next.has(d)) } });
+  }
+
   return (
-    <div className="grid items-start gap-6 lg:grid-cols-2">
-      <Card title="Service" subtitle="Pause the kitchen, toggle payment methods.">
-        <Toggle
-          label="Store is open"
-          description="When off, the menu is read-only and checkout is blocked."
-          checked={form.store_open ?? true}
-          onChange={(v) => patch({ store_open: v })}
-        />
-        <Toggle
-          label="Cash on delivery"
-          description="Customers can choose to pay the driver in cash."
-          checked={form.cod_enabled ?? true}
-          onChange={(v) => patch({ cod_enabled: v })}
-        />
-        <Toggle
-          label="Pickup"
-          description="Customers can opt to collect from the kitchen (not yet wired)."
-          checked={form.pickup_enabled ?? false}
-          onChange={(v) => patch({ pickup_enabled: v })}
-        />
-
-        <Field label="Closed-store message">
-          <textarea
-            rows={3}
-            value={form.closed_message ?? ''}
-            onChange={(e) => patch({ closed_message: e.target.value })}
-            placeholder="Shown to customers when the store is closed."
-            className="w-full resize-none rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] italic text-walnut outline-none focus:border-walnut placeholder:italic placeholder:text-ink-muted"
-          />
-        </Field>
-      </Card>
-
-      <Card title="Contact" subtitle="What's shown on receipts, emails, the footer.">
-        <Field label="Phone">
-          <input
-            type="text"
-            value={form.contact_phone ?? ''}
-            onChange={(e) => patch({ contact_phone: e.target.value })}
-            className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut"
-          />
-        </Field>
-        <Field label="Email">
-          <input
-            type="email"
-            value={form.contact_email ?? ''}
-            onChange={(e) => patch({ contact_email: e.target.value })}
-            className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut"
-          />
-        </Field>
-      </Card>
-
-      <Card title="Hours" subtitle="Trading days, opening / closing, and same-day cutoff. These power the homepage band, footer, contact page, terms, and the FoodEstablishment JSON-LD.">
-        <div>
-          <p className="m-0 mb-2 font-serif text-[12px] tracking-[0.08em] text-walnut [font-variant:small-caps]">Open days</p>
-          <div className="flex flex-wrap gap-2">
-            {ALL_DAYS.map((d) => {
-              const isOn = (form.hours?.days ?? []).includes(d);
-              return (
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => {
-                    const current = new Set(form.hours?.days ?? []);
-                    if (isOn) current.delete(d); else current.add(d);
-                    const next: WeekDay[] = ALL_DAYS.filter((x) => current.has(x));
-                    patch({ hours: { ...(form.hours ?? { open: '12:00', close: '20:00', sameDayCutoff: '10:00', days: [] }), days: next } });
-                  }}
-                  className={`rounded-[2px] border px-3 py-1.5 font-serif text-[12.5px] tracking-[0.04em] transition-colors ${
-                    isOn ? 'border-walnut bg-walnut text-cream' : 'border-rule bg-cream-soft text-walnut hover:border-walnut'
-                  }`}
-                >
-                  {d}
-                </button>
-              );
-            })}
-          </div>
-          <p className="m-0 mt-2 font-serif text-[12px] italic text-ink-muted">
-            Pick the days the kitchen actually trades. Days you leave off show as "Closed" on the public pages.
-          </p>
+    <>
+      <div className="admin-page-head">
+        <div className="admin-page-head__text">
+          <div className="admin-page-head__eyebrow">Kitchen settings</div>
+          <h1 className="admin-page-head__title">
+            Site &amp; <em>kitchen</em>
+          </h1>
         </div>
-        <div className="grid grid-cols-3 gap-3">
-          <Field label="Opens">
-            <input
-              type="time"
-              value={form.hours?.open ?? '12:00'}
-              onChange={(e) => patch({ hours: { ...(form.hours ?? { days: [], close: '20:00', sameDayCutoff: '10:00' }) as HoursBlob, open: e.target.value } })}
-              className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut"
-            />
-          </Field>
-          <Field label="Closes">
-            <input
-              type="time"
-              value={form.hours?.close ?? '20:00'}
-              onChange={(e) => patch({ hours: { ...(form.hours ?? { days: [], open: '12:00', sameDayCutoff: '10:00' }) as HoursBlob, close: e.target.value } })}
-              className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut"
-            />
-          </Field>
-          <Field label="Same-day cutoff">
-            <input
-              type="time"
-              value={form.hours?.sameDayCutoff ?? '10:00'}
-              onChange={(e) => patch({ hours: { ...(form.hours ?? { days: [], open: '12:00', close: '20:00' }) as HoursBlob, sameDayCutoff: e.target.value } })}
-              className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut"
-            />
-          </Field>
+        <div className="admin-page-head__actions">
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={pending}
+            className="receipt-btn receipt-btn--primary"
+            style={{ cursor: pending ? 'wait' : 'pointer' }}
+          >
+            {pending ? 'Saving…' : 'Save changes'}
+          </button>
         </div>
-      </Card>
-
-      <Card title="Operations" subtitle="Defaults used when a zone doesn't override.">
-        <div className="grid grid-cols-2 gap-3">
-          <Field label="Default prep min (mins)">
-            <input
-              type="number"
-              value={form.default_prep_time_min ?? 60}
-              onChange={(e) => patch({ default_prep_time_min: Number(e.target.value) })}
-              className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut"
-            />
-          </Field>
-          <Field label="Default prep max (mins)">
-            <input
-              type="number"
-              value={form.default_prep_time_max ?? 90}
-              onChange={(e) => patch({ default_prep_time_max: Number(e.target.value) })}
-              className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut"
-            />
-          </Field>
-        </div>
-        <Field label="Global min order (£)">
-          <input
-            type="number"
-            step="1"
-            value={form.global_min_order_gbp ?? 10}
-            onChange={(e) => patch({ global_min_order_gbp: Number(e.target.value) })}
-            className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut"
-          />
-        </Field>
-      </Card>
-
-      <div className="lg:col-span-2">
-        <button
-          type="button"
-          onClick={handleSave}
-          disabled={pending}
-          className="rounded-[2px] bg-walnut px-6 py-3 font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] hover:bg-bronze-deep disabled:opacity-60"
-        >
-          {pending ? 'Saving…' : 'Save settings'}
-        </button>
       </div>
-    </div>
+
+      <div className="settings-layout">
+        <aside className="settings-sidebar">
+          <p className="settings-sidebar__title">Settings</p>
+          <a href="#hours" className="settings-sidebar__link is-active">
+            Hours &amp; cutoff
+          </a>
+          <a href="#contact" className="settings-sidebar__link">
+            Contact
+          </a>
+          <a href="#flags" className="settings-sidebar__link">
+            Operational toggles
+          </a>
+          <a href="#operations" className="settings-sidebar__link">
+            Operations
+          </a>
+        </aside>
+
+        <div className="settings-main">
+          {/* HOURS */}
+          <section id="hours" className="form-section">
+            <header className="form-section__head">
+              <h2 className="form-section__title">
+                Hours &amp; <em>cutoff</em>
+              </h2>
+              <span className="form-section__num">№ 01</span>
+            </header>
+            <p className="t-body-muted" style={{ margin: '0 0 18px' }}>
+              When the kitchen accepts orders, and the cutoff time for same-day delivery. Used everywhere across the customer site.
+            </p>
+
+            <div>
+              {ALL_DAYS.map((day) => {
+                const isOpen = openSet.has(day);
+                return (
+                  <div key={day} className={`day-row${isOpen ? '' : ' is-closed'}`}>
+                    <span className="day-row__name">{day}</span>
+                    <label className="switch" style={{ cursor: 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={isOpen}
+                        onChange={(e) => setDayOpen(day, e.target.checked)}
+                      />
+                      <span className="switch__track">
+                        <span className="switch__thumb" />
+                      </span>
+                    </label>
+                    {isOpen ? (
+                      <div className="day-row__times">
+                        <input
+                          type="time"
+                          className="day-row__time"
+                          value={hours.open}
+                          onChange={(e) => patch({ hours: { ...hours, open: e.target.value } })}
+                        />
+                        <span>to</span>
+                        <input
+                          type="time"
+                          className="day-row__time"
+                          value={hours.close}
+                          onChange={(e) => patch({ hours: { ...hours, close: e.target.value } })}
+                        />
+                      </div>
+                    ) : (
+                      <span className="day-row__closed-label">Closed</span>
+                    )}
+                    <span />
+                  </div>
+                );
+              })}
+            </div>
+
+            <div style={{ marginTop: 24, paddingTop: 20, borderTop: '1px solid var(--color-rule)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <div className="form-field">
+                <label className="form-field__label" htmlFor="cutoff">
+                  Same-day cutoff time
+                </label>
+                <input
+                  id="cutoff"
+                  className="form-field__input"
+                  type="time"
+                  value={hours.sameDayCutoff}
+                  onChange={(e) => patch({ hours: { ...hours, sameDayCutoff: e.target.value } })}
+                />
+                <span className="form-field__help">
+                  Orders after this time are delivered the next available day.
+                </span>
+              </div>
+              <div className="form-field">
+                <label className="form-field__label" htmlFor="prep">
+                  Default prep <small>· minutes</small>
+                </label>
+                <input
+                  id="prep"
+                  className="form-field__input"
+                  type="number"
+                  value={form.default_prep_time_min ?? 60}
+                  onChange={(e) => patch({ default_prep_time_min: Number(e.target.value) })}
+                  min={0}
+                  step={5}
+                />
+                <span className="form-field__help">
+                  Used at checkout when no zone-specific time is set.
+                </span>
+              </div>
+            </div>
+
+            <div className="form-field" style={{ marginTop: 16 }}>
+              <label className="form-field__label" htmlFor="closed-msg">
+                Closed-store message <small>· shown when the store is paused</small>
+              </label>
+              <textarea
+                id="closed-msg"
+                className="form-field__textarea"
+                placeholder="e.g., Closed for Easter — back Tue 22 April."
+                style={{ minHeight: 60 }}
+                value={form.closed_message ?? ''}
+                onChange={(e) => patch({ closed_message: e.target.value })}
+              />
+            </div>
+          </section>
+
+          {/* CONTACT */}
+          <section id="contact" className="form-section">
+            <header className="form-section__head">
+              <h2 className="form-section__title">
+                Contact <em>details</em>
+              </h2>
+              <span className="form-section__num">№ 02</span>
+            </header>
+            <p className="t-body-muted" style={{ margin: '0 0 18px' }}>
+              Used in the header, footer, contact page, order emails, and receipts.
+            </p>
+
+            <div className="form-grid">
+              <div className="form-field">
+                <label className="form-field__label" htmlFor="phone">
+                  Phone
+                </label>
+                <input
+                  id="phone"
+                  className="form-field__input"
+                  type="tel"
+                  value={form.contact_phone ?? ''}
+                  onChange={(e) => patch({ contact_phone: e.target.value })}
+                />
+              </div>
+              <div className="form-field">
+                <label className="form-field__label" htmlFor="email">
+                  Public email
+                </label>
+                <input
+                  id="email"
+                  className="form-field__input"
+                  type="email"
+                  value={form.contact_email ?? ''}
+                  onChange={(e) => patch({ contact_email: e.target.value })}
+                />
+              </div>
+            </div>
+          </section>
+
+          {/* FLAGS */}
+          <section id="flags" className="form-section">
+            <header className="form-section__head">
+              <h2 className="form-section__title">
+                Operational <em>toggles</em>
+              </h2>
+              <span className="form-section__num">№ 03</span>
+            </header>
+            <p className="t-body-muted" style={{ margin: '0 0 18px' }}>
+              Quick switches to pause the kitchen, gate payment methods, etc.
+            </p>
+
+            <RowToggle
+              label="Store is open"
+              description="When off, the menu is read-only and checkout is blocked."
+              checked={form.store_open ?? true}
+              onChange={(v) => patch({ store_open: v })}
+            />
+            <RowToggle
+              label="Cash on delivery"
+              description="Customers can choose to pay the driver in cash."
+              checked={form.cod_enabled ?? true}
+              onChange={(v) => patch({ cod_enabled: v })}
+            />
+            <RowToggle
+              label="Pickup"
+              description="Customers can opt to collect from the kitchen (not yet wired)."
+              checked={form.pickup_enabled ?? false}
+              onChange={(v) => patch({ pickup_enabled: v })}
+            />
+          </section>
+
+          {/* OPERATIONS */}
+          <section id="operations" className="form-section">
+            <header className="form-section__head">
+              <h2 className="form-section__title">
+                Operational <em>defaults</em>
+              </h2>
+              <span className="form-section__num">№ 04</span>
+            </header>
+            <p className="t-body-muted" style={{ margin: '0 0 18px' }}>
+              Defaults used when a zone doesn&apos;t override.
+            </p>
+            <div className="form-grid">
+              <div className="form-field">
+                <label className="form-field__label" htmlFor="prep-max">
+                  Default prep max <small>· minutes</small>
+                </label>
+                <input
+                  id="prep-max"
+                  className="form-field__input"
+                  type="number"
+                  value={form.default_prep_time_max ?? 90}
+                  onChange={(e) => patch({ default_prep_time_max: Number(e.target.value) })}
+                />
+              </div>
+              <div className="form-field">
+                <label className="form-field__label" htmlFor="min-order">
+                  Global min order <small>· £</small>
+                </label>
+                <input
+                  id="min-order"
+                  className="form-field__input"
+                  type="number"
+                  step={1}
+                  value={form.global_min_order_gbp ?? 10}
+                  onChange={(e) => patch({ global_min_order_gbp: Number(e.target.value) })}
+                />
+              </div>
+            </div>
+          </section>
+
+          <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={pending}
+              className="receipt-btn receipt-btn--primary"
+              style={{ cursor: pending ? 'wait' : 'pointer' }}
+            >
+              {pending ? 'Saving…' : 'Save settings'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
-function Card({ title, subtitle, children }: { title: string; subtitle: string; children: React.ReactNode }) {
-  return (
-    <section className="rounded-[2px] border border-rule bg-cream p-5">
-      <h2 className="m-0 font-serif text-[18px] font-medium text-walnut">{title}</h2>
-      <p className="m-0 mb-4 font-serif text-[13px] italic text-ink-muted">{subtitle}</p>
-      <div className="flex flex-col gap-4">{children}</div>
-    </section>
-  );
-}
-
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label className="flex flex-col gap-1 font-serif text-[11.5px] font-medium tracking-[0.08em] text-walnut [font-variant:small-caps]">
-      {label}
-      {children}
-    </label>
-  );
-}
-
-function Toggle({
+function RowToggle({
   label,
   description,
   checked,
@@ -240,17 +354,31 @@ function Toggle({
   onChange: (v: boolean) => void;
 }) {
   return (
-    <label className="flex cursor-pointer items-start gap-3 rounded-[2px] border border-rule bg-cream-soft p-3">
-      <input
-        type="checkbox"
-        checked={checked}
-        onChange={(e) => onChange(e.target.checked)}
-        className="mt-0.5 h-[18px] w-[18px] accent-walnut"
-      />
+    <label
+      style={{
+        display: 'flex',
+        gap: 16,
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '12px 0',
+        borderBottom: '1px solid var(--color-rule)',
+        cursor: 'pointer',
+      }}
+    >
       <div>
-        <div className="font-serif text-[14px] font-medium text-walnut">{label}</div>
-        <div className="font-serif text-[12.5px] italic text-ink-muted">{description}</div>
+        <div className="t-body" style={{ fontWeight: 500, margin: 0 }}>
+          {label}
+        </div>
+        <div className="t-body-muted" style={{ margin: 0 }}>
+          {description}
+        </div>
       </div>
+      <span className="switch">
+        <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+        <span className="switch__track">
+          <span className="switch__thumb" />
+        </span>
+      </span>
     </label>
   );
 }
