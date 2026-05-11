@@ -8,6 +8,7 @@ import { Menu, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { siteConfig } from '@/constants/siteConfig';
 import { cn } from '@/lib/utils';
+import HeaderCartLink from './HeaderCartLink';
 
 type Nav = { label: string; href: string };
 
@@ -77,22 +78,28 @@ export default function SiteHeader({
           })}
         </nav>
 
-        <Link
-          href={cta.href}
-          className="hidden rounded-[2px] bg-bronze px-[18px] py-[10px] font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] transition-colors hover:bg-cream hover:text-walnut md:inline-block"
-        >
-          {cta.label}
-        </Link>
+        <div className="hidden items-center gap-3 md:flex">
+          <HeaderCartLink tone="onDark" />
+          <Link
+            href={cta.href}
+            className="rounded-[2px] bg-bronze px-[18px] py-[10px] font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] transition-colors hover:bg-cream hover:text-walnut"
+          >
+            {cta.label}
+          </Link>
+        </div>
 
-        {/* Mobile burger */}
-        <button
-          className="inline-flex h-8 w-8 items-center justify-center text-cream md:hidden"
-          onClick={() => setMobileOpen((v) => !v)}
-          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={mobileOpen}
-        >
-          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        {/* Mobile: cart + burger */}
+        <div className="flex items-center gap-1 md:hidden">
+          <HeaderCartLink tone="onDark" />
+          <button
+            className="inline-flex h-8 w-8 items-center justify-center text-cream"
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
+          >
+            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile nav */}

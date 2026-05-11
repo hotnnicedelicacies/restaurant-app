@@ -77,7 +77,12 @@ export const useCart = create<CartState>()(
     {
       name: 'hnn_cart',
       storage: createJSONStorage(() => localStorage),
-      version: 1,
+      // v2: bumped after the menu data source moved from legacy slugs to
+      // Supabase UUIDs. Older persisted carts stored slugs in `menuItemId`,
+      // which broke checkout once the DB went live. Returning undefined
+      // here wipes the stored state so the cart starts empty.
+      version: 2,
+      migrate: () => undefined,
     }
   )
 );
