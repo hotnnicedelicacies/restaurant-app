@@ -1,5 +1,14 @@
 import { getServiceClient } from '@/lib/supabase/server';
 import SettingsForm from './SettingsForm';
+import { siteConfig } from '@/constants/siteConfig';
+import type { WeekDay } from '@/lib/data/hours';
+
+interface HoursBlob {
+  days: WeekDay[];
+  open: string;
+  close: string;
+  sameDayCutoff: string;
+}
 
 interface SettingsBlob {
   store_open?: boolean;
@@ -11,6 +20,7 @@ interface SettingsBlob {
   default_prep_time_min?: number;
   default_prep_time_max?: number;
   global_min_order_gbp?: number;
+  hours?: HoursBlob;
 }
 
 export default async function AdminSettingsPage() {
@@ -28,6 +38,12 @@ export default async function AdminSettingsPage() {
     default_prep_time_min: (map.get('default_prep_time_min') as number | undefined) ?? 60,
     default_prep_time_max: (map.get('default_prep_time_max') as number | undefined) ?? 90,
     global_min_order_gbp: (map.get('global_min_order_gbp') as number | undefined) ?? 10,
+    hours: (map.get('hours') as HoursBlob | undefined) ?? {
+      days: [...siteConfig.hours.days] as WeekDay[],
+      open: siteConfig.hours.open,
+      close: siteConfig.hours.close,
+      sameDayCutoff: siteConfig.hours.sameDayCutoff,
+    },
   };
 
   return (

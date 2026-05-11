@@ -8,6 +8,7 @@ import CtaBand from '@/components/home/CtaBand';
 import SectionHead from '@/components/ui/SectionHead';
 import { siteConfig } from '@/constants/siteConfig';
 import { absoluteUrl, romanLower } from '@/lib/utils';
+import { getHours } from '@/lib/data/hours';
 import portraitImg from '@/assets/meals/jollof-rice-with-protein-of-choice-and-plantain.jpeg';
 
 export const metadata: Metadata = {
@@ -40,7 +41,8 @@ const PILLARS = [
   },
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const hours = await getHours();
   return (
     <>
       <SiteHeader />
@@ -119,9 +121,9 @@ export default function AboutPage() {
               </p>
               <p>
                 We've earned a five-star food hygiene rating from the Food Standards Agency, which we
-                are quietly proud of and very rigorous about. We deliver across Teesside, Tuesday
-                through Sunday, between twelve and eight. Order by ten in the morning and we'll have it
-                at your door before dinner cools.
+                are quietly proud of and very rigorous about. We deliver across Teesside,{' '}
+                {hours.daysLong.toLowerCase()}, {hours.timeLong}. {hours.cutoffShort.toLowerCase()},
+                and we'll have it at your door before dinner cools.
               </p>
               <p>That, more or less, is the whole story. The rest is in the pots.</p>
             </article>

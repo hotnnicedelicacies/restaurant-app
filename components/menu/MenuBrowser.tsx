@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Search } from 'lucide-react';
+import { Search, SlidersHorizontal, X } from 'lucide-react';
 import FareRow, { type FareRowItem } from './FareRow';
 import type { MenuCategoryView, MenuItemView } from '@/lib/data/menu';
 
@@ -30,6 +30,8 @@ export default function MenuBrowser({ categories, itemsByCategory }: Props) {
   const [query, setQuery] = useState('');
   const [activeTag, setActiveTag] = useState<string | null>(null);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  // Mobile: tags hidden behind a "Filters" toggle so they don't eat the viewport.
+  const [tagsOpen, setTagsOpen] = useState(false);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
   // Collect the unique tag universe so filters surface only what's actually
@@ -97,40 +99,80 @@ export default function MenuBrowser({ categories, itemsByCategory }: Props) {
 
   return (
     <>
-      {/* Toolbar */}
-      <div className="sticky top-[68px] z-40 border-b border-rule bg-cream">
-        <div className="container flex flex-wrap items-center gap-4 py-4">
-          <div className="relative min-w-0 flex-1 sm:max-w-md">
-            <Search
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted"
-              size={16}
-            />
-            <input
-              type="search"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search dishes — jollof, suya, lasagna…"
-              aria-label="Search menu"
-              className="w-full rounded-[2px] border border-rule bg-transparent py-[11px] pl-[38px] pr-3.5 font-serif text-[15px] text-walnut outline-none transition-colors focus:border-walnut placeholder:italic placeholder:text-ink-muted"
-            />
+      {/* Search + tags. Non-sticky on mobile so it scrolls away;
+          sticky on desktop where there's room. */}
+      <div className="border-b border-rule bg-cream md:sticky md:top-[68px] md:z-40">
+        <div className="container py-3 md:py-4">
+          {/* Row 1: search + filter toggle (mobile) */}
+          <div className="flex items-center gap-2">
+            <div className="relative min-w-0 flex-1">
+              <Search
+                className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-muted"
+                size={16}
+              />
+              <input
+                type="search"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search dishes…"
+                aria-label="Search menu"
+                className="w-full rounded-[2px] border border-rule bg-transparent py-2.5 pl-[38px] pr-3 font-serif text-[14.5px] text-walnut outline-none transition-colors focus:border-walnut placeholder:italic placeholder:text-ink-muted"
+              />
+            </div>
+
+            {availableTags.length > 0 && (
+              <button
+                type="button"
+                onClick={() => setTagsOpen((v) => !v)}
+                aria-expanded={tagsOpen}
+                aria-controls="menu-filters"
+                className={`relative inline-flex items-center gap-1.5 rounded-[2px] border px-3 py-2 font-mono text-[10px] uppercase tracking-[0.14em] transition-colors md:hidden ${
+                  activeTag || tagsOpen
+                    ? 'border-walnut bg-walnut text-cream'
+                    : 'border-rule bg-cream text-walnut hover:border-walnut'
+                }`}
+              >
+                {tagsOpen ? <X size={14} /> : <SlidersHorizontal size={14} />}
+                Filters
+                {activeTag && !tagsOpen && (
+                  <span className="ml-0.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-bronze px-1 font-mono text-[9px] font-semibold text-walnut">
+                    1
+                  </span>
+                )}
+              </button>
+            )}
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <Chip active={activeTag === null} onClick={() => setActiveTag(null)}>
-              All
-            </Chip>
-            {availableTags.map((t) => (
-              <Chip key={t} active={activeTag === t} onClick={() => setActiveTag(activeTag === t ? null : t)}>
-                {t}
+
+          {/* Row 2: tag chips. Hidden on mobile until expanded; always shown on desktop. */}
+          {availableTags.length > 0 && (
+            <div
+              id="menu-filters"
+              className={`${tagsOpen ? 'flex' : 'hidden'} mt-3 flex-wrap items-center gap-2 md:flex`}
+            >
+              <Chip active={activeTag === null} onClick={() => setActiveTag(null)}>
+                All
               </Chip>
-            ))}
-          </div>
+              {availableTags.map((t) => (
+                <Chip
+                  key={t}
+                  active={activeTag === t}
+                  onClick={() => setActiveTag(activeTag === t ? null : t)}
+                >
+                  {t}
+                </Chip>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Category jump nav */}
-      <nav aria-label="Jump to category" className="sticky top-[133px] z-30 border-b border-rule bg-cream">
+      {/* Category jump nav — single sticky strip on mobile (under header). */}
+      <nav
+        aria-label="Jump to category"
+        className="sticky top-[68px] z-30 border-b border-rule bg-cream md:top-[133px]"
+      >
         <div className="container">
-          <div className="flex gap-1 overflow-x-auto py-3.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div className="flex gap-1 overflow-x-auto py-2 md:py-3.5 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {categories.map((c) => {
               const count = (filteredByCat[c.slug] ?? []).length;
               if (count === 0) return null;
@@ -141,7 +183,7 @@ export default function MenuBrowser({ categories, itemsByCategory }: Props) {
                   type="button"
                   onClick={() => jumpToCategory(c.slug)}
                   aria-current={isActive ? 'true' : undefined}
-                  className={`whitespace-nowrap rounded-full px-3.5 py-1.5 font-serif text-[13px] font-medium tracking-[0.18em] [font-variant:small-caps] transition-colors ${
+                  className={`whitespace-nowrap rounded-full px-3 py-1.5 font-serif text-[12.5px] font-medium tracking-[0.16em] [font-variant:small-caps] transition-colors md:px-3.5 md:text-[13px] md:tracking-[0.18em] ${
                     isActive
                       ? 'bg-walnut text-cream'
                       : 'text-ink-muted hover:text-walnut'
@@ -186,7 +228,7 @@ export default function MenuBrowser({ categories, itemsByCategory }: Props) {
                 }}
                 id={cat.slug}
                 key={cat.slug}
-                className="mb-[clamp(48px,6vw,72px)] scroll-mt-[140px] last:mb-0"
+                className="mb-[clamp(48px,6vw,72px)] scroll-mt-[120px] last:mb-0 md:scroll-mt-[180px]"
               >
                 <header className="mb-6 flex items-baseline justify-between gap-4 border-b border-walnut pb-3.5">
                   <h2 className="m-0 font-serif text-[clamp(24px,3vw,32px)] font-medium tracking-[-0.005em] text-walnut">

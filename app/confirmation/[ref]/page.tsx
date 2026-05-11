@@ -7,6 +7,7 @@ import HeritageButton from '@/components/ui/HeritageButton';
 import { getOrderByRef } from '@/lib/data/orders';
 import { siteConfig } from '@/constants/siteConfig';
 import { formatGBP, formatLongDate, formatTime } from '@/lib/utils';
+import ClearCartOnMount from '@/components/checkout/ClearCartOnMount';
 
 export const metadata: Metadata = {
   title: 'Order confirmed',
@@ -37,6 +38,7 @@ export default async function ConfirmationPage({ params, searchParams }: Props) 
 
   return (
     <>
+      {!cardFailed && <ClearCartOnMount />}
       <SiteHeader />
       <main>
         <section className="py-[clamp(56px,8vw,96px)]">

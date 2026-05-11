@@ -12,11 +12,9 @@ import { toast } from 'sonner';
 export default function StripePaymentSection({
   orderRef,
   returnUrl,
-  onClearCart,
 }: {
   orderRef: string;
   returnUrl: string;
-  onClearCart: () => void;
 }) {
   const stripe = useStripe();
   const elements = useElements();
@@ -27,9 +25,10 @@ export default function StripePaymentSection({
     if (!stripe || !elements) return;
 
     setSubmitting(true);
-    // Clear the cart optimistically — even if the payment fails the customer
-    // can retry from the existing order via the same /checkout link.
-    onClearCart();
+    // NB: don't clear the cart here. If we do, the parent CheckoutForm
+    // sees an empty cart and unmounts these Elements before Stripe can
+    // 3DS / redirect, dropping the user onto an "empty basket" screen.
+    // The confirmation page clears the cart once payment lands.
     const { error } = await stripe.confirmPayment({
       elements,
       confirmParams: {

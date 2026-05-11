@@ -86,9 +86,9 @@ export default async function AccountPage() {
               <form action={signOutAction} className="mt-3 border-t border-rule pt-4">
                 <button
                   type="submit"
-                  className="px-3.5 font-serif text-[14px] italic text-ink-muted transition-colors hover:text-[#8B2A1A]"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-[2px] border border-walnut bg-transparent px-4 py-2.5 font-serif text-[12.5px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] transition-colors hover:border-danger hover:bg-danger hover:text-cream"
                 >
-                  Sign out
+                  Sign out →
                 </button>
               </form>
             </aside>

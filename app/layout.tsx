@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono, Cormorant_Garamond } from 'next/font/google';
 import { siteConfig } from '@/constants/siteConfig';
 import { absoluteUrl } from '@/lib/utils';
+import { getHours } from '@/lib/data/hours';
 import { Toaster } from 'sonner';
 import CookieBanner from '@/components/CookieBanner';
 import './globals.css';
@@ -114,7 +115,8 @@ export const metadata: Metadata = {
 };
 
 // --- JSON-LD: FoodEstablishment (rendered once site-wide) ---
-const restaurantSchema = {
+function buildRestaurantSchema(hours: { days: string[]; open: string; close: string }) {
+  return {
   '@context': 'https://schema.org',
   '@type': 'FoodEstablishment',
   '@id': absoluteUrl('#business'),
@@ -142,9 +144,9 @@ const restaurantSchema = {
   })),
   openingHoursSpecification: {
     '@type': 'OpeningHoursSpecification',
-    dayOfWeek: ['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-    opens: '12:00',
-    closes: '20:00',
+    dayOfWeek: hours.days,
+    opens: hours.open,
+    closes: hours.close,
   },
   aggregateRating: {
     '@type': 'AggregateRating',
@@ -155,11 +157,18 @@ const restaurantSchema = {
     description: `${siteConfig.foodHygiene.ratingLabel} · ${siteConfig.foodHygiene.authority}`,
   },
   sameAs: [siteConfig.social.instagram, siteConfig.social.facebook].filter(Boolean),
-};
+  };
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
+  const hours = await getHours();
+  const restaurantSchema = buildRestaurantSchema({
+    days: hours.days,
+    open: hours.open,
+    close: hours.close,
+  });
   return (
     <html
       lang="en-GB"

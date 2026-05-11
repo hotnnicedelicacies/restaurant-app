@@ -177,7 +177,9 @@ export default function CheckoutForm() {
   }
 
   // --- Empty cart guard ---
-  if (cartLines.length === 0) {
+  // Important: don't show the empty state once an order has been created
+  // and we're awaiting Stripe confirmation — the user is mid-payment.
+  if (cartLines.length === 0 && !clientSecret) {
     return (
       <div className="mx-auto max-w-[480px] py-[clamp(48px,8vw,96px)] text-center">
         <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-bronze-deep">
@@ -227,7 +229,7 @@ export default function CheckoutForm() {
               },
             }}
           >
-            <StripePaymentSection orderRef={orderRef} returnUrl={absoluteUrl(siteConfig.routes.confirmation(orderRef))} onClearCart={clearCart} />
+            <StripePaymentSection orderRef={orderRef} returnUrl={absoluteUrl(siteConfig.routes.confirmation(orderRef))} />
           </Elements>
         ) : (
           <form onSubmit={onSubmit} className="flex flex-col gap-5">

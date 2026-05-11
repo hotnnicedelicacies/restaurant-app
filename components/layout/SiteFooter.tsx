@@ -1,13 +1,15 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { siteConfig } from '@/constants/siteConfig';
+import { getHours } from '@/lib/data/hours';
 
 /**
  * Customer-facing footer. Walnut band, four columns on desktop, stacks on
  * mobile. Bottom row contains the four legal links per UK PECR/GDPR best
  * practice (always-visible, one click away).
  */
-export default function SiteFooter() {
+export default async function SiteFooter() {
+  const hours = await getHours();
   return (
     <footer className="border-t border-[rgba(241,229,205,0.22)] bg-walnut pt-14 pb-6 text-cream">
       <div className="container">
@@ -77,9 +79,9 @@ export default function SiteFooter() {
 
           {/* Hours */}
           <FooterColumn title="Hours">
-            <span>Tuesday – Sunday</span>
-            <span>12pm – 8pm</span>
-            <span>Order by 10am for same-day</span>
+            <span>{hours.daysLong}</span>
+            <span>{hours.timeLong}</span>
+            <span>{hours.cutoffShort}</span>
           </FooterColumn>
         </div>
 

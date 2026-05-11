@@ -5,6 +5,7 @@ import PageHero from '@/components/layout/PageHero';
 import CtaBand from '@/components/home/CtaBand';
 import MenuBrowser from '@/components/menu/MenuBrowser';
 import { getCategoriesWithItems } from '@/lib/data/menu';
+import { getHours } from '@/lib/data/hours';
 import { siteConfig } from '@/constants/siteConfig';
 import { absoluteUrl, formatGBP } from '@/lib/utils';
 
@@ -28,7 +29,10 @@ const DIETARY_SCHEMA_MAP: Record<string, string> = {
 };
 
 export default async function MenuPage() {
-  const { categories, itemsByCategory } = await getCategoriesWithItems();
+  const [{ categories, itemsByCategory }, hours] = await Promise.all([
+    getCategoriesWithItems(),
+    getHours(),
+  ]);
 
   // JSON-LD: Menu schema (helps Google show the menu in search)
   const menuSchema = {
@@ -65,9 +69,10 @@ export default async function MenuPage() {
       <SiteHeader />
       <main>
         <PageHero
-          eyebrow={`Vol. 01 · Today's Kitchen · ${siteConfig.hours.displayShort}`}
+          compact
+          eyebrow={`Today's Kitchen · ${hours.displayShort}`}
           title={<>Today's <em>Menu</em></>}
-          sub="Cooked this morning · Order by 10am for same-day delivery to Teesside."
+          sub={`Cooked this morning · ${hours.cutoffShort} to Teesside.`}
         />
 
         {categories.length === 0 ? (

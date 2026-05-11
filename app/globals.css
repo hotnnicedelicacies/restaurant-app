@@ -248,6 +248,10 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -0.00
   max-width: 580px;
   line-height: 1.5;
 }
+.page-hero--compact { padding: clamp(28px, 5vw, 56px) 0 clamp(20px, 3.5vw, 36px); }
+.page-hero--compact .page-hero__title { font-size: clamp(28px, 5vw, 44px); }
+.page-hero--compact .page-hero__sub { font-size: 15px; }
+.page-hero--compact .page-hero__eyebrow { margin-bottom: 10px; }
 
 /* ============================================================
    LEGAL CONTENT (privacy, terms, refund, cookies)

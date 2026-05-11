@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import LegalLayout from '@/components/legal/LegalLayout';
 import { siteConfig } from '@/constants/siteConfig';
 import { absoluteUrl } from '@/lib/utils';
+import { getHours } from '@/lib/data/hours';
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
@@ -10,7 +11,9 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const hours = await getHours();
+  const cutoffLabel = hours.cutoffShort.replace(/^Order by /i, '').replace(/ for same-day delivery$/i, '');
   return (
     <LegalLayout
       eyebrow="Legal · Terms"
@@ -74,7 +77,7 @@ export default function TermsPage() {
       <p>If a price is obviously wrong (e.g., a £25 lasagna listed at £2.50 by mistake), we may cancel the order and refund you — we'll let you know before the kitchen starts cooking.</p>
 
       <h2 id="delivery">5. <em>Delivery</em></h2>
-      <p>We deliver Tuesday – Sunday between 12pm and 8pm to postcodes within our zones (see <a href={siteConfig.routes.contact}>Contact</a> for current zones). Orders placed before 10am are eligible for same-day delivery; later orders go onto the next available day's list.</p>
+      <p>We deliver {hours.daysLong} between {hours.timeLong} to postcodes within our zones (see <a href={siteConfig.routes.contact}>Contact</a> for current zones). Orders placed before {cutoffLabel} are eligible for same-day delivery; later orders go onto the next available day&apos;s list.</p>
       <p>Delivery times shown at checkout are estimates. We do our best to hit them, but kitchen volume, weather, or traffic can cause delays. If we're going to be substantially late, we'll text or call.</p>
       <p>Risk in the food passes to you on delivery. Please refrigerate promptly if you're not eating immediately.</p>
 

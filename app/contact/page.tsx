@@ -6,10 +6,13 @@ import DeliveryAreas from '@/components/home/DeliveryAreas';
 import ContactForm from '@/components/contact/ContactForm';
 import { siteConfig } from '@/constants/siteConfig';
 import { absoluteUrl } from '@/lib/utils';
+import { getHours, type WeekDay } from '@/lib/data/hours';
+
+const ALL_DAYS: WeekDay[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 export const metadata: Metadata = {
   title: 'Contact',
-  description: `Get in touch with ${siteConfig.name}. WhatsApp, phone, email — kitchen hours Tue – Sun 12pm – 8pm.`,
+  description: `Get in touch with ${siteConfig.name}. WhatsApp, phone, email, and where we deliver across Teesside.`,
   alternates: { canonical: absoluteUrl(siteConfig.routes.contact) },
   openGraph: {
     title: `Contact ${siteConfig.name}`,
@@ -71,17 +74,15 @@ const CHANNELS: {
   },
 ];
 
-const HOURS = [
-  { day: 'Monday', value: 'Closed', closed: true },
-  { day: 'Tuesday', value: '12pm – 8pm' },
-  { day: 'Wednesday', value: '12pm – 8pm' },
-  { day: 'Thursday', value: '12pm – 8pm' },
-  { day: 'Friday', value: '12pm – 8pm' },
-  { day: 'Saturday', value: '12pm – 8pm' },
-  { day: 'Sunday', value: '12pm – 8pm' },
-];
+export default async function ContactPage() {
+  const hours = await getHours();
+  const openSet = new Set<string>(hours.days);
+  const HOURS = ALL_DAYS.map((day) => ({
+    day,
+    value: openSet.has(day) ? hours.timeLong : 'Closed',
+    closed: !openSet.has(day),
+  }));
 
-export default function ContactPage() {
   return (
     <>
       <script

@@ -5,6 +5,16 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { updateSetting } from '@/lib/admin/catalogActions';
 
+type WeekDay =
+  | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+
+interface HoursBlob {
+  days: WeekDay[];
+  open: string;
+  close: string;
+  sameDayCutoff: string;
+}
+
 interface SettingsBlob {
   store_open?: boolean;
   cod_enabled?: boolean;
@@ -15,7 +25,12 @@ interface SettingsBlob {
   default_prep_time_min?: number;
   default_prep_time_max?: number;
   global_min_order_gbp?: number;
+  hours?: HoursBlob;
 }
+
+const ALL_DAYS: WeekDay[] = [
+  'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday',
+];
 
 export default function SettingsForm({ initial }: { initial: SettingsBlob }) {
   const router = useRouter();
@@ -91,6 +106,63 @@ export default function SettingsForm({ initial }: { initial: SettingsBlob }) {
             className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut"
           />
         </Field>
+      </Card>
+
+      <Card title="Hours" subtitle="Trading days, opening / closing, and same-day cutoff. These power the homepage band, footer, contact page, terms, and the FoodEstablishment JSON-LD.">
+        <div>
+          <p className="m-0 mb-2 font-serif text-[12px] tracking-[0.08em] text-walnut [font-variant:small-caps]">Open days</p>
+          <div className="flex flex-wrap gap-2">
+            {ALL_DAYS.map((d) => {
+              const isOn = (form.hours?.days ?? []).includes(d);
+              return (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => {
+                    const current = new Set(form.hours?.days ?? []);
+                    if (isOn) current.delete(d); else current.add(d);
+                    const next: WeekDay[] = ALL_DAYS.filter((x) => current.has(x));
+                    patch({ hours: { ...(form.hours ?? { open: '12:00', close: '20:00', sameDayCutoff: '10:00', days: [] }), days: next } });
+                  }}
+                  className={`rounded-[2px] border px-3 py-1.5 font-serif text-[12.5px] tracking-[0.04em] transition-colors ${
+                    isOn ? 'border-walnut bg-walnut text-cream' : 'border-rule bg-cream-soft text-walnut hover:border-walnut'
+                  }`}
+                >
+                  {d}
+                </button>
+              );
+            })}
+          </div>
+          <p className="m-0 mt-2 font-serif text-[12px] italic text-ink-muted">
+            Pick the days the kitchen actually trades. Days you leave off show as "Closed" on the public pages.
+          </p>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          <Field label="Opens">
+            <input
+              type="time"
+              value={form.hours?.open ?? '12:00'}
+              onChange={(e) => patch({ hours: { ...(form.hours ?? { days: [], close: '20:00', sameDayCutoff: '10:00' }) as HoursBlob, open: e.target.value } })}
+              className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut"
+            />
+          </Field>
+          <Field label="Closes">
+            <input
+              type="time"
+              value={form.hours?.close ?? '20:00'}
+              onChange={(e) => patch({ hours: { ...(form.hours ?? { days: [], open: '12:00', sameDayCutoff: '10:00' }) as HoursBlob, close: e.target.value } })}
+              className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut"
+            />
+          </Field>
+          <Field label="Same-day cutoff">
+            <input
+              type="time"
+              value={form.hours?.sameDayCutoff ?? '10:00'}
+              onChange={(e) => patch({ hours: { ...(form.hours ?? { days: [], open: '12:00', close: '20:00' }) as HoursBlob, sameDayCutoff: e.target.value } })}
+              className="w-full rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut"
+            />
+          </Field>
+        </div>
       </Card>
 
       <Card title="Operations" subtitle="Defaults used when a zone doesn't override.">

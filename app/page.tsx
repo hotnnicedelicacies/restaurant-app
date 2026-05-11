@@ -11,6 +11,7 @@ import CtaBand from '@/components/home/CtaBand';
 import { siteConfig } from '@/constants/siteConfig';
 import { formatLongDate, absoluteUrl } from '@/lib/utils';
 import { getFeaturedItems, type MenuItemView } from '@/lib/data/menu';
+import { getHours } from '@/lib/data/hours';
 import { type FareRowItem } from '@/components/menu/FareRow';
 
 import heroImg from '@/assets/hero-food.png';
@@ -51,7 +52,7 @@ const websiteSchema = {
 };
 
 export default async function HomePage() {
-  const featuredRaw = await getFeaturedItems(6);
+  const [featuredRaw, hours] = await Promise.all([getFeaturedItems(6), getHours()]);
   const featured = featuredRaw.map(toFareRowItem);
   const today = formatLongDate(new Date());
 
@@ -69,7 +70,7 @@ export default async function HomePage() {
           image={heroImg}
           imageAlt="A spread of Hot N Nice home-cooked dishes including jollof rice, plantain lasagna, suya skewers and soups"
           eyebrow={siteConfig.voice.kitchenLocation}
-          meta={`№ 11 · ${today} · Tue – Sun`}
+          meta={`№ 11 · ${today} · ${hours.daysShort}`}
           headline={
             <>
               Italian &amp; West African,
@@ -115,7 +116,7 @@ export default async function HomePage() {
         <CtaBand
           eyebrow="Ready when you are"
           title={<>Tonight's dinner, <em>handled.</em></>}
-          sub="Place your order before ten and we'll have it at your door hot, between twelve and eight."
+          sub={`${hours.cutoffShort} — and we'll have it at your door hot, ${hours.timeLong}.`}
           cta={{ label: 'Place your order', href: siteConfig.routes.menu }}
         />
       </main>
