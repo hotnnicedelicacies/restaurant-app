@@ -19,9 +19,9 @@
 | (mid) Env rename + seed infrastructure | ✓ Shipped | `Rename Supabase env vars…` |
 | 3. Menu (list + detail) + cart (zustand + DB-with-legacy-fallback) | ✓ Shipped | `Phase 3: Menu (list + detail) + cart` |
 | 4. Checkout + Stripe + COD (core flow + confirmation page) | ✓ Shipped | `Phase 4: Checkout + Stripe + COD` |
-| 5. Track + Receipt + Email (Resend HTML — no PDF in v1) | ⏳ Next |  |
-| 6. Admin pages (orders, menu, categories, zones, payments, settings) | ⏳ |  |
-| 7. PWA manifest + final cutover | ⏳ |  |
+| 5. Track + Receipt + Email (Resend HTML — no PDF in v1) | ✓ Shipped | `Phase 5: Track + Receipt…` |
+| 6. Admin pages (orders, menu, categories, zones, payments, settings) | ✓ Shipped | `Phase 6a/6b/6c …` |
+| 7. PWA manifest + final cutover | ✓ Shipped | `Phase 7: PWA + cutover` |
 
 ## Key design decisions to honour
 
@@ -129,4 +129,38 @@ constants/meals.ts      — LEGACY data, used as fallback only. Phase 3+ DB quer
 - Decide whether `lib/orders/emailTemplates.ts` + `sendOrderEmails.ts` + `timeSlots.ts` are worth porting into Phase 5 or replacing entirely with new Resend templates.
 - Remove `constants/meals.ts` and the legacy-fallback branches in `lib/data/menu.ts` once the DB seed is verified in prod.
 - Generate a real `/og-image.jpg` — currently the metadata references it but it doesn't exist.
-- Add `apple-icon.png` + a real `manifest.webmanifest` (Phase 7).
+- Add `apple-icon.png`. `manifest.webmanifest` is wired (`app/manifest.ts`) but uses `/logo.png` for the 512px icon — replace with a purpose-built maskable PNG before launch.
+
+## Launch checklist (Phase 7 cutover)
+
+Pre-deploy:
+
+1. **Environment variables** on Vercel (production + preview):
+   - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`
+   - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
+   - `RESEND_API_KEY`, `ORDER_FROM_EMAIL`, `ORDER_NOTIFICATION_EMAIL`
+   - `NEXT_PUBLIC_SITE_URL` (set to live domain so sitemap + emails use absolute URLs)
+2. **Supabase**: ensure all 3 migrations are applied (`supabase/setup.sql` is the combined paste-once version). Confirm RLS is on. Verify `menu-images` storage bucket exists + is public.
+3. **Stripe webhook** at `https://hotnnicedelicacies.com/api/stripe/webhook` registered for: `payment_intent.succeeded`, `payment_intent.payment_failed`, `charge.refunded`, `charge.dispute.created`. Capture the signing secret into `STRIPE_WEBHOOK_SECRET`.
+4. **Resend domain** verified for `orders@hotnnicedelicacies.com` (DNS records: SPF, DKIM). Without this, emails go to spam or fail outright.
+5. **Admin user** seeded — `hotnnicedelicacies@gmail.com` is_admin=true (the seed `--create-admin` flag handles this).
+6. **OG image** — replace the placeholder reference at `/og-image.jpg` with a real 1200×630 image. Apple icon at `/apple-icon.png`.
+
+Smoke test on prod (after first deploy):
+
+- [ ] Home loads, menu loads, item detail loads
+- [ ] Add to cart → cart page → checkout → COD path → confirmation + email
+- [ ] Add to cart → checkout → card path with `4242 4242 4242 4242` → confirmation + email + webhook flips payment_status to paid
+- [ ] `/track/[ref]` shows order, kitchen note, cancel button works (issues real refund on test mode)
+- [ ] `/receipt/[ref]` prints clean
+- [ ] `/admin/sign-in` → log in → orders list → open detail → advance status → email lands
+- [ ] Admin: create category, create zone, create menu item (with variants + addons), publish, confirm it appears on public menu
+- [ ] Admin payments page reflects the test orders
+- [ ] PWA: open the site on iOS Safari / Android Chrome, "Add to home screen", launches in standalone
+
+Post-launch:
+
+- Switch Stripe to live mode (re-register webhook, swap keys, re-test).
+- Submit sitemap to Google Search Console (`hotnnicedelicacies.com/sitemap.xml`).
+- Set up a basic uptime check (Better Stack / Uptime Robot) on `/` and `/api/zones/check`.
+- Set up Resend webhooks / alerts so email failures don't go silent.
