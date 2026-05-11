@@ -99,164 +99,188 @@ export default function OrderPaymentControls(props: Props) {
     });
   }
 
+  const refunded = props.refundAmountGbp ?? 0;
+
   return (
-    <section className="rounded-[2px] border border-rule bg-cream p-5">
-      <h2 className="mb-3 font-mono text-[10px] uppercase tracking-[0.24em] text-bronze-deep">Payment</h2>
+    <>
+      {/* Payment */}
+      <div className="form-section" style={{ marginTop: 20 }}>
+        <header className="form-section__head">
+          <h2 className="form-section__title">Payment</h2>
+        </header>
+        <p className="t-body">
+          <span className={props.paymentMethod === 'card' ? 'pill pill--card' : 'pill pill--cod'} style={{ verticalAlign: 2 }}>
+            {props.paymentMethod === 'card' ? 'Card' : 'COD'}
+          </span>{' '}
+          <b style={{ fontWeight: 500 }}>
+            {props.paymentMethod === 'card'
+              ? props.cardBrand
+                ? `${props.cardBrand} ending ${props.cardLast4}`
+                : 'Card payment'
+              : 'Cash on delivery'}
+          </b>
+        </p>
+        <p className="t-body-muted" style={{ marginTop: 4 }}>
+          {props.paymentMethod === 'card'
+            ? `${props.paymentStatus === 'paid' ? 'Charged' : props.paymentStatus} ${formatGBP(props.totalGbp)}`
+            : props.codStatus === 'collected'
+              ? `Collected ${formatGBP(props.totalGbp)}`
+              : `Due on delivery · ${formatGBP(props.totalGbp)}`}
+          {refunded > 0 && (
+            <>
+              <br />
+              <em>Refunded: {formatGBP(refunded)}</em>
+            </>
+          )}
+        </p>
 
-      <p className="m-0 mb-1 font-serif text-[15px] font-medium text-walnut">
-        {props.paymentMethod === 'card'
-          ? props.cardBrand
-            ? `${props.cardBrand} ending ${props.cardLast4}`
-            : 'Card'
-          : 'Cash on delivery'}
-      </p>
-      <p className="m-0 font-serif text-[13.5px] italic text-ink-muted">
-        Total · <b className="not-italic font-medium text-walnut tabular-nums">{formatGBP(props.totalGbp)}</b>
-      </p>
-      <p className="m-0 mt-1 font-serif text-[12.5px] italic text-ink-muted">
-        Status ·{' '}
-        {props.paymentMethod === 'card'
-          ? props.paymentStatus
-          : props.codStatus === 'collected'
-            ? 'Collected'
-            : 'Uncollected'}
-        {props.refundAmountGbp && props.refundAmountGbp > 0 && (
-          <> · Refunded {formatGBP(props.refundAmountGbp)}</>
-        )}
-      </p>
-
-      <div className="mt-4 flex flex-col gap-2">
         {canMarkCollected && (
-          <button
-            type="button"
-            onClick={handleMarkCollected}
-            disabled={pending}
-            className="rounded-[2px] bg-walnut px-4 py-2.5 font-serif text-[12.5px] font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] hover:bg-bronze-deep disabled:opacity-60"
-          >
-            Mark cash collected
-          </button>
+          <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+            <span className="pill pill--uncollected">Cash not yet collected</span>
+            <button
+              type="button"
+              onClick={handleMarkCollected}
+              disabled={pending}
+              className="status-btn status-btn--primary"
+              style={{ flex: 1, cursor: pending ? 'wait' : 'pointer' }}
+            >
+              Mark cash as collected →
+            </button>
+          </div>
         )}
 
-        {canRefund && (
-          <AlertDialog open={refundOpen} onOpenChange={setRefundOpen}>
-            <AlertDialogTrigger asChild>
-              <button
-                type="button"
-                className="rounded-[2px] border border-walnut bg-transparent px-4 py-2.5 font-serif text-[12.5px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] hover:bg-walnut hover:text-cream"
-              >
-                Issue refund
-              </button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="rounded-[2px] border border-rule bg-cream">
-              <AlertDialogHeader>
-                <AlertDialogTitle className="font-serif text-walnut">Refund this order?</AlertDialogTitle>
-                <AlertDialogDescription className="font-serif text-[13.5px] italic text-ink-muted">
-                  Leave amount blank for a full refund. Reason is internal — it’s logged in the kitchen notes.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <div className="flex flex-col gap-3">
-                <label className="flex flex-col gap-1 font-serif text-[12.5px] tracking-[0.04em] text-walnut">
-                  Amount (£)
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0.01"
-                    placeholder={`Max ${formatGBP(props.totalGbp - (props.refundAmountGbp ?? 0))}`}
-                    value={refundAmount}
-                    onChange={(e) => setRefundAmount(e.target.value)}
-                    className="rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut"
-                  />
-                </label>
-                <label className="flex flex-col gap-1 font-serif text-[12.5px] tracking-[0.04em] text-walnut">
-                  Reason (internal)
-                  <input
-                    type="text"
-                    value={refundReason}
-                    onChange={(e) => setRefundReason(e.target.value)}
-                    placeholder="e.g. wrong item delivered"
-                    className="rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut placeholder:italic placeholder:text-ink-muted"
-                  />
-                </label>
-              </div>
-              <AlertDialogFooter>
-                <AlertDialogCancel
-                  disabled={pending}
-                  className="rounded-[2px] border border-walnut bg-transparent font-serif font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] hover:bg-walnut hover:text-cream"
-                >
-                  Back
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleRefund();
-                  }}
-                  disabled={pending}
-                  className="rounded-[2px] bg-danger font-serif font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] hover:bg-danger/90"
-                >
-                  {pending ? 'Refunding…' : 'Issue refund'}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
-
-        {canCancel && (
-          <AlertDialog open={cancelOpen} onOpenChange={setCancelOpen}>
-            <AlertDialogTrigger asChild>
-              <button
-                type="button"
-                className="rounded-[2px] border border-danger bg-transparent px-4 py-2.5 font-serif text-[12.5px] font-semibold uppercase tracking-[0.16em] text-danger [font-variant:small-caps] hover:bg-danger hover:text-cream"
-              >
-                Cancel order
-              </button>
-            </AlertDialogTrigger>
-            <AlertDialogContent className="rounded-[2px] border border-rule bg-cream">
-              <AlertDialogHeader>
-                <AlertDialogTitle className="font-serif text-walnut">Cancel this order?</AlertDialogTitle>
-                <AlertDialogDescription className="font-serif text-[13.5px] italic text-ink-muted">
-                  {props.paymentMethod === 'card' && props.paymentStatus === 'paid'
-                    ? 'A full refund will be issued and the customer will be emailed.'
-                    : 'The customer will be emailed.'}
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <label className="flex flex-col gap-1 font-serif text-[12.5px] tracking-[0.04em] text-walnut">
-                Reason (shared with customer)
-                <textarea
-                  rows={2}
-                  value={cancelReason}
-                  onChange={(e) => setCancelReason(e.target.value)}
-                  placeholder="e.g. ingredients ran out"
-                  className="rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut placeholder:italic placeholder:text-ink-muted"
-                />
-              </label>
-              <AlertDialogFooter>
-                <AlertDialogCancel
-                  disabled={pending}
-                  className="rounded-[2px] border border-walnut bg-transparent font-serif font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] hover:bg-walnut hover:text-cream"
-                >
-                  Keep order
-                </AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleCancel();
-                  }}
-                  disabled={pending}
-                  className="rounded-[2px] bg-danger font-serif font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] hover:bg-danger/90"
-                >
-                  {pending ? 'Cancelling…' : 'Yes, cancel'}
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        )}
-
-        {props.status === 'cancelled' && props.cancelledReason && (
-          <p className="m-0 mt-2 rounded-[2px] border border-danger/40 bg-danger/5 p-3 font-serif text-[12.5px] italic text-danger">
-            Cancelled · {props.cancelledReason}
-          </p>
+        {canRefund && !canMarkCollected && (
+          <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
+            <AlertDialog open={refundOpen} onOpenChange={setRefundOpen}>
+              <AlertDialogTrigger asChild>
+                <button type="button" className="receipt-btn" style={{ padding: '8px 14px', fontSize: 12, cursor: 'pointer' }}>
+                  Issue refund
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="rounded-[2px] border border-rule bg-cream">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="font-serif text-walnut">Refund this order?</AlertDialogTitle>
+                  <AlertDialogDescription className="font-serif text-[13.5px] italic text-ink-muted">
+                    Leave amount blank for a full refund. Reason is internal — it's logged in the kitchen notes.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <div className="flex flex-col gap-3">
+                  <label className="form-field">
+                    <span className="form-field__label">Amount (£)</span>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0.01"
+                      placeholder={`Max ${formatGBP(props.totalGbp - refunded)}`}
+                      value={refundAmount}
+                      onChange={(e) => setRefundAmount(e.target.value)}
+                      className="form-field__input"
+                    />
+                  </label>
+                  <label className="form-field">
+                    <span className="form-field__label">Reason (internal)</span>
+                    <input
+                      type="text"
+                      value={refundReason}
+                      onChange={(e) => setRefundReason(e.target.value)}
+                      placeholder="e.g. wrong item delivered"
+                      className="form-field__input"
+                    />
+                  </label>
+                </div>
+                <AlertDialogFooter>
+                  <AlertDialogCancel disabled={pending}>Back</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={(e) => {
+                      e.preventDefault();
+                      handleRefund();
+                    }}
+                    disabled={pending}
+                  >
+                    {pending ? 'Refunding…' : 'Issue refund'}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
         )}
       </div>
-    </section>
+
+      {/* Danger zone — cancel + refund */}
+      {(canRefund || canCancel) && (
+        <div className="admin-danger">
+          <h3 className="admin-danger__title">Cancel or refund</h3>
+          <p className="admin-danger__body">
+            Cancel halts cooking and refunds in full via Stripe. Partial refund lets you choose the amount (for missing items, late delivery, etc.). Both notify the customer.
+          </p>
+          <div className="admin-danger__actions">
+            {canRefund && (
+              <button
+                type="button"
+                onClick={() => setRefundOpen(true)}
+                disabled={pending}
+                className="admin-danger__btn"
+                style={{ cursor: pending ? 'wait' : 'pointer' }}
+              >
+                Issue partial refund
+              </button>
+            )}
+            {canCancel && (
+              <AlertDialog open={cancelOpen} onOpenChange={setCancelOpen}>
+                <AlertDialogTrigger asChild>
+                  <button
+                    type="button"
+                    disabled={pending}
+                    className="admin-danger__btn"
+                    style={{ cursor: pending ? 'wait' : 'pointer' }}
+                  >
+                    Cancel{props.paymentMethod === 'card' && props.paymentStatus === 'paid' ? ' & full refund' : ''}
+                  </button>
+                </AlertDialogTrigger>
+                <AlertDialogContent className="rounded-[2px] border border-rule bg-cream">
+                  <AlertDialogHeader>
+                    <AlertDialogTitle className="font-serif text-walnut">Cancel this order?</AlertDialogTitle>
+                    <AlertDialogDescription className="font-serif text-[13.5px] italic text-ink-muted">
+                      {props.paymentMethod === 'card' && props.paymentStatus === 'paid'
+                        ? 'A full refund will be issued and the customer will be emailed.'
+                        : 'The customer will be emailed.'}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <label className="form-field">
+                    <span className="form-field__label">Reason (shared with customer)</span>
+                    <textarea
+                      rows={2}
+                      value={cancelReason}
+                      onChange={(e) => setCancelReason(e.target.value)}
+                      placeholder="e.g. ingredients ran out"
+                      className="form-field__textarea"
+                    />
+                  </label>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel disabled={pending}>Keep order</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={(e) => {
+                        e.preventDefault();
+                        handleCancel();
+                      }}
+                      disabled={pending}
+                    >
+                      {pending ? 'Cancelling…' : 'Yes, cancel'}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+          </div>
+        </div>
+      )}
+
+      {props.status === 'cancelled' && props.cancelledReason && (
+        <div className="admin-danger" style={{ marginTop: 12 }}>
+          <h3 className="admin-danger__title">Cancelled</h3>
+          <p className="admin-danger__body">{props.cancelledReason}</p>
+        </div>
+      )}
+    </>
   );
 }

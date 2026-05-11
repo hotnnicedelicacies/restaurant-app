@@ -1,8 +1,11 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getOrderByRef } from '@/lib/data/orders';
 import { getServiceClient } from '@/lib/supabase/server';
+import { getStorageUrl } from '@/lib/supabase/storage';
 import { formatGBP, formatLongDate, formatTime } from '@/lib/utils';
+import { siteConfig } from '@/constants/siteConfig';
 import OrderStatusControls from './OrderStatusControls';
 import KitchenNotesPanel from './KitchenNotesPanel';
 import OrderPaymentControls from './OrderPaymentControls';
@@ -15,7 +18,13 @@ const STATUS_LABELS: Record<string, string> = {
   cancelled: 'Cancelled',
 };
 
-const STAGES = ['received', 'preparing', 'on_its_way', 'delivered'] as const;
+const STATUS_PILL: Record<string, string> = {
+  received: 'pill pill--received',
+  preparing: 'pill pill--preparing',
+  on_its_way: 'pill pill--out',
+  delivered: 'pill pill--delivered',
+  cancelled: 'pill pill--cancelled',
+};
 
 export default async function AdminOrderDetail({ params }: { params: Promise<{ ref: string }> }) {
   const { ref } = await params;
@@ -29,115 +38,155 @@ export default async function AdminOrderDetail({ params }: { params: Promise<{ r
     .eq('order_id', order.id)
     .order('created_at', { ascending: false });
 
-  const isCancelled = order.status === 'cancelled';
-  const stageIdx = isCancelled ? -1 : STAGES.indexOf(order.status as typeof STAGES[number]);
-
   return (
-    <div className="grid items-start gap-6 md:grid-cols-[1.6fr_1fr]">
-      <div className="min-w-0">
-        <header className="mb-6 flex flex-wrap items-baseline justify-between gap-3 border-b border-rule pb-4">
-          <div>
-            <Link href="/admin/orders" className="mb-2 inline-block font-mono text-[10px] uppercase tracking-[0.2em] text-bronze-deep hover:text-walnut">
-              ← All orders
-            </Link>
-            <h1 className="m-0 font-serif text-[clamp(24px,3vw,30px)] font-medium leading-[1.04] text-walnut">
-              Order <em className="font-normal italic text-bronze-deep">{order.ref}</em>
-            </h1>
-            <p className="m-0 mt-1 font-serif text-[13px] italic text-ink-muted">
-              Placed {formatLongDate(order.createdAt)} at {formatTime(order.createdAt)}
-            </p>
-          </div>
-          <span className={`rounded-[2px] border px-3 py-1 font-serif text-[12.5px] font-medium tracking-[0.04em] [font-variant:small-caps] ${
-            isCancelled ? 'border-danger bg-danger/10 text-danger' : 'border-walnut bg-walnut/10 text-walnut'
-          }`}>
-            {STATUS_LABELS[order.status] ?? order.status}
-          </span>
-        </header>
+    <>
+      <Link href="/admin/orders" className="admin-detail__back">
+        ← Back to today's orders
+      </Link>
 
-        {/* Timeline + transition controls */}
-        <section className="mb-5 rounded-[2px] border border-rule bg-cream p-5">
-          <h2 className="mb-3 font-mono text-[10px] uppercase tracking-[0.24em] text-bronze-deep">Lifecycle</h2>
-          {!isCancelled && (
-            <div className="relative mb-5 grid grid-cols-4 gap-2 pt-3">
-              <div className="pointer-events-none absolute top-[18px] left-[12.5%] right-[12.5%] h-px bg-rule" aria-hidden />
-              {STAGES.map((stage, i) => {
-                const isDone = i < stageIdx;
-                const isCurrent = i === stageIdx;
+      <div className="admin-page-head">
+        <div className="admin-page-head__text">
+          <div className="admin-page-head__eyebrow">
+            № {order.ref} · Placed {formatTime(order.createdAt)} · {formatLongDate(order.createdAt)}
+          </div>
+          <h1 className="admin-page-head__title">
+            {order.customer.firstName} <em>{order.customer.lastName}</em>
+          </h1>
+          <p className="t-body-muted" style={{ marginTop: 4 }}>
+            {order.items.length} item{order.items.length === 1 ? '' : 's'} ·{' '}
+            {formatGBP(order.totalGbp)} ·{' '}
+            <span className={order.paymentMethod === 'card' ? 'pill pill--card' : 'pill pill--cod'} style={{ verticalAlign: 2 }}>
+              {order.paymentMethod === 'card'
+                ? `Card${order.cardBrand ? ` · ${order.cardBrand} ${order.cardLast4 ?? ''}` : ''}`
+                : 'Cash on delivery'}
+            </span>{' '}
+            <span className={STATUS_PILL[order.status] ?? 'pill'} style={{ verticalAlign: 2 }}>
+              {STATUS_LABELS[order.status] ?? order.status}
+            </span>
+          </p>
+        </div>
+        <div className="admin-page-head__actions">
+          <Link href={siteConfig.routes.receipt(order.ref)} className="receipt-btn" style={{ textDecoration: 'none' }} target="_blank">
+            Print receipt
+          </Link>
+          <Link
+            href={siteConfig.routes.track(order.ref)}
+            className="receipt-btn receipt-btn--primary"
+            style={{ textDecoration: 'none' }}
+            target="_blank"
+          >
+            View customer status →
+          </Link>
+        </div>
+      </div>
+
+      <div className="admin-detail">
+        {/* LEFT: order content */}
+        <div>
+          {/* Customer + delivery */}
+          <div className="form-section">
+            <header className="form-section__head">
+              <h2 className="form-section__title">Customer &amp; <em>delivery</em></h2>
+              <span className="form-section__num">№ 01</span>
+            </header>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 28 }}>
+              <div>
+                <div className="t-mono" style={{ marginBottom: 6 }}>Customer</div>
+                <p className="t-body" style={{ fontWeight: 500, margin: '0 0 4px' }}>
+                  {order.customer.firstName} {order.customer.lastName}
+                </p>
+                <p className="t-body-muted">
+                  <a href={`tel:${order.customer.phone}`} style={{ color: 'var(--color-walnut)', borderBottom: '1px solid var(--color-rule)' }}>
+                    {order.customer.phone}
+                  </a>
+                  <br />
+                  <a href={`mailto:${order.customer.email}`} style={{ color: 'var(--color-walnut)', borderBottom: '1px solid var(--color-rule)' }}>
+                    {order.customer.email}
+                  </a>
+                </p>
+              </div>
+              <div>
+                <div className="t-mono" style={{ marginBottom: 6 }}>Delivering to</div>
+                <p className="t-body" style={{ fontWeight: 500, margin: '0 0 4px' }}>
+                  {order.delivery.line1}
+                  {order.delivery.line2 && <>, {order.delivery.line2}</>}
+                </p>
+                <p className="t-body-muted">
+                  {order.delivery.city} ·{' '}
+                  <b style={{ color: 'var(--color-walnut)', fontVariant: 'small-caps', letterSpacing: '0.08em' }}>
+                    {order.delivery.postcode}
+                  </b>
+                  <br />
+                  <em>Fee:</em> {formatGBP(order.delivery.feeGbp)} · <em>Window:</em>{' '}
+                  {order.delivery.windowStart.slice(0, 5)} – {order.delivery.windowEnd.slice(0, 5)}
+                </p>
+                {order.delivery.notes && (
+                  <p className="t-body-muted" style={{ marginTop: 8, paddingLeft: 10, borderLeft: '2px solid var(--color-rule)' }}>
+                    "{order.delivery.notes}"
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Items */}
+          <div className="form-section" style={{ marginTop: 20 }}>
+            <header className="form-section__head">
+              <h2 className="form-section__title">What they <em>ordered</em></h2>
+              <span className="form-section__num">{order.items.length} items</span>
+            </header>
+
+            <div className="summary__items" style={{ margin: 0, padding: 0, border: 0 }}>
+              {order.items.map((item) => {
+                const variantParts = Object.values(item.variantsChosen ?? {}).map((v) => v.label);
+                const addonsLine = (item.addonsChosen ?? []).map((a) => a.label).join(', ');
                 return (
-                  <div key={stage} className="relative z-10 text-center">
-                    <div className={`mx-auto mb-1.5 flex h-[28px] w-[28px] items-center justify-center rounded-full font-serif text-[12.5px] italic ${
-                      isCurrent
-                        ? 'border border-walnut bg-walnut text-cream'
-                        : isDone
-                          ? 'border border-bronze bg-bronze text-walnut'
-                          : 'border border-rule bg-cream-soft text-ink-muted'
-                    }`}>
-                      {i + 1}
+                  <div className="summary__item" key={item.id}>
+                    {item.imagePath ? (
+                      <Image src={getStorageUrl(item.imagePath)} alt={item.name} width={64} height={64} />
+                    ) : (
+                      <div style={{ width: 64, height: 64, background: 'var(--color-cream-soft)', borderRadius: 2 }} />
+                    )}
+                    <div className="summary__item-text">
+                      <h3 className="summary__item-name">{item.name}</h3>
+                      {(variantParts.length > 0 || addonsLine) && (
+                        <p className="summary__item-meta">
+                          {variantParts.map((p, i) => (
+                            <span key={p}>
+                              {i > 0 && ' · '}
+                              <b style={{ color: 'var(--color-walnut)', fontWeight: 500 }}>{p}</b>
+                            </span>
+                          ))}
+                          {addonsLine && (
+                            <>
+                              {' · '}
+                              <b style={{ color: 'var(--color-walnut)', fontWeight: 500 }}>{addonsLine}</b>
+                            </>
+                          )}
+                        </p>
+                      )}
+                      {item.specialInstructions && (
+                        <p className="summary__item-meta" style={{ marginTop: 6, paddingLeft: 10, borderLeft: '2px solid var(--color-rule)' }}>
+                          "{item.specialInstructions}"
+                        </p>
+                      )}
+                      <span className="summary__item-qty">× {item.quantity}</span>
                     </div>
-                    <p className={`m-0 font-serif text-[11px] tracking-[0.06em] [font-variant:small-caps] ${i > stageIdx ? 'text-ink-muted' : 'text-walnut'}`}>
-                      {STATUS_LABELS[stage]}
-                    </p>
+                    <span className="summary__item-price">{formatGBP(item.lineTotalGbp)}</span>
                   </div>
                 );
               })}
             </div>
-          )}
-          <OrderStatusControls
-            orderRef={order.ref}
-            currentStatus={order.status}
-          />
-        </section>
 
-        {/* Items */}
-        <section className="mb-5 rounded-[2px] border border-rule bg-cream p-5">
-          <h2 className="mb-3 font-mono text-[10px] uppercase tracking-[0.24em] text-bronze-deep">
-            Items ({order.items.length})
-          </h2>
-          <table className="w-full border-collapse">
-            <tbody className="font-serif text-[13.5px] text-walnut">
-              {order.items.map((item) => {
-                const variantParts = Object.values(item.variantsChosen ?? {}).map((v) => v.label);
-                const addonsLine = (item.addonsChosen ?? []).map((a) => a.label).join(', ');
-                const sub = [variantParts.join(' · '), addonsLine].filter(Boolean).join(' · ');
-                return (
-                  <tr key={item.id} className="border-t border-rule align-top">
-                    <td className="py-2.5 pr-3">
-                      <div className="font-medium">{item.name}</div>
-                      {sub && <div className="text-[12px] italic text-ink-muted">{sub}</div>}
-                      {item.specialInstructions && (
-                        <div className="mt-1 border-l-2 border-rule pl-2.5 text-[12px] italic text-ink-muted">
-                          "{item.specialInstructions}"
-                        </div>
-                      )}
-                    </td>
-                    <td className="py-2.5 px-3 text-right font-mono text-[12px] text-ink-muted">× {item.quantity}</td>
-                    <td className="py-2.5 pl-3 text-right tabular-nums font-medium">{formatGBP(item.lineTotalGbp)}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-            <tfoot className="font-serif text-walnut">
-              <tr className="border-t border-rule">
-                <td className="py-2 pr-3">Subtotal</td>
-                <td colSpan={2} className="py-2 pl-3 text-right tabular-nums">{formatGBP(order.subtotalGbp)}</td>
-              </tr>
-              <tr>
-                <td className="py-2 pr-3 italic text-ink-muted">Delivery</td>
-                <td colSpan={2} className="py-2 pl-3 text-right tabular-nums italic text-ink-muted">{formatGBP(order.delivery.feeGbp)}</td>
-              </tr>
-              <tr className="border-t border-walnut">
-                <td className="py-3 pr-3 text-[15px] font-semibold">Total</td>
-                <td colSpan={2} className="py-3 pl-3 text-right text-[15px] font-semibold tabular-nums">{formatGBP(order.totalGbp)}</td>
-              </tr>
-            </tfoot>
-          </table>
-        </section>
+            <div className="summary__totals" style={{ marginTop: 18, paddingTop: 18, borderTop: '1px solid var(--color-rule)' }}>
+              <div className="summary__row"><span>Subtotal</span><span>{formatGBP(order.subtotalGbp)}</span></div>
+              <div className="summary__row summary__row--muted"><span>Delivery</span><span>{formatGBP(order.delivery.feeGbp)}</span></div>
+              <div className="summary__row summary__row--grand"><span>Total</span><span>{formatGBP(order.totalGbp)}</span></div>
+            </div>
+          </div>
 
-        {/* Kitchen notes */}
-        <section className="rounded-[2px] border border-rule bg-cream p-5">
-          <h2 className="mb-3 font-mono text-[10px] uppercase tracking-[0.24em] text-bronze-deep">
-            Kitchen notes
-          </h2>
+          {/* Kitchen notes */}
           <KitchenNotesPanel
             orderRef={order.ref}
             notes={(notes ?? []).map((n) => ({
@@ -149,53 +198,29 @@ export default async function AdminOrderDetail({ params }: { params: Promise<{ r
               createdAt: n.created_at,
             }))}
           />
-        </section>
+        </div>
+
+        {/* RIGHT: status + payment + danger */}
+        <aside>
+          <OrderStatusControls
+            orderRef={order.ref}
+            currentStatus={order.status}
+          />
+
+          <OrderPaymentControls
+            orderRef={order.ref}
+            paymentMethod={order.paymentMethod}
+            paymentStatus={order.paymentStatus}
+            codStatus={order.codStatus}
+            cardBrand={order.cardBrand}
+            cardLast4={order.cardLast4}
+            totalGbp={order.totalGbp}
+            refundAmountGbp={order.refundAmountGbp}
+            status={order.status}
+            cancelledReason={order.cancelledReason}
+          />
+        </aside>
       </div>
-
-      {/* Sidebar */}
-      <aside className="space-y-5 md:sticky md:top-[120px]">
-        <section className="rounded-[2px] border border-rule bg-cream p-5">
-          <h2 className="mb-3 font-mono text-[10px] uppercase tracking-[0.24em] text-bronze-deep">Customer</h2>
-          <p className="m-0 mb-1 font-serif text-[15px] font-medium text-walnut">
-            {order.customer.firstName} {order.customer.lastName}
-          </p>
-          <p className="m-0 font-serif text-[13.5px] italic text-ink-muted">
-            <a href={`mailto:${order.customer.email}`} className="link-underline">{order.customer.email}</a>
-          </p>
-          <p className="m-0 font-serif text-[13.5px] italic text-ink-muted">
-            <a href={`tel:${order.customer.phone}`} className="link-underline">{order.customer.phone}</a>
-          </p>
-          <p className="mt-3 m-0 font-mono text-[10px] uppercase tracking-[0.2em] text-bronze-deep">Address</p>
-          <p className="m-0 font-serif text-[13.5px] text-walnut">
-            {order.delivery.line1}
-            {order.delivery.line2 && <><br />{order.delivery.line2}</>}
-            <br />{order.delivery.city} · {order.delivery.postcode}
-          </p>
-          <p className="mt-3 m-0 font-mono text-[10px] uppercase tracking-[0.2em] text-bronze-deep">Window</p>
-          <p className="m-0 font-serif text-[13.5px] text-walnut">
-            {formatLongDate(order.delivery.date)} · {order.delivery.windowStart.slice(0, 5)} – {order.delivery.windowEnd.slice(0, 5)}
-          </p>
-          {order.delivery.notes && (
-            <>
-              <p className="mt-3 m-0 font-mono text-[10px] uppercase tracking-[0.2em] text-bronze-deep">Delivery notes</p>
-              <p className="m-0 font-serif text-[13.5px] italic text-walnut">"{order.delivery.notes}"</p>
-            </>
-          )}
-        </section>
-
-        <OrderPaymentControls
-          orderRef={order.ref}
-          paymentMethod={order.paymentMethod}
-          paymentStatus={order.paymentStatus}
-          codStatus={order.codStatus}
-          cardBrand={order.cardBrand}
-          cardLast4={order.cardLast4}
-          totalGbp={order.totalGbp}
-          refundAmountGbp={order.refundAmountGbp}
-          status={order.status}
-          cancelledReason={order.cancelledReason}
-        />
-      </aside>
-    </div>
+    </>
   );
 }

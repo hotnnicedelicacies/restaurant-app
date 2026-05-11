@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { addKitchenNote } from '@/lib/admin/orderActions';
-import { formatShortDate, formatTime } from '@/lib/utils';
+import { formatTime } from '@/lib/utils';
 
 interface Note {
   id: string;
@@ -14,6 +14,14 @@ interface Note {
   visibleToCustomer: boolean;
   createdAt: string;
 }
+
+const STATUS_LABEL: Record<string, string> = {
+  received: 'Received',
+  preparing: 'Preparing',
+  on_its_way: 'On its way',
+  delivered: 'Delivered',
+  cancelled: 'Cancelled',
+};
 
 export default function KitchenNotesPanel({
   orderRef,
@@ -25,7 +33,7 @@ export default function KitchenNotesPanel({
   const router = useRouter();
   const [pending, start] = useTransition();
   const [body, setBody] = useState('');
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
 
   function handleAdd() {
     if (!body.trim()) return;
@@ -35,64 +43,80 @@ export default function KitchenNotesPanel({
         toast.error(res.error);
         return;
       }
-      toast.success(visible ? 'Note added and emailed to customer.' : 'Internal note added.');
+      toast.success(visible ? 'Note posted and emailed.' : 'Internal note added.');
       setBody('');
-      setVisible(false);
       router.refresh();
     });
   }
 
+  const customerVisible = notes.filter((n) => n.visibleToCustomer);
+
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex flex-col gap-2 rounded-[2px] border border-rule bg-cream-soft p-3">
+    <>
+      <div className="kitchen-notes" style={{ marginTop: 20 }}>
+        <h3 className="kitchen-notes__title">
+          Notes from the kitchen{' '}
+          <small style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', fontVariant: 'normal', letterSpacing: 0, color: 'var(--color-ink-muted)', fontWeight: 400 }}>
+            · visible on the customer's track-order page
+          </small>
+        </h3>
+        <ul className="kitchen-notes__list">
+          {customerVisible.length === 0 ? (
+            <li className="kitchen-notes__entry">
+              <p className="kitchen-notes__entry-text" style={{ fontStyle: 'italic', color: 'var(--color-ink-muted)' }}>
+                No customer-visible notes yet.
+              </p>
+            </li>
+          ) : (
+            customerVisible.map((n) => (
+              <li className="kitchen-notes__entry" key={n.id}>
+                <div className="kitchen-notes__entry-meta">
+                  <span>
+                    {n.authorName} · {formatTime(n.createdAt)}
+                  </span>
+                  <span>Status: {n.statusAtTime ? STATUS_LABEL[n.statusAtTime] ?? n.statusAtTime : '—'}</span>
+                </div>
+                <p className="kitchen-notes__entry-text">"{n.body}"</p>
+              </li>
+            ))
+          )}
+        </ul>
+      </div>
+
+      <div className="kitchen-note-form">
+        <h3 className="kitchen-note-form__title">Add a note</h3>
+        <p className="kitchen-note-form__sub">
+          A line to the customer. Posted to their tracking page and (optionally) emailed to them.
+        </p>
         <textarea
-          rows={2}
-          placeholder="Add a note for the team or the customer…"
           value={body}
           onChange={(e) => setBody(e.target.value)}
-          className="resize-none rounded-[2px] border border-rule bg-cream px-3 py-2 font-serif text-[13.5px] text-walnut outline-none focus:border-walnut placeholder:italic placeholder:text-ink-muted"
+          placeholder="e.g., Driver is two streets away…"
         />
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <label className="flex cursor-pointer items-center gap-2 font-serif text-[12.5px] italic text-ink-muted">
+        <div className="kitchen-note-form__row">
+          <label
+            className="auth-form__checkbox"
+            style={{ fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
+          >
             <input
               type="checkbox"
               checked={visible}
               onChange={(e) => setVisible(e.target.checked)}
-              className="h-[16px] w-[16px] accent-walnut"
+              style={{ accentColor: 'var(--color-walnut)' }}
             />
-            Send to customer (email)
+            <span>Also email this to the customer</span>
           </label>
           <button
             type="button"
+            className="kitchen-note-form__send"
             onClick={handleAdd}
             disabled={pending || !body.trim()}
-            className="rounded-[2px] border border-walnut bg-transparent px-4 py-1.5 font-serif text-[12px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] transition-colors hover:bg-walnut hover:text-cream disabled:opacity-50"
+            style={{ cursor: pending || !body.trim() ? 'not-allowed' : 'pointer' }}
           >
-            {pending ? 'Saving…' : 'Add note'}
+            {pending ? 'Posting…' : 'Post note'}
           </button>
         </div>
       </div>
-
-      <ul className="m-0 flex list-none flex-col gap-3 p-0">
-        {notes.length === 0 ? (
-          <li className="font-serif text-[13.5px] italic text-ink-muted">No notes yet.</li>
-        ) : (
-          notes.map((n) => (
-            <li key={n.id} className="border-l-[3px] border-bronze bg-cream-soft p-3">
-              <div className="mb-1 flex flex-wrap items-baseline justify-between gap-2 font-mono text-[10px] uppercase tracking-[0.18em] text-bronze-deep">
-                <span>
-                  {n.authorName} {n.statusAtTime && `· ${n.statusAtTime.replace(/_/g, ' ')}`}
-                </span>
-                <span>
-                  {formatShortDate(n.createdAt)} · {formatTime(n.createdAt)}
-                  {n.visibleToCustomer ? ' · sent to customer' : ' · internal'}
-                </span>
-              </div>
-              <p className="m-0 font-serif text-[14px] italic leading-[1.5] text-walnut">"{n.body}"</p>
-            </li>
-          ))
-        )}
-      </ul>
-    </div>
+    </>
   );
 }

@@ -7,12 +7,19 @@ import { updateOrderStatus } from '@/lib/admin/orderActions';
 
 type Status = 'received' | 'preparing' | 'on_its_way' | 'delivered' | 'cancelled';
 
-const NEXT_STATUS: Record<Status, { value: 'preparing' | 'on_its_way' | 'delivered'; label: string } | null> = {
-  received: { value: 'preparing', label: 'Start cooking →' },
-  preparing: { value: 'on_its_way', label: 'Out for delivery →' },
-  on_its_way: { value: 'delivered', label: 'Mark delivered →' },
-  delivered: null,
-  cancelled: null,
+const STAGES: { value: Exclude<Status, 'cancelled'>; label: string; numeral: string; shortcut: string }[] = [
+  { value: 'received', label: 'Received', numeral: 'i.', shortcut: 'R' },
+  { value: 'preparing', label: 'Preparing', numeral: 'ii.', shortcut: 'P' },
+  { value: 'on_its_way', label: 'On its way', numeral: 'iii.', shortcut: 'O' },
+  { value: 'delivered', label: 'Delivered', numeral: 'iv.', shortcut: 'D' },
+];
+
+const STATUS_PILL: Record<Status, string> = {
+  received: 'pill pill--received',
+  preparing: 'pill pill--preparing',
+  on_its_way: 'pill pill--out',
+  delivered: 'pill pill--delivered',
+  cancelled: 'pill pill--cancelled',
 };
 
 export default function OrderStatusControls({
@@ -24,66 +31,72 @@ export default function OrderStatusControls({
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
-  const [note, setNote] = useState('');
-  const [visible, setVisible] = useState(true);
-  const next = NEXT_STATUS[currentStatus];
+  const currentIdx = STAGES.findIndex((s) => s.value === currentStatus);
 
-  if (!next) {
-    return (
-      <p className="m-0 font-serif text-[13.5px] italic text-ink-muted">
-        {currentStatus === 'cancelled'
-          ? 'This order is cancelled. No further transitions possible.'
-          : 'Order completed. No further transitions possible.'}
-      </p>
-    );
-  }
-
-  function handleAdvance() {
+  function jumpTo(next: Exclude<Status, 'cancelled'>) {
+    if (currentStatus === 'cancelled') return;
     start(async () => {
-      const res = await updateOrderStatus({
-        ref: orderRef,
-        next: next!.value,
-        noteBody: note.trim() || undefined,
-        noteVisibleToCustomer: visible,
-      });
+      const res = await updateOrderStatus({ ref: orderRef, next });
       if (!res.ok) {
         toast.error(res.error);
         return;
       }
-      toast.success(`Moved to ${next!.label.replace(' →', '')}.`);
-      setNote('');
+      toast.success(`Moved to ${STAGES.find((s) => s.value === next)?.label}.`);
       router.refresh();
     });
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <textarea
-        placeholder={`Optional note for the customer (e.g. "Your jollof is on the pass — leaving in 5 min")`}
-        value={note}
-        onChange={(e) => setNote(e.target.value)}
-        rows={2}
-        className="rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[13.5px] text-walnut outline-none focus:border-walnut placeholder:italic placeholder:text-ink-muted"
-      />
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <label className="flex cursor-pointer items-center gap-2 font-serif text-[12.5px] italic text-ink-muted">
-          <input
-            type="checkbox"
-            checked={visible}
-            onChange={(e) => setVisible(e.target.checked)}
-            className="h-[16px] w-[16px] accent-walnut"
-          />
-          Email this note to the customer
-        </label>
-        <button
-          type="button"
-          onClick={handleAdvance}
-          disabled={pending}
-          className="rounded-[2px] bg-walnut px-5 py-2.5 font-serif text-[12.5px] font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] transition-colors hover:bg-bronze-deep disabled:opacity-60"
-        >
-          {pending ? 'Updating…' : next.label}
-        </button>
+    <div className="status-control">
+      <header className="status-control__head">
+        <h2 className="status-control__title">Status</h2>
+        <span className="t-mono">Auto-emails customer</span>
+      </header>
+
+      <div className="status-control__current">
+        <span className="status-control__current-label">Now</span>
+        <span className={STATUS_PILL[currentStatus]}>
+          {STAGES.find((s) => s.value === currentStatus)?.label ?? 'Cancelled'}
+        </span>
       </div>
+
+      <div className="status-control__buttons">
+        {STAGES.map((s, i) => {
+          const isCurrent = i === currentIdx;
+          const isPast = i < currentIdx;
+          const nextStep = i === currentIdx + 1;
+          const disabled = pending || isCurrent || currentStatus === 'cancelled';
+          const isPrimary = nextStep && currentStatus !== 'cancelled';
+          return (
+            <button
+              key={s.value}
+              type="button"
+              className={`status-btn${isPrimary ? ' status-btn--primary' : ''}`}
+              onClick={() => !disabled && jumpTo(s.value)}
+              disabled={disabled}
+              style={isCurrent ? { opacity: 0.6, cursor: 'default' } : { cursor: disabled ? 'wait' : 'pointer' }}
+            >
+              <span>
+                <span className="status-btn__icon">{s.numeral}</span> {s.label}
+                {isCurrent && (
+                  <em style={{ fontStyle: 'italic', color: 'var(--color-ink-muted)', marginLeft: 6 }}>· current</em>
+                )}
+                {isPast && (
+                  <em style={{ fontStyle: 'italic', color: 'var(--color-ink-muted)', marginLeft: 6 }}>· done</em>
+                )}
+              </span>
+              <span className="status-btn__shortcut">{s.shortcut}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      <p className="t-body-muted" style={{ textAlign: 'center', marginTop: 14, fontSize: 12.5 }}>
+        <b style={{ color: 'var(--color-walnut)', fontStyle: 'normal', fontVariant: 'small-caps', letterSpacing: '0.06em' }}>
+          Tip:
+        </b>{' '}
+        click the next step to advance. Customer is auto-emailed.
+      </p>
     </div>
   );
 }
