@@ -145,9 +145,7 @@ export async function POST(request: Request) {
   }
 }
 
-// Stripe sends raw bodies; disable Next.js body parsing (we use request.text())
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
+// App router route handlers don't auto-parse bodies — request.text() gives
+// the raw payload Stripe needs for signature verification. No config needed.
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
