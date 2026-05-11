@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import ConfirmModal from '@/components/admin/ConfirmModal';
 import {
   archiveCategory,
   createCategory,
@@ -19,36 +20,58 @@ interface Category {
   itemCount?: number;
 }
 
+interface CategoryDraft {
+  id?: string;
+  name: string;
+  description: string;
+  displayOrder: number;
+}
+
 export default function CategoriesManager({ categories }: { categories: Category[] }) {
   const router = useRouter();
   const [pending, start] = useTransition();
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [showCreate, setShowCreate] = useState(false);
+  const [draft, setDraft] = useState<CategoryDraft | null>(null);
+  const [archiveTarget, setArchiveTarget] = useState<Category | null>(null);
 
-  function handleCreate(name: string, description: string) {
-    if (!name.trim()) return;
+  function openNew() {
+    setDraft({ name: '', description: '', displayOrder: categories.length + 1 });
+  }
+  function openEdit(c: Category) {
+    setDraft({ id: c.id, name: c.name, description: c.description ?? '', displayOrder: c.displayOrder });
+  }
+
+  function handleSave() {
+    if (!draft) return;
+    if (!draft.name.trim()) {
+      toast.error('Name is required.');
+      return;
+    }
     start(async () => {
-      const res = await createCategory({
-        name,
-        description,
-        displayOrder: categories.length + 1,
-      });
+      const res = draft.id
+        ? await updateCategory({
+            id: draft.id,
+            name: draft.name,
+            description: draft.description,
+            displayOrder: draft.displayOrder,
+          })
+        : await createCategory({
+            name: draft.name,
+            description: draft.description,
+            displayOrder: draft.displayOrder,
+          });
       if (!res.ok) {
         toast.error(res.error);
         return;
       }
-      toast.success('Category created.');
-      setShowCreate(false);
+      toast.success(draft.id ? 'Category saved.' : 'Category created.');
+      setDraft(null);
       router.refresh();
     });
   }
 
-  function handlePatch(
-    id: string,
-    patch: { name?: string; description?: string; displayOrder?: number; isVisible?: boolean }
-  ) {
+  function handleToggle(id: string, isVisible: boolean) {
     start(async () => {
-      const res = await updateCategory({ id, ...patch });
+      const res = await updateCategory({ id, isVisible });
       if (!res.ok) {
         toast.error(res.error);
         return;
@@ -57,15 +80,16 @@ export default function CategoriesManager({ categories }: { categories: Category
     });
   }
 
-  function handleArchive(id: string) {
-    if (!confirm('Archive this category? Items in it will be hidden from the menu.')) return;
+  function handleArchive() {
+    if (!archiveTarget) return;
     start(async () => {
-      const res = await archiveCategory(id);
+      const res = await archiveCategory(archiveTarget.id);
       if (!res.ok) {
         toast.error(res.error);
         return;
       }
       toast.success('Category archived.');
+      setArchiveTarget(null);
       router.refresh();
     });
   }
@@ -84,8 +108,9 @@ export default function CategoriesManager({ categories }: { categories: Category
         <div className="admin-page-head__actions">
           <button
             type="button"
-            onClick={() => setShowCreate(true)}
+            onClick={openNew}
             className="receipt-btn receipt-btn--primary"
+            style={{ cursor: 'pointer' }}
           >
             + Add category
           </button>
@@ -107,7 +132,7 @@ export default function CategoriesManager({ categories }: { categories: Category
           </b>
         </p>
         <p className="t-body-muted" style={{ margin: 0 }}>
-          Categories group menu items on the customer menu page. Reorder is by display order. Items keep their category assignment when a category is renamed; archiving a category hides all its items from the customer site.
+          Categories group menu items on the customer menu page. Display order is what customers see. Items keep their category assignment when a category is renamed; archiving a category hides all its items from the customer site.
         </p>
       </div>
 
@@ -132,263 +157,158 @@ export default function CategoriesManager({ categories }: { categories: Category
                 </td>
               </tr>
             ) : (
-              categories.map((c) =>
-                editingId === c.id ? (
-                  <CategoryEditRow
-                    key={c.id}
-                    category={c}
-                    pending={pending}
-                    onSave={(patch) => {
-                      handlePatch(c.id, patch);
-                      setEditingId(null);
-                    }}
-                    onCancel={() => setEditingId(null)}
-                  />
-                ) : (
-                  <CategoryRow
-                    key={c.id}
-                    category={c}
-                    pending={pending}
-                    onEdit={() => setEditingId(c.id)}
-                    onToggleVisible={(v) => handlePatch(c.id, { isVisible: v })}
-                    onArchive={() => handleArchive(c.id)}
-                  />
-                )
-              )
-            )}
-            {showCreate && (
-              <NewCategoryRow
-                pending={pending}
-                onSave={(name, description) => handleCreate(name, description)}
-                onCancel={() => setShowCreate(false)}
-              />
+              categories.map((c) => (
+                <tr key={c.id}>
+                  <td>
+                    <span className="t-mono">{String(c.displayOrder).padStart(2, '0')}</span>
+                  </td>
+                  <td>
+                    <b style={{ fontWeight: 500 }}>{c.name}</b>
+                  </td>
+                  <td>
+                    <code style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--color-ink-muted)' }}>
+                      {c.slug}
+                    </code>
+                  </td>
+                  <td>
+                    {c.itemCount ?? 0} {(c.itemCount ?? 0) === 1 ? 'item' : 'items'}
+                  </td>
+                  <td className="admin-table__items">{c.description || '—'}</td>
+                  <td style={{ textAlign: 'center' }}>
+                    <label className="switch" style={{ cursor: pending ? 'wait' : 'pointer' }}>
+                      <input
+                        type="checkbox"
+                        checked={c.isVisible}
+                        disabled={pending}
+                        onChange={(e) => handleToggle(c.id, e.target.checked)}
+                      />
+                      <span className="switch__track">
+                        <span className="switch__thumb" />
+                      </span>
+                    </label>
+                  </td>
+                  <td className="admin-table__actions">
+                    <button
+                      type="button"
+                      onClick={() => openEdit(c)}
+                      className="admin-table__action"
+                      style={{ background: 'transparent', border: 0, cursor: 'pointer' }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setArchiveTarget(c)}
+                      className="admin-table__action menu-admin-table__action--danger"
+                      style={{ background: 'transparent', border: 0, cursor: 'pointer' }}
+                    >
+                      Archive
+                    </button>
+                  </td>
+                </tr>
+              ))
             )}
           </tbody>
         </table>
       </div>
+
+      {/* Add / Edit modal */}
+      <ConfirmModal
+        open={draft !== null}
+        onCancel={() => setDraft(null)}
+        onConfirm={handleSave}
+        pending={pending}
+        eyebrow={draft?.id ? 'Edit category' : 'New category'}
+        title={
+          draft?.id ? (
+            <>
+              Edit <em>{draft.name || 'category'}</em>
+            </>
+          ) : (
+            <>
+              Add a <em>category</em>
+            </>
+          )
+        }
+        body={
+          draft?.id ? null : (
+            <>
+              Categories group menu items on the public menu page. The slug is auto-derived from the name.
+            </>
+          )
+        }
+        inputSlot={
+          draft && (
+            <>
+              <label className="form-field__label" htmlFor="cat-name">
+                Name
+              </label>
+              <input
+                id="cat-name"
+                type="text"
+                value={draft.name}
+                onChange={(e) => setDraft({ ...draft, name: e.target.value })}
+                placeholder="e.g. Italian classics"
+                className="form-field__input"
+                autoFocus
+              />
+              <label className="form-field__label" htmlFor="cat-desc" style={{ marginTop: 14 }}>
+                Description <small>· optional</small>
+              </label>
+              <input
+                id="cat-desc"
+                type="text"
+                value={draft.description}
+                onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+                placeholder="Short one-liner shown under the section header"
+                className="form-field__input"
+              />
+              <label className="form-field__label" htmlFor="cat-order" style={{ marginTop: 14 }}>
+                Display order
+              </label>
+              <input
+                id="cat-order"
+                type="number"
+                value={draft.displayOrder}
+                onChange={(e) => setDraft({ ...draft, displayOrder: Number(e.target.value) })}
+                className="form-field__input"
+              />
+            </>
+          )
+        }
+        confirmLabel={pending ? 'Saving…' : draft?.id ? 'Save changes' : 'Create category'}
+      />
+
+      {/* Archive modal */}
+      <ConfirmModal
+        open={archiveTarget !== null}
+        onCancel={() => setArchiveTarget(null)}
+        onConfirm={handleArchive}
+        pending={pending}
+        tone="danger"
+        eyebrow="Archive category"
+        title={
+          archiveTarget && (
+            <>
+              Archive <em>{archiveTarget.name}?</em>
+            </>
+          )
+        }
+        body={
+          archiveTarget && (
+            <>
+              {archiveTarget.itemCount && archiveTarget.itemCount > 0 ? (
+                <>
+                  <b>{archiveTarget.itemCount}</b> item{archiveTarget.itemCount === 1 ? '' : 's'} in this category will be hidden from the customer menu. The items themselves are kept (linked to past orders) and can be moved to another category.
+                </>
+              ) : (
+                <>This category is empty. Archiving removes it from the public menu and the admin lists.</>
+              )}
+            </>
+          )
+        }
+        confirmLabel="Yes, archive"
+      />
     </>
   );
 }
-
-function CategoryRow({
-  category,
-  pending,
-  onEdit,
-  onToggleVisible,
-  onArchive,
-}: {
-  category: Category;
-  pending: boolean;
-  onEdit: () => void;
-  onToggleVisible: (v: boolean) => void;
-  onArchive: () => void;
-}) {
-  return (
-    <tr>
-      <td>
-        <span className="t-mono">{String(category.displayOrder).padStart(2, '0')}</span>
-      </td>
-      <td>
-        <b style={{ fontWeight: 500 }}>{category.name}</b>
-      </td>
-      <td>
-        <code style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--color-ink-muted)' }}>
-          {category.slug}
-        </code>
-      </td>
-      <td>{category.itemCount ?? 0} items</td>
-      <td className="admin-table__items">{category.description || '—'}</td>
-      <td style={{ textAlign: 'center' }}>
-        <label className="switch" style={{ cursor: pending ? 'wait' : 'pointer' }}>
-          <input
-            type="checkbox"
-            checked={category.isVisible}
-            disabled={pending}
-            onChange={(e) => onToggleVisible(e.target.checked)}
-          />
-          <span className="switch__track">
-            <span className="switch__thumb" />
-          </span>
-        </label>
-      </td>
-      <td className="admin-table__actions">
-        <button
-          type="button"
-          onClick={onEdit}
-          className="admin-table__action"
-          style={{ background: 'transparent', border: 0, cursor: 'pointer' }}
-        >
-          Edit
-        </button>
-        <button
-          type="button"
-          onClick={onArchive}
-          className="admin-table__action menu-admin-table__action--danger"
-          style={{ background: 'transparent', border: 0, cursor: 'pointer' }}
-          disabled={pending}
-        >
-          Archive
-        </button>
-      </td>
-    </tr>
-  );
-}
-
-function CategoryEditRow({
-  category,
-  pending,
-  onSave,
-  onCancel,
-}: {
-  category: Category;
-  pending: boolean;
-  onSave: (patch: { name: string; description: string; displayOrder: number }) => void;
-  onCancel: () => void;
-}) {
-  const [name, setName] = useState(category.name);
-  const [description, setDescription] = useState(category.description ?? '');
-  const [order, setOrder] = useState(category.displayOrder);
-
-  return (
-    <tr style={{ background: 'var(--color-cream-soft)' }}>
-      <td>
-        <input
-          type="number"
-          value={order}
-          onChange={(e) => setOrder(Number(e.target.value))}
-          style={{
-            width: 50,
-            padding: '6px 8px',
-            border: '1px solid var(--color-rule)',
-            borderRadius: 2,
-            background: 'var(--color-cream)',
-            fontFamily: 'var(--font-mono)',
-            fontSize: 12,
-            color: 'var(--color-walnut)',
-          }}
-        />
-      </td>
-      <td>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          autoFocus
-          style={EDIT_INPUT}
-        />
-      </td>
-      <td>
-        <code style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--color-ink-muted)' }}>
-          {category.slug}
-        </code>
-      </td>
-      <td>—</td>
-      <td>
-        <input
-          type="text"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Optional"
-          style={EDIT_INPUT}
-        />
-      </td>
-      <td />
-      <td className="admin-table__actions">
-        <button
-          type="button"
-          onClick={() => onSave({ name, description, displayOrder: order })}
-          disabled={pending || !name.trim()}
-          className="receipt-btn receipt-btn--primary"
-          style={{ padding: '6px 10px', fontSize: 11, cursor: 'pointer' }}
-        >
-          Save
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="admin-table__action"
-          style={{ background: 'transparent', border: 0, cursor: 'pointer', marginLeft: 10 }}
-        >
-          Cancel
-        </button>
-      </td>
-    </tr>
-  );
-}
-
-function NewCategoryRow({
-  pending,
-  onSave,
-  onCancel,
-}: {
-  pending: boolean;
-  onSave: (name: string, description: string) => void;
-  onCancel: () => void;
-}) {
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-
-  return (
-    <tr style={{ background: 'var(--color-cream-soft)' }}>
-      <td>
-        <span className="t-mono">NEW</span>
-      </td>
-      <td>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="e.g. Italian classics"
-          autoFocus
-          style={EDIT_INPUT}
-        />
-      </td>
-      <td>
-        <code style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--color-ink-muted)' }}>
-          auto
-        </code>
-      </td>
-      <td>—</td>
-      <td>
-        <input
-          type="text"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Optional short description"
-          style={EDIT_INPUT}
-        />
-      </td>
-      <td />
-      <td className="admin-table__actions">
-        <button
-          type="button"
-          onClick={() => onSave(name, description)}
-          disabled={pending || !name.trim()}
-          className="receipt-btn receipt-btn--primary"
-          style={{ padding: '6px 10px', fontSize: 11, cursor: 'pointer' }}
-        >
-          Create
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="admin-table__action"
-          style={{ background: 'transparent', border: 0, cursor: 'pointer', marginLeft: 10 }}
-        >
-          Cancel
-        </button>
-      </td>
-    </tr>
-  );
-}
-
-const EDIT_INPUT: React.CSSProperties = {
-  width: '100%',
-  padding: '6px 10px',
-  border: '1px solid var(--color-rule)',
-  borderRadius: 2,
-  background: 'var(--color-cream)',
-  fontFamily: 'var(--font-serif)',
-  fontSize: 14,
-  color: 'var(--color-walnut)',
-};

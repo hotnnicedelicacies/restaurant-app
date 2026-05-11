@@ -3,6 +3,7 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import ConfirmModal from '@/components/admin/ConfirmModal';
 import { archiveZone, upsertZone } from '@/lib/admin/catalogActions';
 import { formatGBP } from '@/lib/utils';
 
@@ -37,6 +38,7 @@ export default function ZonesManager({ zones }: { zones: Zone[] }) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [editing, setEditing] = useState<Zone | (Omit<Zone, 'id'> & { id?: string }) | null>(null);
+  const [archiveTarget, setArchiveTarget] = useState<Zone | null>(null);
 
   function handleSave() {
     if (!editing) return;
@@ -56,15 +58,16 @@ export default function ZonesManager({ zones }: { zones: Zone[] }) {
     });
   }
 
-  function handleArchive(id: string) {
-    if (!confirm('Archive this zone? It will no longer be selectable at checkout.')) return;
+  function handleArchive() {
+    if (!archiveTarget) return;
     start(async () => {
-      const res = await archiveZone(id);
+      const res = await archiveZone(archiveTarget.id);
       if (!res.ok) {
         toast.error(res.error);
         return;
       }
       toast.success('Zone archived.');
+      setArchiveTarget(null);
       router.refresh();
     });
   }
@@ -227,7 +230,7 @@ export default function ZonesManager({ zones }: { zones: Zone[] }) {
                     </button>
                     <button
                       type="button"
-                      onClick={() => handleArchive(z.id)}
+                      onClick={() => setArchiveTarget(z)}
                       disabled={pending}
                       className="admin-table__action menu-admin-table__action--danger"
                       style={{ background: 'transparent', border: 0, cursor: 'pointer' }}
@@ -251,6 +254,22 @@ export default function ZonesManager({ zones }: { zones: Zone[] }) {
           onCancel={() => setEditing(null)}
         />
       )}
+
+      <ConfirmModal
+        open={archiveTarget !== null}
+        onCancel={() => setArchiveTarget(null)}
+        onConfirm={handleArchive}
+        pending={pending}
+        tone="danger"
+        eyebrow="Archive delivery zone"
+        title={archiveTarget && <>Archive <em>{archiveTarget.name}?</em></>}
+        body={
+          <>
+            Customers in those postcode prefixes will see the "outside our delivery area" fallback at checkout. The zone is kept in the database and can be restored later.
+          </>
+        }
+        confirmLabel="Yes, archive"
+      />
     </>
   );
 }
