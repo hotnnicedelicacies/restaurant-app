@@ -1,4 +1,7 @@
-import { getServerClient } from '@/lib/supabase/server';
+import { unstable_cache } from 'next/cache';
+import { getPublicClient } from '@/lib/supabase/public';
+
+export const ZONES_TAG = 'zones';
 
 export interface DeliveryZoneView {
   id: string;
@@ -32,27 +35,44 @@ export function postcodeCandidates(input: string): string[] {
   return Array.from(new Set(candidates));
 }
 
-export async function getActiveZones(): Promise<DeliveryZoneView[]> {
-  const supabase = await getServerClient();
-  const { data, error } = await supabase
-    .from('delivery_zones')
-    .select('*')
-    .eq('is_active', true)
-    .is('archived_at', null)
-    .order('display_order', { ascending: true });
-  if (error || !data) return [];
-  return data.map((z) => ({
-    id: z.id,
-    name: z.name,
-    postcodes: z.postcodes,
-    baseFeeGbp: Number(z.base_fee_gbp),
-    minOrderGbp: Number(z.min_order_gbp),
-    prepTimeMin: z.prep_time_min,
-    prepTimeMax: z.prep_time_max,
-    isQuoted: z.is_quoted,
-    allowsCod: z.allows_cod,
-  }));
+async function _getActiveZones(): Promise<DeliveryZoneView[]> {
+  try {
+    const supabase = getPublicClient();
+    const { data, error } = await supabase
+      .from('delivery_zones')
+      .select('*')
+      .eq('is_active', true)
+      .is('archived_at', null)
+      .order('display_order', { ascending: true });
+    if (error) console.error('[zones] query error:', error);
+    if (!data) return [];
+    return data.map((z) => ({
+      id: z.id,
+      name: z.name,
+      postcodes: z.postcodes,
+      baseFeeGbp: Number(z.base_fee_gbp),
+      minOrderGbp: Number(z.min_order_gbp),
+      prepTimeMin: z.prep_time_min,
+      prepTimeMax: z.prep_time_max,
+      isQuoted: z.is_quoted,
+      allowsCod: z.allows_cod,
+    }));
+  } catch (err) {
+    console.error('[zones] getActiveZones threw:', err);
+    return [];
+  }
 }
+
+/**
+ * Wrapped in unstable_cache so the last-good response keeps serving even
+ * if Supabase is briefly unreachable. Admin zone mutations should call
+ * revalidateTag(ZONES_TAG) to invalidate.
+ */
+export const getActiveZones = unstable_cache(
+  _getActiveZones,
+  ['zones:active'],
+  { revalidate: 60, tags: [ZONES_TAG] }
+);
 
 /**
  * Match a postcode to the most-specific active zone. Returns null if no

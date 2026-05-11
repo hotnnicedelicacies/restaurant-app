@@ -8,12 +8,14 @@
 @theme {
   /* --- Typography (loaded via next/font in app/layout.tsx) ---
      Stack matches design-explorations/shared/styles.css verbatim:
-     Cormorant Garamond → Times New Roman → Georgia → serif. */
-  --font-display: var(--font-cormorant), 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
-  --font-body:    var(--font-cormorant), 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
-  --font-sans:    var(--font-geist-sans), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-  --font-mono:    var(--font-geist-mono), ui-monospace, 'SF Mono', monospace;
-  --font-serif:   var(--font-cormorant), 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
+     Cormorant Garamond → Times New Roman → Georgia → serif.
+     Each var() carries an explicit fallback so the declaration is
+     still valid even before next/font has set --font-cormorant. */
+  --font-display: var(--font-cormorant, 'Cormorant Garamond'), 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
+  --font-body:    var(--font-cormorant, 'Cormorant Garamond'), 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
+  --font-sans:    var(--font-geist-sans, system-ui), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono:    var(--font-geist-mono, ui-monospace), ui-monospace, 'SF Mono', monospace;
+  --font-serif:   var(--font-cormorant, 'Cormorant Garamond'), 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
 
   /* --- Walnut & Cream palette (contrast-audited) --- */
   --color-cream:        #F1E5CD;

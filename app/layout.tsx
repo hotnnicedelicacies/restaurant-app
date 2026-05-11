@@ -161,10 +161,11 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en-GB">
-      <body
-        className={`${cormorant.variable} ${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+    <html
+      lang="en-GB"
+      className={`${cormorant.variable} ${geistSans.variable} ${geistMono.variable}`}
+    >
+      <body className="antialiased">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(restaurantSchema) }}

@@ -1,19 +1,19 @@
 /**
- * Menu data access layer.
+ * Menu data access layer — Supabase only.
  *
- * Tries Supabase first. If Supabase env vars aren't configured, the
- * `menu_items` table doesn't exist, or the query errors out, falls back
- * to the legacy hardcoded data in `constants/meals.ts` so the site keeps
- * working during initial provisioning.
- *
- * Once admin has menu CRUD in Phase 6, the fallback becomes a no-op.
+ * No hardcoded fallback. All public reads are wrapped in unstable_cache so
+ * Vercel's data cache serves the last good response; admin mutations call
+ * revalidateTag('menu') to invalidate. If Supabase is genuinely unreachable
+ * AND the cache is cold, callers receive an empty result and the page
+ * renders an empty state — preferable to silently serving stale legacy data.
  */
 
-import { getServerClient } from '@/lib/supabase/server';
+import { unstable_cache } from 'next/cache';
+import { getPublicClient } from '@/lib/supabase/public';
 import { getStorageUrl } from '@/lib/supabase/storage';
 import type { Database, VariantsBlob, AddonsBlob } from '@/lib/supabase/types';
-import { meals as legacyMeals } from '@/constants/meals';
-import type { StaticImageData } from 'next/image';
+
+export const MENU_TAG = 'menu';
 
 export interface MenuCategoryView {
   id: string;
@@ -32,8 +32,7 @@ export interface MenuItemView {
   description: string;
   longDescription: string | null;
   priceGbp: number;
-  /** Either a Supabase Storage path/URL or a StaticImageData for legacy assets. */
-  image: string | StaticImageData;
+  image: string;
   galleryPaths: string[];
   isAvailable: boolean;
   isCodEligible: boolean;
@@ -44,105 +43,6 @@ export interface MenuItemView {
   variants: VariantsBlob;
   addons: AddonsBlob;
 }
-
-function isSupabaseConfigured() {
-  // Accept either the new (publishable) or legacy (anon) key name so this
-  // works on the live env and any older preview deploys.
-  return Boolean(
-    process.env.NEXT_PUBLIC_SUPABASE_URL &&
-      (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
-  );
-}
-
-// --- Fallback data adapters from constants/meals.ts -----------------------
-
-type LegacyMeal = (typeof legacyMeals)[number];
-
-const LEGACY_CATEGORY_ORDER = [
-  'rice',
-  'pasta',
-  'grill',
-  'soup',
-  'swallow',
-  'sides',
-  'snacks',
-  'breakfast',
-] as const;
-
-const LEGACY_CATEGORY_NAMES: Record<string, string> = {
-  rice: 'Rice',
-  pasta: 'Pasta',
-  grill: 'Grill',
-  soup: 'Soup',
-  swallow: 'Swallow',
-  sides: 'Sides',
-  snacks: 'Snacks & Party',
-  breakfast: 'Breakfast',
-};
-
-const LEGACY_FEATURED_SLUGS = [
-  'jollof-rice-with-protein-and-plantain',
-  'plantain-lasagna',
-  'roasted-tilapia-fish',
-  'suya',
-  'edikaikong',
-  'small-chops',
-];
-
-const LEGACY_SIGNATURES: Record<string, string[]> = {
-  'jollof-rice-with-protein-and-plantain': ['Signature'],
-  'plantain-lasagna': ['House signature'],
-  'suya-burger': ['Fusion'],
-};
-
-function legacyToView(meal: LegacyMeal): MenuItemView {
-  return {
-    id: meal.id,
-    slug: meal.id,
-    categorySlug: meal.category,
-    categoryName: LEGACY_CATEGORY_NAMES[meal.category] ?? meal.category,
-    name: meal.name,
-    description: meal.description,
-    longDescription: null,
-    priceGbp: meal.price,
-    image: meal.image,
-    galleryPaths: [],
-    isAvailable: true,
-    isCodEligible: true,
-    isFeatured: LEGACY_FEATURED_SLUGS.includes(meal.id),
-    dietaryTags: [],
-    allergenTags: [],
-    badges: LEGACY_SIGNATURES[meal.id] ?? [],
-    variants: { groups: [] },
-    addons: { items: [] },
-  };
-}
-
-function legacyCategories(): MenuCategoryView[] {
-  const seen = new Set<string>();
-  return legacyMeals
-    .map((m) => m.category)
-    .filter((c) => {
-      if (seen.has(c)) return false;
-      seen.add(c);
-      return true;
-    })
-    .sort(
-      (a, b) =>
-        LEGACY_CATEGORY_ORDER.indexOf(a as (typeof LEGACY_CATEGORY_ORDER)[number]) -
-        LEGACY_CATEGORY_ORDER.indexOf(b as (typeof LEGACY_CATEGORY_ORDER)[number])
-    )
-    .map((slug, i) => ({
-      id: slug,
-      slug,
-      name: LEGACY_CATEGORY_NAMES[slug] ?? slug,
-      description: null,
-      displayOrder: i,
-    }));
-}
-
-// --- Supabase adapters ----------------------------------------------------
 
 type DbItem = Database['public']['Tables']['menu_items']['Row'] & {
   category: Pick<Database['public']['Tables']['menu_categories']['Row'], 'name' | 'slug'> | null;
@@ -171,101 +71,114 @@ function dbToView(item: DbItem): MenuItemView {
   };
 }
 
-// --- Public API -----------------------------------------------------------
+// ─────────────────────────────────────────────────────────────────────
+// Uncached implementations
+// ─────────────────────────────────────────────────────────────────────
 
-export async function getCategoriesWithItems(): Promise<{
+async function _getCategoriesWithItems(): Promise<{
   categories: MenuCategoryView[];
   itemsByCategory: Record<string, MenuItemView[]>;
 }> {
-  if (isSupabaseConfigured()) {
-    try {
-      const supabase = await getServerClient();
-      const { data: categories } = await supabase
-        .from('menu_categories')
-        .select('*')
-        .eq('is_visible', true)
-        .is('archived_at', null)
-        .order('display_order', { ascending: true });
+  try {
+    const supabase = getPublicClient();
+    const [{ data: categories, error: catErr }, { data: items, error: itemsErr }] =
+      await Promise.all([
+        supabase
+          .from('menu_categories')
+          .select('*')
+          .eq('is_visible', true)
+          .is('archived_at', null)
+          .order('display_order', { ascending: true }),
+        supabase
+          .from('menu_items')
+          .select('*, category:menu_categories!inner(name,slug)')
+          .eq('is_hidden', false)
+          .is('archived_at', null)
+          .order('display_order', { ascending: true }),
+      ]);
 
-      const { data: items } = await supabase
-        .from('menu_items')
-        .select('*, category:menu_categories!inner(name,slug)')
-        .eq('is_hidden', false)
-        .is('archived_at', null)
-        .order('display_order', { ascending: true });
+    if (catErr) console.error('[menu] categories query error:', catErr);
+    if (itemsErr) console.error('[menu] items query error:', itemsErr);
+    if (!categories) return { categories: [], itemsByCategory: {} };
 
-      if (categories && items) {
-        const cats: MenuCategoryView[] = categories.map((c) => ({
-          id: c.id,
-          slug: c.slug,
-          name: c.name,
-          description: c.description,
-          displayOrder: c.display_order,
-        }));
-        const byCat: Record<string, MenuItemView[]> = {};
-        for (const c of cats) byCat[c.slug] = [];
-        for (const it of items as unknown as DbItem[]) {
-          const slug = it.category?.slug;
-          if (slug && byCat[slug]) byCat[slug].push(dbToView(it));
-        }
-        return { categories: cats, itemsByCategory: byCat };
-      }
-    } catch (err) {
-      console.warn('[menu] Supabase fetch failed, falling back to legacy data:', err);
+    const cats: MenuCategoryView[] = categories.map((c) => ({
+      id: c.id,
+      slug: c.slug,
+      name: c.name,
+      description: c.description,
+      displayOrder: c.display_order,
+    }));
+    const byCat: Record<string, MenuItemView[]> = {};
+    for (const c of cats) byCat[c.slug] = [];
+    for (const it of (items ?? []) as unknown as DbItem[]) {
+      const slug = it.category?.slug;
+      if (slug && byCat[slug]) byCat[slug].push(dbToView(it));
     }
+    return { categories: cats, itemsByCategory: byCat };
+  } catch (err) {
+    console.error('[menu] getCategoriesWithItems threw:', err);
+    return { categories: [], itemsByCategory: {} };
   }
-
-  // Fallback: legacy hardcoded data
-  const categories = legacyCategories();
-  const byCat: Record<string, MenuItemView[]> = {};
-  for (const c of categories) byCat[c.slug] = [];
-  for (const m of legacyMeals) {
-    if (byCat[m.category]) byCat[m.category].push(legacyToView(m));
-  }
-  return { categories, itemsByCategory: byCat };
 }
 
-export async function getMenuItem(slug: string): Promise<MenuItemView | null> {
-  if (isSupabaseConfigured()) {
-    try {
-      const supabase = await getServerClient();
-      const { data } = await supabase
-        .from('menu_items')
-        .select('*, category:menu_categories!inner(name,slug)')
-        .eq('slug', slug)
-        .eq('is_hidden', false)
-        .is('archived_at', null)
-        .maybeSingle();
-      if (data) return dbToView(data as unknown as DbItem);
-    } catch (err) {
-      console.warn('[menu] Supabase getMenuItem failed:', err);
-    }
+async function _getMenuItem(slug: string): Promise<MenuItemView | null> {
+  try {
+    const supabase = getPublicClient();
+    const { data, error } = await supabase
+      .from('menu_items')
+      .select('*, category:menu_categories!inner(name,slug)')
+      .eq('slug', slug)
+      .eq('is_hidden', false)
+      .is('archived_at', null)
+      .maybeSingle();
+    if (error) console.error('[menu] getMenuItem error:', error);
+    return data ? dbToView(data as unknown as DbItem) : null;
+  } catch (err) {
+    console.error('[menu] getMenuItem threw:', err);
+    return null;
   }
-
-  const legacy = legacyMeals.find((m) => m.id === slug);
-  return legacy ? legacyToView(legacy) : null;
 }
 
-export async function getFeaturedItems(limit = 6): Promise<MenuItemView[]> {
-  if (isSupabaseConfigured()) {
-    try {
-      const supabase = await getServerClient();
-      const { data } = await supabase
-        .from('menu_items')
-        .select('*, category:menu_categories!inner(name,slug)')
-        .eq('is_featured', true)
-        .eq('is_hidden', false)
-        .is('archived_at', null)
-        .order('display_order', { ascending: true })
-        .limit(limit);
-      if (data) return (data as unknown as DbItem[]).map(dbToView);
-    } catch (err) {
-      console.warn('[menu] Supabase getFeaturedItems failed:', err);
-    }
+async function _getFeaturedItems(limit: number): Promise<MenuItemView[]> {
+  try {
+    const supabase = getPublicClient();
+    const { data, error } = await supabase
+      .from('menu_items')
+      .select('*, category:menu_categories!inner(name,slug)')
+      .eq('is_featured', true)
+      .eq('is_hidden', false)
+      .is('archived_at', null)
+      .order('display_order', { ascending: true })
+      .limit(limit);
+    if (error) console.error('[menu] getFeaturedItems error:', error);
+    return (data ?? []).map((d) => dbToView(d as unknown as DbItem));
+  } catch (err) {
+    console.error('[menu] getFeaturedItems threw:', err);
+    return [];
   }
-
-  return LEGACY_FEATURED_SLUGS.slice(0, limit)
-    .map((id) => legacyMeals.find((m) => m.id === id))
-    .filter((m): m is LegacyMeal => Boolean(m))
-    .map(legacyToView);
 }
+
+// ─────────────────────────────────────────────────────────────────────
+// Cached public API
+// `revalidate: 60` = serve the cached value for 60s, then revalidate in
+// the background. If Supabase is briefly down the last-good response
+// continues to serve. Admin mutations call revalidateTag(MENU_TAG).
+// ─────────────────────────────────────────────────────────────────────
+
+export const getCategoriesWithItems = unstable_cache(
+  _getCategoriesWithItems,
+  ['menu:categories-with-items'],
+  { revalidate: 60, tags: [MENU_TAG] }
+);
+
+export const getMenuItem = unstable_cache(
+  _getMenuItem,
+  ['menu:item-by-slug'],
+  { revalidate: 60, tags: [MENU_TAG] }
+);
+
+export const getFeaturedItems = unstable_cache(
+  async (limit: number = 6) => _getFeaturedItems(limit),
+  ['menu:featured'],
+  { revalidate: 60, tags: [MENU_TAG] }
+);

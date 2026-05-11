@@ -1,6 +1,8 @@
 'use server';
 
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
+import { MENU_TAG } from '@/lib/data/menu';
+import { ZONES_TAG } from '@/lib/data/zones';
 import { getServiceClient } from '@/lib/supabase/server';
 import { requireAdmin } from './auth';
 import type { VariantsBlob, AddonsBlob } from '@/lib/supabase/types';
@@ -49,6 +51,7 @@ export async function createCategory(args: {
 
   revalidatePath('/admin/categories');
   revalidatePath('/menu');
+  revalidateTag(MENU_TAG, 'default');
   return { ok: true, data: { id: data.id } };
 }
 
@@ -81,6 +84,7 @@ export async function updateCategory(args: {
 
   revalidatePath('/admin/categories');
   revalidatePath('/menu');
+  revalidateTag(MENU_TAG, 'default');
   return { ok: true };
 }
 
@@ -94,6 +98,7 @@ export async function archiveCategory(id: string): Promise<Result> {
   if (error) return { ok: false, error: error.message };
   revalidatePath('/admin/categories');
   revalidatePath('/menu');
+  revalidateTag(MENU_TAG, 'default');
   return { ok: true };
 }
 
@@ -136,6 +141,7 @@ export async function upsertZone(args: {
     if (error) return { ok: false, error: error.message };
     revalidatePath('/admin/zones');
     revalidatePath('/checkout');
+    revalidateTag(ZONES_TAG, 'default');
     return { ok: true, data: { id: args.id } };
   }
 
@@ -143,6 +149,7 @@ export async function upsertZone(args: {
   if (error) return { ok: false, error: error.message };
   revalidatePath('/admin/zones');
   revalidatePath('/checkout');
+    revalidateTag(ZONES_TAG, 'default');
   return { ok: true, data: { id: data.id } };
 }
 
@@ -155,6 +162,7 @@ export async function archiveZone(id: string): Promise<Result> {
     .eq('id', id);
   if (error) return { ok: false, error: error.message };
   revalidatePath('/admin/zones');
+  revalidateTag(ZONES_TAG, 'default');
   return { ok: true };
 }
 
@@ -216,6 +224,7 @@ export async function upsertMenuItem(args: MenuItemFormData): Promise<Result<{ i
     if (error) return { ok: false, error: error.message };
     revalidatePath('/admin/menu');
     revalidatePath('/menu');
+  revalidateTag(MENU_TAG, 'default');
     revalidatePath(`/menu/${payload.slug}`);
     return { ok: true, data: { id: args.id } };
   }
@@ -224,6 +233,7 @@ export async function upsertMenuItem(args: MenuItemFormData): Promise<Result<{ i
   if (error) return { ok: false, error: error.message };
   revalidatePath('/admin/menu');
   revalidatePath('/menu');
+  revalidateTag(MENU_TAG, 'default');
   return { ok: true, data: { id: data.id } };
 }
 
@@ -237,6 +247,7 @@ export async function archiveMenuItem(id: string): Promise<Result> {
   if (error) return { ok: false, error: error.message };
   revalidatePath('/admin/menu');
   revalidatePath('/menu');
+  revalidateTag(MENU_TAG, 'default');
   return { ok: true };
 }
 
@@ -247,6 +258,7 @@ export async function toggleItemAvailability(id: string, available: boolean): Pr
   if (error) return { ok: false, error: error.message };
   revalidatePath('/admin/menu');
   revalidatePath('/menu');
+  revalidateTag(MENU_TAG, 'default');
   return { ok: true };
 }
 

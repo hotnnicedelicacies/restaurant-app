@@ -62,7 +62,7 @@ export default function KitchenStory({
               {body}
             </div>
             {link && (
-              <Link href={link.href} className="link-underline">
+              <Link href={link.href} className="link-underline w-fit">
                 {link.label}
               </Link>
             )}
