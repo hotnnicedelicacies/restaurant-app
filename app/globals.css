@@ -2222,3 +2222,27 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -0.00
   object-fit: cover;
   border-radius: 2px;
 }
+
+/* ============================================================
+   RECEIPT BUTTON — used across admin + receipt page
+   ============================================================ */
+.receipt-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 13px;
+  font-variant: small-caps;
+  letter-spacing: 0.14em;
+  padding: 10px 16px;
+  border-radius: 2px;
+  border: 1px solid var(--color-walnut);
+  background: transparent;
+  color: var(--color-walnut);
+  cursor: pointer;
+  transition: background 200ms ease, color 200ms ease;
+}
+.receipt-btn:hover { background: var(--color-walnut); color: var(--color-cream); }
+.receipt-btn--primary { background: var(--color-walnut); color: var(--color-cream); }
+.receipt-btn--primary:hover { background: var(--color-bronze-deep); }
