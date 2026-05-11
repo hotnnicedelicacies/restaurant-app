@@ -1,157 +1,176 @@
-'use client';
-
-import { useState } from 'react';
+import type { Metadata } from 'next';
+import SiteHeader from '@/components/layout/SiteHeader';
+import SiteFooter from '@/components/layout/SiteFooter';
+import PageHero from '@/components/layout/PageHero';
+import DeliveryAreas from '@/components/home/DeliveryAreas';
+import ContactForm from '@/components/contact/ContactForm';
 import { siteConfig } from '@/constants/siteConfig';
-import { Phone, Mail, MessageCircle, MapPin } from 'lucide-react';
-import { toast } from 'sonner';
+import { absoluteUrl } from '@/lib/utils';
 
-const ContactPage = () => {
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    message: '',
-  });
+export const metadata: Metadata = {
+  title: 'Contact',
+  description: `Get in touch with ${siteConfig.name}. WhatsApp, phone, email — kitchen hours Tue – Sun 12pm – 8pm.`,
+  alternates: { canonical: absoluteUrl(siteConfig.routes.contact) },
+  openGraph: {
+    title: `Contact ${siteConfig.name}`,
+    description: 'WhatsApp, phone, email — and where we deliver across Teesside.',
+    type: 'website',
+    images: [absoluteUrl('/og-image.jpg')],
+  },
+};
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    const message = encodeURIComponent(
-      `Hi! My name is ${form.name}.\n\n${form.message}\n\nEmail: ${form.email}${form.phone ? `\nPhone: ${form.phone}` : ''}`
-    );
-    toast.success('Opening WhatsApp!');
+const CONTACT_PAGE_SCHEMA = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  url: absoluteUrl(siteConfig.routes.contact),
+  name: `Contact ${siteConfig.name}`,
+  description: 'Get in touch — WhatsApp, phone, email, and kitchen hours.',
+  mainEntity: {
+    '@type': 'Organization',
+    name: siteConfig.name,
+    telephone: siteConfig.contact.phone,
+    email: siteConfig.contact.email,
+    address: {
+      '@type': 'PostalAddress',
+      addressLocality: 'Middlesbrough',
+      addressRegion: 'North Yorkshire',
+      addressCountry: 'GB',
+    },
+  },
+};
 
-    setTimeout(() => {
-      window.open(`https://wa.me/${siteConfig.contact.whatsapp}?text=${message}`, '_blank');
-    }, 1000);
-  };
+const CHANNELS: {
+  label: string;
+  value: string;
+  caption: string;
+  cta: { label: string; href: string };
+}[] = [
+  {
+    label: 'WhatsApp',
+    value: siteConfig.contact.whatsappDisplay,
+    caption: 'Fastest reply · live orders, custom requests',
+    cta: { label: 'Open chat →', href: `https://wa.me/${siteConfig.contact.whatsapp}` },
+  },
+  {
+    label: 'Phone',
+    value: siteConfig.contact.phone,
+    caption: 'Available during kitchen hours',
+    cta: { label: 'Call →', href: `tel:${siteConfig.contact.phone}` },
+  },
+  {
+    label: 'Email',
+    value: siteConfig.contact.email,
+    caption: 'For invoices, larger orders, press',
+    cta: { label: 'Email us →', href: `mailto:${siteConfig.contact.email}` },
+  },
+  {
+    label: 'Instagram',
+    value: '@hotnnicedelicacies',
+    caption: "Today's kitchen, behind the scenes",
+    cta: { label: 'Follow →', href: siteConfig.social.instagram },
+  },
+];
 
-  const inputClass =
-    'w-full border border-input rounded-lg px-4 py-3 bg-card text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all font-body';
+const HOURS = [
+  { day: 'Monday', value: 'Closed', closed: true },
+  { day: 'Tuesday', value: '12pm – 8pm' },
+  { day: 'Wednesday', value: '12pm – 8pm' },
+  { day: 'Thursday', value: '12pm – 8pm' },
+  { day: 'Friday', value: '12pm – 8pm' },
+  { day: 'Saturday', value: '12pm – 8pm' },
+  { day: 'Sunday', value: '12pm – 8pm' },
+];
 
+export default function ContactPage() {
   return (
-    <section className="bg-background py-16 md:py-24">
-      <div className="container max-w-5xl px-4">
-        <div className="mb-12 text-center">
-          <h1 className="font-display text-foreground mb-4 text-4xl font-bold md:text-5xl">
-            Get In Touch
-          </h1>
-          <p className="text-muted-foreground mx-auto max-w-xl text-lg">
-            Got a question, special request, or just want to chat about our food? We&apos;d love to
-            hear from you!
-          </p>
-        </div>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(CONTACT_PAGE_SCHEMA) }}
+      />
+      <SiteHeader />
+      <main>
+        <PageHero
+          eyebrow="Say hello · Middlesbrough"
+          title={<>Get in <em>touch.</em></>}
+          sub="The quickest way to reach us is WhatsApp — we answer between the kitchen passes."
+        />
 
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2">
-          {/* Contact Info */}
-          <div className="space-y-6">
-            <h2 className="font-display text-foreground text-2xl font-semibold">
-              Reach Out Directly
-            </h2>
-
-            <a
-              href={`https://wa.me/${siteConfig.contact.whatsapp}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-secondary/10 border-secondary/20 hover:bg-secondary/20 flex items-center gap-4 rounded-xl border p-4 transition-colors"
-            >
-              <div className="bg-secondary flex h-12 w-12 items-center justify-center rounded-xl">
-                <MessageCircle size={22} className="text-secondary-foreground" />
-              </div>
+        <section className="py-[clamp(56px,8vw,96px)]">
+          <div className="container">
+            <div className="grid items-start gap-[clamp(40px,6vw,80px)] md:grid-cols-[1.1fr_1fr]">
+              {/* LEFT: channels + hours */}
               <div>
-                <p className="text-foreground font-semibold">WhatsApp</p>
-                <p className="text-muted-foreground text-sm">
-                  {siteConfig.contact.whatsappDisplay}
+                <div className="t-mono mb-2.5">Find us</div>
+                <h2 className="t-display-m mb-2">Reach the <em>kitchen</em></h2>
+                <p className="t-body-l mb-5">
+                  If your question is about a live order, WhatsApp gets the fastest reply.
                 </p>
-              </div>
-            </a>
 
-            <a
-              href={`tel:${siteConfig.contact.phone}`}
-              className="bg-primary/5 border-primary/10 hover:bg-primary/10 flex items-center gap-4 rounded-xl border p-4 transition-colors"
-            >
-              <div className="bg-primary flex h-12 w-12 items-center justify-center rounded-xl">
-                <Phone size={22} className="text-primary-foreground" />
-              </div>
-              <div>
-                <p className="text-foreground font-semibold">Phone</p>
-                <p className="text-muted-foreground text-sm">{siteConfig.contact.phone}</p>
-              </div>
-            </a>
+                <div className="mt-2 flex flex-col border-t border-[--color-border]">
+                  {CHANNELS.map((ch) => (
+                    <div
+                      key={ch.label}
+                      className="grid items-center gap-4 border-b border-[--color-border] py-[18px] sm:grid-cols-[90px_1fr_auto]"
+                    >
+                      <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[--color-bronze-deep]">
+                        {ch.label}
+                      </span>
+                      <span className="font-serif text-[17px] text-[--color-walnut]">
+                        {ch.value}
+                        <em className="mt-0.5 block text-[14px] italic text-[--color-ink-muted]">
+                          {ch.caption}
+                        </em>
+                      </span>
+                      <a
+                        href={ch.cta.href}
+                        target={ch.cta.href.startsWith('http') ? '_blank' : undefined}
+                        rel={ch.cta.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                        className="font-serif text-[14px] italic text-[--color-bronze-deep] border-b border-[--color-bronze-deep] pb-px sm:justify-self-end"
+                      >
+                        {ch.cta.label}
+                      </a>
+                    </div>
+                  ))}
+                </div>
 
-            <a
-              href={`mailto:${siteConfig.contact.email}`}
-              className="bg-warm-gold/5 border-warm-gold/10 hover:bg-warm-gold/10 flex items-center gap-4 rounded-xl border p-4 transition-colors"
-            >
-              <div className="bg-warm-gold flex h-12 w-12 items-center justify-center rounded-xl">
-                <Mail size={22} className="text-warm-gold-foreground" />
+                {/* HOURS */}
+                <div className="mt-8 rounded-[2px] border border-[--color-border] bg-[--color-cream-soft] p-6">
+                  <h3 className="m-0 mb-4 font-serif text-[18px] font-medium tracking-[0.14em] text-[--color-bronze-deep] [font-variant:small-caps]">
+                    Kitchen hours
+                  </h3>
+                  <ul className="m-0 flex list-none flex-col gap-2 p-0 font-serif text-[15px] text-[--color-walnut]">
+                    {HOURS.map((h) => (
+                      <li
+                        key={h.day}
+                        className={`flex justify-between ${h.closed ? 'italic text-[--color-ink-muted]' : ''}`}
+                      >
+                        <b className="font-medium tracking-[0.08em] [font-variant:small-caps]">{h.day}</b>
+                        <span>{h.value}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="m-0 mt-3 border-t border-[--color-border] pt-3 font-serif text-[13.5px] italic text-[--color-ink-muted]">
+                    Order by{' '}
+                    <b className="font-medium not-italic tracking-[0.08em] text-[--color-walnut] [font-variant:small-caps]">
+                      10am
+                    </b>{' '}
+                    for same-day delivery. Anything later goes onto the next day's list.
+                  </p>
+                </div>
               </div>
-              <div>
-                <p className="text-foreground font-semibold">Email</p>
-                <p className="text-muted-foreground text-sm">{siteConfig.contact.email}</p>
-              </div>
-            </a>
 
-            <div className="bg-muted border-border flex items-start gap-4 rounded-xl border p-4">
-              <div className="bg-accent flex h-12 w-12 shrink-0 items-center justify-center rounded-xl">
-                <MapPin size={22} className="text-accent-foreground" />
-              </div>
+              {/* RIGHT: form */}
               <div>
-                <p className="text-foreground font-semibold">Delivery Areas</p>
-                <p className="text-muted-foreground text-sm">
-                  {siteConfig.delivery.areas.join(', ')}
-                </p>
+                <ContactForm />
               </div>
             </div>
           </div>
+        </section>
 
-          {/* Contact Form */}
-          <div>
-            <h2 className="font-display text-foreground mb-6 text-2xl font-semibold">
-              Send a Message
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                required
-                placeholder="Your Name *"
-                className={inputClass}
-                value={form.name}
-                onChange={e => setForm({ ...form, name: e.target.value })}
-              />
-              <input
-                required
-                type="email"
-                placeholder="Email Address *"
-                className={inputClass}
-                value={form.email}
-                onChange={e => setForm({ ...form, email: e.target.value })}
-              />
-              <input
-                type="tel"
-                placeholder="Phone (optional)"
-                className={inputClass}
-                value={form.phone}
-                onChange={e => setForm({ ...form, phone: e.target.value })}
-              />
-              <textarea
-                required
-                placeholder="Your message *"
-                rows={5}
-                className={inputClass}
-                value={form.message}
-                onChange={e => setForm({ ...form, message: e.target.value })}
-              />
-              <button
-                type="submit"
-                className="bg-gradient-warm text-primary-foreground w-full rounded-xl py-4 text-lg font-bold transition-opacity hover:opacity-90"
-              >
-                Send Message
-              </button>
-            </form>
-          </div>
-        </div>
-      </div>
-    </section>
+        <DeliveryAreas />
+      </main>
+      <SiteFooter />
+    </>
   );
-};
-
-export default ContactPage;
+}

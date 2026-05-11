@@ -1,265 +1,144 @@
-'use client';
-
-import Link from 'next/link';
-import { motion } from 'framer-motion';
-import { UtensilsCrossed, Truck, ClipboardList, Phone, Mail, MessageCircle } from 'lucide-react';
+import SiteHeader from '@/components/layout/SiteHeader';
+import SiteFooter from '@/components/layout/SiteFooter';
+import HeritageHero from '@/components/home/HeritageHero';
+import DayBand from '@/components/home/DayBand';
+import BillOfFare from '@/components/menu/BillOfFare';
+import HygieneSection from '@/components/home/HygieneSection';
+import KitchenStory from '@/components/home/KitchenStory';
+import HowItWorks from '@/components/home/HowItWorks';
+import DeliveryAreas from '@/components/home/DeliveryAreas';
+import CtaBand from '@/components/home/CtaBand';
 import { siteConfig } from '@/constants/siteConfig';
+import { formatLongDate, absoluteUrl } from '@/lib/utils';
 import { meals } from '@/constants/meals';
-import MealCard from '@/components/MealCard';
-import FoodHygieneTrustStrip from '@/components/FoodHygieneTrustStrip';
-import FoodHygieneSection from '@/components/FoodHygieneSection';
+import { type FareRowItem } from '@/components/menu/FareRow';
+
 import heroImg from '@/assets/hero-food.jpg';
-import Image from 'next/image';
+import storyImg from '@/assets/meals/jollof-rice-with-protein-of-choice-and-plantain.jpeg';
 
-const featuredMeals = meals.slice(0, 9);
+/**
+ * --- Featured items for the "Today's Bill of Fare" homepage section ---
+ * In Phase 3 this becomes a Supabase query (`is_featured = true`); for now
+ * we pick six iconic items by slug from the hardcoded menu data.
+ */
+const FEATURED_SLUGS = [
+  'jollof-rice-with-protein-and-plantain',
+  'plantain-lasagna',
+  'roasted-tilapia-fish',
+  'suya',
+  'edikaikong',
+  'small-chops',
+];
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.1, duration: 0.5 },
-  }),
+function getFeaturedItems(): FareRowItem[] {
+  return FEATURED_SLUGS.map((slug, i) => {
+    const meal = meals.find((m) => m.id === slug);
+    if (!meal) return null;
+    const categoryLabel = meal.category.charAt(0).toUpperCase() + meal.category.slice(1);
+    const num = String(i + 1).padStart(2, '0');
+    const badges = slug === 'jollof-rice-with-protein-and-plantain' ? ['Signature'] : slug === 'plantain-lasagna' ? ['House signature'] : [];
+    return {
+      slug: meal.id,
+      numLabel: `№ ${num} · ${categoryLabel}`,
+      name: meal.name,
+      description: meal.description,
+      price: meal.price,
+      image: meal.image,
+      imageAlt: meal.name,
+      badges,
+      available: true,
+    } satisfies FareRowItem;
+  }).filter(Boolean) as FareRowItem[];
+}
+
+// ===== SEO (page-level overrides) =====
+export const metadata = {
+  alternates: { canonical: absoluteUrl(siteConfig.routes.home) },
 };
 
-export default function Home() {
+// JSON-LD: WebSite + Menu — extends the FoodEstablishment in root layout
+const websiteSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  url: absoluteUrl(),
+  name: siteConfig.name,
+  potentialAction: {
+    '@type': 'SearchAction',
+    target: `${absoluteUrl(siteConfig.routes.menu)}?q={search_term}`,
+    'query-input': 'required name=search_term',
+  },
+};
+
+export default function HomePage() {
+  const featured = getFeaturedItems();
+  const today = formatLongDate(new Date());
+
   return (
     <>
-      {/* Hero */}
-      <section className="relative flex min-h-[85vh] items-center overflow-hidden">
-        <Image
-          src={heroImg}
-          alt="A spread of freshly cooked home meals including jollof rice, grilled skewers, and hearty soups"
-          className="absolute inset-0 h-full w-full object-cover"
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+
+      <SiteHeader />
+
+      <main id="main">
+        <HeritageHero
+          image={heroImg}
+          imageAlt="A spread of Hot N Nice home-cooked dishes including jollof rice, plantain lasagna, suya skewers and soups"
+          eyebrow={siteConfig.voice.kitchenLocation}
+          meta={`№ 11 · ${today} · Tue – Sun`}
+          headline={
+            <>
+              Italian &amp; West African,
+              <br />
+              cooked from scratch, <em>delivered hot.</em>
+            </>
+          }
+          deck="No shortcuts. No frozen meals. A five-star kitchen on its feet from ten o'clock every morning — bringing dinner to your door across Teesside."
+          primaryCta={{ label: "See today's menu", href: siteConfig.routes.menu }}
+          secondaryCta={{
+            label: 'or message us on WhatsApp',
+            href: `https://wa.me/${siteConfig.contact.whatsapp}`,
+          }}
         />
-        <div className="bg-gradient-hero absolute inset-0" />
-        <div className="relative z-10 container px-4 py-20">
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7 }}
-            className="max-w-2xl"
-          >
-            <h1 className="font-display text-primary-foreground mb-6 text-4xl leading-tight font-bold md:text-6xl lg:text-7xl">
-              Freshly Made,
-              <span className="text-primary block">Delivered to Your Door</span>
-            </h1>
-            <p className="text-primary-foreground/80 font-body mb-8 text-lg leading-relaxed md:text-xl">
-              Made with love, delivered hot to your door in Middlesbrough. From smoky grilled
-              skewers to rich, hearty soups — taste the flavours of home.
-            </p>
-            <div className="flex flex-col gap-4 sm:flex-row">
-              <Link
-                href="/order"
-                className="bg-gradient-warm text-primary-foreground rounded-xl px-8 py-4 text-center text-lg font-bold transition-opacity hover:opacity-90"
-              >
-                Order Now
-              </Link>
-              <Link
-                href="/menu"
-                className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10 rounded-xl border-2 px-8 py-4 text-center text-lg font-semibold transition-colors"
-              >
-                View Menu
-              </Link>
-            </div>
-          </motion.div>
-        </div>
-      </section>
 
-      <FoodHygieneTrustStrip />
+        <DayBand />
 
-      {/* About */}
-      <section className="bg-background py-16 md:py-24">
-        <div className="container px-4">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-100px' }}
-            variants={fadeUp}
-            custom={0}
-            className="mx-auto max-w-3xl text-center"
-          >
-            <h2 className="font-display text-foreground mb-6 text-3xl font-bold md:text-4xl">
-              Who&apos;s Cooking Your Food?
-            </h2>
-            <p className="text-muted-foreground mb-4 text-lg leading-relaxed">
-              We&apos;re a family that brought bold, vibrant flavours from our home kitchen all the
-              way to Middlesbrough. Every meal is prepared from scratch using recipes passed down
-              through generations, fresh ingredients sourced daily, and a whole lot of love.
-            </p>
-            <p className="text-muted-foreground text-lg leading-relaxed">
-              No shortcuts. No frozen meals. Just honest, home-cooked food — the way it&apos;s meant
-              to taste.
-            </p>
-            <p className="text-muted-foreground mt-4 text-lg leading-relaxed">
-              And we&apos;re proud to hold a{' '}
-              <a
-                href={siteConfig.foodHygiene.listingUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary font-semibold underline-offset-4 hover:underline"
-              >
-                5-star Food Hygiene Rating
-              </a>{' '}
-              from the {siteConfig.foodHygiene.authority} — because every kitchen deserves nothing
-              less.
-            </p>
-          </motion.div>
-        </div>
-      </section>
+        <BillOfFare items={featured} />
 
-      {/* Featured Meals */}
-      <section className="bg-muted py-16 md:py-24">
-        <div className="container">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeUp}
-            custom={0}
-            className="mb-12 text-center"
-          >
-            <h2 className="font-display text-foreground mb-4 text-3xl font-bold md:text-4xl">
-              Our Most Loved Dishes
-            </h2>
-            <p className="text-muted-foreground text-lg">Straight from our kitchen to your table</p>
-          </motion.div>
-          <div className="grid gap-6 px-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {featuredMeals.map((meal, i) => (
-              <motion.div
-                key={meal.id}
-                initial="hidden"
-                whileInView="visible"
-                className="last:sm:hidden last:lg:block last:xl:hidden"
-                viewport={{ once: true }}
-                variants={fadeUp}
-                custom={i}
-              >
-                <MealCard meal={meal} />
-              </motion.div>
-            ))}
-          </div>
-          <div className="mt-10 text-center">
-            <Link
-              href="/menu"
-              className="border-primary text-primary hover:bg-primary hover:text-primary-foreground inline-block rounded-xl border-2 px-8 py-3 font-semibold transition-colors"
-            >
-              View Full Menu
-            </Link>
-          </div>
-        </div>
-      </section>
+        <HygieneSection />
 
-      <FoodHygieneSection />
+        <KitchenStory
+          image={storyImg}
+          imageAlt="Jollof rice plated from the kitchen"
+          eyebrow="From the kitchen"
+          title={<>A small kitchen, <em>cooking honestly.</em></>}
+          body={
+            <>
+              <p>
+                We're a family kitchen in Middlesbrough, cooking <b>Italian classics and West African staples</b> from scratch every morning. Our pots go on by ten o'clock — and what you see on the menu today is what we have prepared today.
+              </p>
+              <p>
+                No shortcuts. <em>No frozen meals.</em> Just dinner, made with care, and delivered hot to your door across Teesside.
+              </p>
+            </>
+          }
+        />
 
-      {/* How It Works */}
-      <section className="bg-background py-16 md:py-24">
-        <div className="container px-4">
-          <h2 className="font-display text-foreground mb-12 text-center text-3xl font-bold md:text-4xl">
-            How It Works
-          </h2>
-          <div className="mx-auto grid max-w-4xl grid-cols-1 gap-8 md:grid-cols-3">
-            {[
-              {
-                icon: UtensilsCrossed,
-                step: '1',
-                title: 'Browse Our Menu',
-                desc: 'Explore our delicious selection of freshly made dishes',
-              },
-              {
-                icon: ClipboardList,
-                step: '2',
-                title: 'Place Your Order',
-                desc: 'Choose your meals and submit your order online or via WhatsApp',
-              },
-              {
-                icon: Truck,
-                step: '3',
-                title: 'We Deliver Hot',
-                desc: 'Freshly cooked meals delivered straight to your door',
-              },
-            ].map((item, i) => (
-              <motion.div
-                key={item.step}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
-                variants={fadeUp}
-                custom={i}
-                className="text-center"
-              >
-                <div className="bg-primary/10 mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl">
-                  <item.icon size={28} className="text-primary" />
-                </div>
-                <div className="text-primary mb-2 text-sm font-bold">Step {item.step}</div>
-                <h3 className="font-display text-foreground mb-2 text-xl font-semibold">
-                  {item.title}
-                </h3>
-                <p className="text-muted-foreground text-sm">{item.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+        <HowItWorks />
 
-      {/* Delivery Areas */}
-      <section className="bg-muted py-16 md:py-20">
-        <div className="container px-4 text-center">
-          <h2 className="font-display text-foreground mb-4 text-3xl font-bold md:text-4xl">
-            Delivering Across Middlesbrough
-          </h2>
-          <p className="text-muted-foreground mb-6 text-lg">
-            {siteConfig.delivery.areas.join(' • ')}
-          </p>
-          <div className="bg-card border-border inline-block max-w-md rounded-xl border px-8 py-4 shadow-sm">
-            <p className="text-foreground font-semibold">
-              Delivery from £{siteConfig.delivery.pricing.middlesbrough} within Middlesbrough
-            </p>
-            <p className="text-muted-foreground mt-1 text-sm">
-              Final price depends on your exact location. Surrounding areas — contact us for a
-              quote.
-            </p>
-          </div>
-        </div>
-      </section>
+        <DeliveryAreas />
 
-      {/* CTA */}
-      <section className="bg-gradient-cta py-16 md:py-24">
-        <div className="container px-4 text-center">
-          <h2 className="font-display text-primary-foreground mb-4 text-3xl font-bold md:text-4xl">
-            Ready to Taste Something Delicious?
-          </h2>
-          <p className="text-primary-foreground/80 mx-auto mb-8 max-w-xl text-lg">
-            Order now and let us bring the flavours of home to your doorstep.
-          </p>
-          <Link
-            href="/order"
-            className="bg-foreground text-background mb-8 inline-block rounded-xl px-10 py-4 text-lg font-bold transition-opacity hover:opacity-90"
-          >
-            Place Your Order
-          </Link>
-          <div className="text-primary-foreground/80 flex flex-wrap justify-center gap-6 text-sm">
-            <a
-              href={`https://wa.me/${siteConfig.contact.whatsapp}`}
-              className="hover:text-primary-foreground flex items-center gap-2 transition-colors"
-            >
-              <MessageCircle size={18} /> WhatsApp
-            </a>
-            <a
-              href={`tel:${siteConfig.contact.phone}`}
-              className="hover:text-primary-foreground flex items-center gap-2 transition-colors"
-            >
-              <Phone size={18} /> {siteConfig.contact.phone}
-            </a>
-            <a
-              href={`mailto:${siteConfig.contact.email}`}
-              className="hover:text-primary-foreground flex items-center gap-2 transition-colors"
-            >
-              <Mail size={18} /> {siteConfig.contact.email}
-            </a>
-          </div>
-        </div>
-      </section>
+        <CtaBand
+          eyebrow="Ready when you are"
+          title={<>Tonight's dinner, <em>handled.</em></>}
+          sub="Place your order before ten and we'll have it at your door hot, between twelve and eight."
+          cta={{ label: 'Place your order', href: siteConfig.routes.menu }}
+        />
+      </main>
+
+      <SiteFooter />
     </>
   );
 }
