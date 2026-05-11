@@ -274,3 +274,84 @@ export async function addKitchenNote(args: {
   revalidatePath(`/track/${args.ref}`);
   return { ok: true };
 }
+
+/**
+ * Manual Stripe sync — used when the webhook may have been missed (local
+ * dev without `stripe listen`, transient network issue, etc.). Fetches
+ * the PaymentIntent + latest charge from Stripe directly and reconciles
+ * payment_status / card_brand / card_last4 / refund_amount on our order.
+ */
+export async function syncStripePayment(ref: string): Promise<Result<{ paymentStatus: string }>> {
+  const admin = await requireAdmin();
+  const order = await getOrderByRef(ref);
+  if (!order) return { ok: false, error: 'Order not found.' };
+  if (order.paymentMethod !== 'card') return { ok: false, error: 'Only card orders can be synced.' };
+
+  const supabase = getServiceClient();
+  const { data: row } = await supabase
+    .from('orders')
+    .select('stripe_payment_intent_id')
+    .eq('id', order.id)
+    .single();
+  if (!row?.stripe_payment_intent_id) return { ok: false, error: 'No Stripe PaymentIntent on file.' };
+
+  let stripeStatus: string;
+  let cardBrand: string | null = null;
+  let cardLast4: string | null = null;
+  let refundedTotal = 0;
+
+  try {
+    const stripe = getStripe();
+    const pi = await stripe.paymentIntents.retrieve(row.stripe_payment_intent_id, {
+      expand: ['latest_charge'],
+    });
+    stripeStatus = pi.status; // 'succeeded' | 'requires_payment_method' | 'requires_action' | etc.
+    const charge =
+      pi.latest_charge && typeof pi.latest_charge !== 'string' ? pi.latest_charge : null;
+    if (charge) {
+      cardBrand = charge.payment_method_details?.card?.brand ?? null;
+      cardLast4 = charge.payment_method_details?.card?.last4 ?? null;
+      refundedTotal = (charge.amount_refunded ?? 0) / 100;
+    }
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : 'Stripe lookup failed.' };
+  }
+
+  // Map Stripe states to our payment_status
+  let nextPaymentStatus: 'pending' | 'paid' | 'failed' | 'refunded' | 'partially_refunded';
+  if (stripeStatus === 'succeeded') {
+    if (refundedTotal >= Number(order.totalGbp)) nextPaymentStatus = 'refunded';
+    else if (refundedTotal > 0) nextPaymentStatus = 'partially_refunded';
+    else nextPaymentStatus = 'paid';
+  } else if (stripeStatus === 'canceled' || stripeStatus === 'requires_payment_method') {
+    nextPaymentStatus = 'failed';
+  } else {
+    nextPaymentStatus = 'pending';
+  }
+
+  const { error } = await supabase
+    .from('orders')
+    .update({
+      payment_status: nextPaymentStatus,
+      card_brand: cardBrand,
+      card_last4: cardLast4,
+      refund_amount_gbp: refundedTotal > 0 ? refundedTotal : null,
+    })
+    .eq('id', order.id);
+  if (error) return { ok: false, error: error.message };
+
+  await supabase.from('kitchen_notes').insert({
+    order_id: order.id,
+    author_id: admin.id,
+    author_name: admin.displayName,
+    status_at_time: order.status,
+    body: `Stripe re-sync · payment_status now '${nextPaymentStatus}' (stripe says '${stripeStatus}').`,
+    visible_to_customer: false,
+    emailed: false,
+  });
+
+  revalidatePath(`/admin/orders/${ref}`);
+  revalidatePath('/admin/orders');
+  revalidatePath('/admin/payments');
+  return { ok: true, data: { paymentStatus: nextPaymentStatus } };
+}

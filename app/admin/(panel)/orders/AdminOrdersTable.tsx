@@ -15,6 +15,7 @@ export interface OrderRow {
   totalGbp: number;
   createdAt: string;
   itemsLine: string;
+  stripePaymentIntentId: string | null;
 }
 
 const STATUS_LABELS: Record<OrderRow['status'], string> = {
@@ -32,6 +33,23 @@ const STATUS_PILL: Record<OrderRow['status'], string> = {
   delivered: 'pill pill--delivered',
   cancelled: 'pill pill--cancelled',
 };
+
+function paymentDot(row: OrderRow): { color: string; label: string } {
+  // Maps the row's payment state to a small traffic-light dot rendered
+  // next to the payment-method pill. Green = settled, yellow = pending,
+  // red = failed / refunded, grey = N/A.
+  if (row.status === 'cancelled') return { color: '#A56F40', label: 'Cancelled' };
+  if (row.paymentMethod === 'card') {
+    if (row.paymentStatus === 'paid') return { color: '#1e7d3f', label: 'Paid' };
+    if (row.paymentStatus === 'pending') return { color: '#d97706', label: 'Payment pending' };
+    if (row.paymentStatus === 'failed') return { color: '#8B2A1A', label: 'Payment failed' };
+    if (row.paymentStatus === 'refunded') return { color: '#8B2A1A', label: 'Refunded' };
+    if (row.paymentStatus === 'partially_refunded') return { color: '#d97706', label: 'Partially refunded' };
+  }
+  // COD
+  if (row.codStatus === 'collected') return { color: '#1e7d3f', label: 'Cash collected' };
+  return { color: '#d97706', label: 'Awaiting cash' };
+}
 
 function timeAgo(iso: string): string {
   const ms = Date.now() - new Date(iso).getTime();
@@ -72,6 +90,7 @@ export default function AdminOrdersTable({ rows }: { rows: OrderRow[] }) {
         <tbody>
           {rows.map((o) => {
             const cancelled = o.status === 'cancelled';
+            const dot = paymentDot(o);
             return (
               <tr
                 key={o.ref}
@@ -104,8 +123,23 @@ export default function AdminOrdersTable({ rows }: { rows: OrderRow[] }) {
                   <div className="admin-table__items">{o.itemsLine || '—'}</div>
                 </td>
                 <td>
-                  <span className={`pill ${o.paymentMethod === 'card' ? 'pill--card' : 'pill--cod'}`}>
-                    {o.paymentMethod === 'card' ? 'Card' : 'COD'}
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+                    <span
+                      title={dot.label}
+                      aria-label={dot.label}
+                      style={{
+                        display: 'inline-block',
+                        width: 8,
+                        height: 8,
+                        borderRadius: '50%',
+                        background: dot.color,
+                        boxShadow: `0 0 0 3px ${dot.color}22`,
+                        flexShrink: 0,
+                      }}
+                    />
+                    <span className={`pill ${o.paymentMethod === 'card' ? 'pill--card' : 'pill--cod'}`}>
+                      {o.paymentMethod === 'card' ? 'Card' : 'COD'}
+                    </span>
                   </span>
                 </td>
                 <td

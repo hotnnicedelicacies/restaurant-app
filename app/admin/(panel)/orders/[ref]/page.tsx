@@ -205,6 +205,7 @@ export default async function AdminOrderDetail({ params }: { params: Promise<{ r
           <OrderStatusControls
             orderRef={order.ref}
             currentStatus={order.status}
+            customerName={`${order.customer.firstName} ${order.customer.lastName}`}
           />
 
           <OrderPaymentControls
@@ -218,6 +219,7 @@ export default async function AdminOrderDetail({ params }: { params: Promise<{ r
             refundAmountGbp={order.refundAmountGbp}
             status={order.status}
             cancelledReason={order.cancelledReason}
+            customerName={`${order.customer.firstName} ${order.customer.lastName}`}
           />
         </aside>
       </div>

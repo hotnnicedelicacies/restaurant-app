@@ -3,18 +3,13 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import ConfirmModal from '@/components/admin/ConfirmModal';
 import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
-import { adminCancelOrder, markCodCollected, refundOrder } from '@/lib/admin/orderActions';
+  adminCancelOrder,
+  markCodCollected,
+  refundOrder,
+  syncStripePayment,
+} from '@/lib/admin/orderActions';
 import { formatGBP } from '@/lib/utils';
 
 interface Props {
@@ -28,22 +23,29 @@ interface Props {
   refundAmountGbp: number | null;
   status: 'received' | 'preparing' | 'on_its_way' | 'delivered' | 'cancelled';
   cancelledReason: string | null;
+  customerName: string;
 }
 
 export default function OrderPaymentControls(props: Props) {
   const router = useRouter();
   const [pending, start] = useTransition();
+  const [collectOpen, setCollectOpen] = useState(false);
   const [refundOpen, setRefundOpen] = useState(false);
   const [refundAmount, setRefundAmount] = useState('');
   const [refundReason, setRefundReason] = useState('');
   const [cancelOpen, setCancelOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState('');
+  const [syncOpen, setSyncOpen] = useState(false);
 
   const canRefund =
     props.paymentMethod === 'card' &&
     (props.paymentStatus === 'paid' || props.paymentStatus === 'partially_refunded');
-  const canMarkCollected = props.paymentMethod === 'cod' && props.codStatus !== 'collected' && props.status !== 'cancelled';
+  const canMarkCollected =
+    props.paymentMethod === 'cod' && props.codStatus !== 'collected' && props.status !== 'cancelled';
   const canCancel = props.status !== 'cancelled' && props.status !== 'delivered';
+  const canSync =
+    props.paymentMethod === 'card' &&
+    (props.paymentStatus === 'pending' || props.paymentStatus === 'failed');
 
   function handleMarkCollected() {
     start(async () => {
@@ -53,6 +55,7 @@ export default function OrderPaymentControls(props: Props) {
         return;
       }
       toast.success('Marked as collected.');
+      setCollectOpen(false);
       router.refresh();
     });
   }
@@ -99,11 +102,25 @@ export default function OrderPaymentControls(props: Props) {
     });
   }
 
+  function handleSync() {
+    start(async () => {
+      const res = await syncStripePayment(props.orderRef);
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      toast.success(`Stripe says: ${res.data?.paymentStatus}.`);
+      setSyncOpen(false);
+      router.refresh();
+    });
+  }
+
   const refunded = props.refundAmountGbp ?? 0;
+  const remainingRefundable = props.totalGbp - refunded;
 
   return (
     <>
-      {/* Payment */}
+      {/* Payment summary */}
       <div className="form-section" style={{ marginTop: 20 }}>
         <header className="form-section__head">
           <h2 className="form-section__title">Payment</h2>
@@ -134,79 +151,73 @@ export default function OrderPaymentControls(props: Props) {
           )}
         </p>
 
-        {canMarkCollected && (
-          <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
-            <span className="pill pill--uncollected">Cash not yet collected</span>
+        {canSync && (
+          <div
+            style={{
+              marginTop: 12,
+              padding: '10px 12px',
+              background: 'var(--color-cream-soft)',
+              borderLeft: '3px solid var(--color-bronze)',
+              borderRadius: '0 2px 2px 0',
+            }}
+          >
+            <p className="t-body-muted" style={{ margin: '0 0 8px' }}>
+              Status shows <b style={{ color: 'var(--color-walnut)', fontWeight: 500 }}>{props.paymentStatus}</b> but Stripe may have collected the payment. Re-sync to check.
+            </p>
             <button
               type="button"
-              onClick={handleMarkCollected}
-              disabled={pending}
-              className="status-btn status-btn--primary"
-              style={{ flex: 1, cursor: pending ? 'wait' : 'pointer' }}
+              onClick={() => setSyncOpen(true)}
+              className="receipt-btn"
+              style={{ padding: '6px 12px', fontSize: 11, cursor: 'pointer' }}
             >
-              Mark cash as collected →
+              Sync with Stripe
             </button>
-          </div>
-        )}
-
-        {canRefund && !canMarkCollected && (
-          <div style={{ display: 'flex', gap: 8, marginTop: 12, flexWrap: 'wrap' }}>
-            <AlertDialog open={refundOpen} onOpenChange={setRefundOpen}>
-              <AlertDialogTrigger asChild>
-                <button type="button" className="receipt-btn" style={{ padding: '8px 14px', fontSize: 12, cursor: 'pointer' }}>
-                  Issue refund
-                </button>
-              </AlertDialogTrigger>
-              <AlertDialogContent className="rounded-[2px] border border-rule bg-cream">
-                <AlertDialogHeader>
-                  <AlertDialogTitle className="font-serif text-walnut">Refund this order?</AlertDialogTitle>
-                  <AlertDialogDescription className="font-serif text-[13.5px] italic text-ink-muted">
-                    Leave amount blank for a full refund. Reason is internal — it's logged in the kitchen notes.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <div className="flex flex-col gap-3">
-                  <label className="form-field">
-                    <span className="form-field__label">Amount (£)</span>
-                    <input
-                      type="number"
-                      step="0.01"
-                      min="0.01"
-                      placeholder={`Max ${formatGBP(props.totalGbp - refunded)}`}
-                      value={refundAmount}
-                      onChange={(e) => setRefundAmount(e.target.value)}
-                      className="form-field__input"
-                    />
-                  </label>
-                  <label className="form-field">
-                    <span className="form-field__label">Reason (internal)</span>
-                    <input
-                      type="text"
-                      value={refundReason}
-                      onChange={(e) => setRefundReason(e.target.value)}
-                      placeholder="e.g. wrong item delivered"
-                      className="form-field__input"
-                    />
-                  </label>
-                </div>
-                <AlertDialogFooter>
-                  <AlertDialogCancel disabled={pending}>Back</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleRefund();
-                    }}
-                    disabled={pending}
-                  >
-                    {pending ? 'Refunding…' : 'Issue refund'}
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
           </div>
         )}
       </div>
 
-      {/* Danger zone — cancel + refund */}
+      {/* COD reconciliation card — only when payment_method is COD */}
+      {props.paymentMethod === 'cod' && (
+        <div
+          className="form-section"
+          style={{
+            marginTop: 20,
+            background: 'var(--color-cream-soft)',
+            borderColor: 'var(--color-bronze)',
+          }}
+        >
+          <header className="form-section__head" style={{ borderBottomColor: 'rgba(165, 111, 64, 0.3)' }}>
+            <h2 className="form-section__title">
+              COD <em>reconciliation</em>
+            </h2>
+          </header>
+          <p className="t-body-muted">
+            After delivery, confirm here that the driver received the cash. Cash collection is tracked separately from order status so you have a clean record.
+          </p>
+          <div style={{ display: 'flex', gap: 10, marginTop: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+            {props.codStatus === 'collected' ? (
+              <span className="pill pill--collected">Cash collected</span>
+            ) : props.status === 'cancelled' ? (
+              <span className="pill pill--cancelled">Order cancelled</span>
+            ) : (
+              <>
+                <span className="pill pill--uncollected">Cash not yet collected</span>
+                <button
+                  type="button"
+                  onClick={() => setCollectOpen(true)}
+                  className="status-btn status-btn--primary"
+                  style={{ flex: 1, cursor: 'pointer' }}
+                  disabled={pending}
+                >
+                  Mark cash as collected →
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Danger zone */}
       {(canRefund || canCancel) && (
         <div className="admin-danger">
           <h3 className="admin-danger__title">Cancel or refund</h3>
@@ -226,50 +237,15 @@ export default function OrderPaymentControls(props: Props) {
               </button>
             )}
             {canCancel && (
-              <AlertDialog open={cancelOpen} onOpenChange={setCancelOpen}>
-                <AlertDialogTrigger asChild>
-                  <button
-                    type="button"
-                    disabled={pending}
-                    className="admin-danger__btn"
-                    style={{ cursor: pending ? 'wait' : 'pointer' }}
-                  >
-                    Cancel{props.paymentMethod === 'card' && props.paymentStatus === 'paid' ? ' & full refund' : ''}
-                  </button>
-                </AlertDialogTrigger>
-                <AlertDialogContent className="rounded-[2px] border border-rule bg-cream">
-                  <AlertDialogHeader>
-                    <AlertDialogTitle className="font-serif text-walnut">Cancel this order?</AlertDialogTitle>
-                    <AlertDialogDescription className="font-serif text-[13.5px] italic text-ink-muted">
-                      {props.paymentMethod === 'card' && props.paymentStatus === 'paid'
-                        ? 'A full refund will be issued and the customer will be emailed.'
-                        : 'The customer will be emailed.'}
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <label className="form-field">
-                    <span className="form-field__label">Reason (shared with customer)</span>
-                    <textarea
-                      rows={2}
-                      value={cancelReason}
-                      onChange={(e) => setCancelReason(e.target.value)}
-                      placeholder="e.g. ingredients ran out"
-                      className="form-field__textarea"
-                    />
-                  </label>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel disabled={pending}>Keep order</AlertDialogCancel>
-                    <AlertDialogAction
-                      onClick={(e) => {
-                        e.preventDefault();
-                        handleCancel();
-                      }}
-                      disabled={pending}
-                    >
-                      {pending ? 'Cancelling…' : 'Yes, cancel'}
-                    </AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              <button
+                type="button"
+                onClick={() => setCancelOpen(true)}
+                disabled={pending}
+                className="admin-danger__btn"
+                style={{ cursor: pending ? 'wait' : 'pointer' }}
+              >
+                Cancel{props.paymentMethod === 'card' && props.paymentStatus === 'paid' ? ' & full refund' : ''}
+              </button>
             )}
           </div>
         </div>
@@ -281,6 +257,128 @@ export default function OrderPaymentControls(props: Props) {
           <p className="admin-danger__body">{props.cancelledReason}</p>
         </div>
       )}
+
+      {/* ===== Modals ===== */}
+
+      <ConfirmModal
+        open={collectOpen}
+        onCancel={() => setCollectOpen(false)}
+        onConfirm={handleMarkCollected}
+        pending={pending}
+        eyebrow="COD reconciliation"
+        title={<>Mark cash as <em>collected?</em></>}
+        body={
+          <>
+            This locks the cash amount as received from the driver. Payment status flips to <b>paid</b>.
+          </>
+        }
+        detail={[
+          { label: 'Order', value: props.orderRef },
+          { label: 'Amount', value: formatGBP(props.totalGbp) },
+        ]}
+        confirmLabel="Yes, mark collected"
+      />
+
+      <ConfirmModal
+        open={syncOpen}
+        onCancel={() => setSyncOpen(false)}
+        onConfirm={handleSync}
+        pending={pending}
+        eyebrow="Stripe re-sync"
+        title={<>Re-sync with <em>Stripe?</em></>}
+        body={
+          <>
+            We'll fetch the latest PaymentIntent from Stripe and update this order's payment status. Safe to run multiple times — used when a webhook is missed in dev or transient network issues.
+          </>
+        }
+        confirmLabel="Sync now"
+      />
+
+      <ConfirmModal
+        open={refundOpen}
+        onCancel={() => setRefundOpen(false)}
+        onConfirm={handleRefund}
+        pending={pending}
+        tone="danger"
+        eyebrow="Refund this order"
+        title={<>Issue a <em>refund?</em></>}
+        body={
+          <>
+            Leave the amount blank for a full refund (max <b>{formatGBP(remainingRefundable)}</b>). Reason is internal — it's logged in the kitchen notes.
+          </>
+        }
+        inputSlot={
+          <>
+            <label className="form-field__label" htmlFor="refund-amt">
+              Refund amount
+            </label>
+            <input
+              id="refund-amt"
+              type="number"
+              step="0.01"
+              min="0.01"
+              max={remainingRefundable}
+              placeholder={`Max ${formatGBP(remainingRefundable)}`}
+              value={refundAmount}
+              onChange={(e) => setRefundAmount(e.target.value)}
+              className="form-field__input"
+            />
+            <label
+              className="form-field__label"
+              htmlFor="refund-reason"
+              style={{ marginTop: 14 }}
+            >
+              Reason (internal)
+            </label>
+            <input
+              id="refund-reason"
+              type="text"
+              value={refundReason}
+              onChange={(e) => setRefundReason(e.target.value)}
+              placeholder="e.g. wrong item delivered"
+              className="form-field__input"
+            />
+          </>
+        }
+        confirmLabel={pending ? 'Refunding…' : 'Issue refund'}
+      />
+
+      <ConfirmModal
+        open={cancelOpen}
+        onCancel={() => setCancelOpen(false)}
+        onConfirm={handleCancel}
+        pending={pending}
+        tone="danger"
+        eyebrow="Cancel order"
+        title={<>Cancel order <em>{props.orderRef}?</em></>}
+        body={
+          props.paymentMethod === 'card' && props.paymentStatus === 'paid' ? (
+            <>
+              A full refund will be issued via Stripe and <b>{props.customerName}</b> will be emailed. There's no undo.
+            </>
+          ) : (
+            <>
+              The kitchen log records the cancellation and <b>{props.customerName}</b> is emailed.
+            </>
+          )
+        }
+        inputSlot={
+          <>
+            <label className="form-field__label" htmlFor="cancel-reason">
+              Reason (shared with customer)
+            </label>
+            <textarea
+              id="cancel-reason"
+              rows={3}
+              value={cancelReason}
+              onChange={(e) => setCancelReason(e.target.value)}
+              placeholder="e.g. ingredients ran out"
+              className="form-field__textarea"
+            />
+          </>
+        }
+        confirmLabel={pending ? 'Cancelling…' : 'Yes, cancel'}
+      />
     </>
   );
 }

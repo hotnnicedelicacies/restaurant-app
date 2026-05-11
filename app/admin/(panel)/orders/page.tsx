@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import { getServiceClient } from '@/lib/supabase/server';
-import { formatGBP, formatLongDate, formatTime } from '@/lib/utils';
+import { formatLongDate } from '@/lib/utils';
 import AdminOrdersTable, { type OrderRow } from './AdminOrdersTable';
+import ExportCsvButton from './ExportCsvButton';
 
 interface SearchParams {
   status?: string;
   payment?: string;
   q?: string;
+  range?: 'today' | 'week' | 'month' | 'all';
 }
 
 const STATUS_PILLS: { value: string; label: string }[] = [
@@ -18,6 +20,35 @@ const STATUS_PILLS: { value: string; label: string }[] = [
   { value: 'cancelled', label: 'Cancelled' },
 ];
 
+const RANGES: { value: NonNullable<SearchParams['range']>; label: string }[] = [
+  { value: 'today', label: 'Today' },
+  { value: 'week', label: 'This week' },
+  { value: 'month', label: 'This month' },
+  { value: 'all', label: 'All time' },
+];
+
+function rangeStart(range: SearchParams['range']): string | null {
+  const now = new Date();
+  if (!range || range === 'today') {
+    const d = new Date(now);
+    d.setHours(0, 0, 0, 0);
+    return d.toISOString();
+  }
+  if (range === 'week') return new Date(now.getTime() - 7 * 86_400_000).toISOString();
+  if (range === 'month') return new Date(now.getTime() - 30 * 86_400_000).toISOString();
+  return null;
+}
+
+function buildHref(sp: SearchParams, overrides: Partial<SearchParams>): string {
+  const merged = { ...sp, ...overrides };
+  const params = new URLSearchParams();
+  if (merged.status && merged.status !== 'all') params.set('status', merged.status);
+  if (merged.payment) params.set('payment', merged.payment);
+  if (merged.range && merged.range !== 'today') params.set('range', merged.range);
+  if (merged.q) params.set('q', merged.q);
+  return `/admin/orders${params.toString() ? `?${params.toString()}` : ''}`;
+}
+
 export default async function AdminOrdersPage({
   searchParams,
 }: {
@@ -25,16 +56,19 @@ export default async function AdminOrdersPage({
 }) {
   const sp = await searchParams;
   const activeStatus = sp.status ?? 'all';
+  const range = sp.range ?? 'today';
   const supabase = getServiceClient();
+  const from = rangeStart(range);
 
   let q = supabase
     .from('orders')
     .select(
-      'id, ref, status, payment_method, payment_status, cod_status, customer_first_name, customer_last_name, customer_phone, delivery_postcode, total_gbp, created_at'
+      'id, ref, status, payment_method, payment_status, cod_status, customer_first_name, customer_last_name, customer_phone, delivery_postcode, total_gbp, created_at, stripe_payment_intent_id'
     )
     .order('created_at', { ascending: false })
     .limit(200);
 
+  if (from) q = q.gte('created_at', from);
   if (activeStatus !== 'all') {
     q = q.eq(
       'status',
@@ -52,24 +86,21 @@ export default async function AdminOrdersPage({
 
   const { data: orders, error } = await q;
 
-  // Fetch counts per status for the toolbar chips
-  const { data: allTodayRaw } = await supabase
-    .from('orders')
-    .select('status')
-    .order('created_at', { ascending: false })
-    .limit(500);
-  const allToday = allTodayRaw ?? [];
+  // Counts per status — scoped to the same date range as the table.
+  let countsQuery = supabase.from('orders').select('status');
+  if (from) countsQuery = countsQuery.gte('created_at', from);
+  const { data: allInRange } = await countsQuery;
   const counts: Record<string, number> = {
-    all: allToday.length,
+    all: (allInRange ?? []).length,
     received: 0,
     preparing: 0,
     on_its_way: 0,
     delivered: 0,
     cancelled: 0,
   };
-  for (const o of allToday) counts[o.status] = (counts[o.status] ?? 0) + 1;
+  for (const o of allInRange ?? []) counts[o.status] = (counts[o.status] ?? 0) + 1;
 
-  // Aggregate the line-item names per order — single round trip
+  // Aggregate line-item names per order
   const orderIds = (orders ?? []).map((o) => o.id);
   const itemsByOrder: Record<string, string[]> = {};
   if (orderIds.length > 0) {
@@ -95,27 +126,25 @@ export default async function AdminOrdersPage({
     totalGbp: Number(o.total_gbp),
     createdAt: o.created_at,
     itemsLine: (itemsByOrder[o.id] ?? []).join(' · '),
+    stripePaymentIntentId: o.stripe_payment_intent_id,
   }));
 
   const today = formatLongDate(new Date());
+  const rangeLabel = RANGES.find((r) => r.value === range)?.label ?? 'Today';
 
   return (
     <>
       <div className="admin-page-head">
         <div className="admin-page-head__text">
-          <div className="admin-page-head__eyebrow">{today} · Live service</div>
+          <div className="admin-page-head__eyebrow">
+            {rangeLabel} · {today}
+          </div>
           <h1 className="admin-page-head__title">
             Today's <em>orders</em>
           </h1>
         </div>
         <div className="admin-page-head__actions">
-          <Link
-            href="/admin/payments"
-            className="receipt-btn"
-            style={{ textDecoration: 'none' }}
-          >
-            Payments →
-          </Link>
+          <ExportCsvButton rows={rows} rangeLabel={rangeLabel} />
         </div>
       </div>
 
@@ -129,6 +158,9 @@ export default async function AdminOrdersPage({
         <form className="admin-toolbar__search" method="get">
           {activeStatus !== 'all' && <input type="hidden" name="status" value={activeStatus} />}
           {sp.payment && <input type="hidden" name="payment" value={sp.payment} />}
+          {sp.range && sp.range !== 'today' && (
+            <input type="hidden" name="range" value={sp.range} />
+          )}
           <svg
             className="admin-toolbar__search-icon"
             viewBox="0 0 24 24"
@@ -148,15 +180,11 @@ export default async function AdminOrdersPage({
         </form>
         {STATUS_PILLS.map((pill) => {
           const isActive = activeStatus === pill.value;
-          const href =
-            pill.value === 'all'
-              ? `/admin/orders${sp.payment ? `?payment=${sp.payment}` : ''}`
-              : `/admin/orders?status=${pill.value}${sp.payment ? `&payment=${sp.payment}` : ''}`;
           const count = counts[pill.value];
           return (
             <Link
               key={pill.value}
-              href={href}
+              href={buildHref(sp, { status: pill.value })}
               className={`admin-filter ${isActive ? 'is-active' : ''}`}
               style={{ textDecoration: 'none', cursor: 'pointer' }}
             >
@@ -167,12 +195,24 @@ export default async function AdminOrdersPage({
             </Link>
           );
         })}
+        <span style={{ marginLeft: 'auto', display: 'inline-flex', gap: 6 }}>
+          {RANGES.map((r) => (
+            <Link
+              key={r.value}
+              href={buildHref(sp, { range: r.value })}
+              className={`admin-filter ${range === r.value ? 'is-active' : ''}`}
+              style={{ textDecoration: 'none', cursor: 'pointer' }}
+            >
+              {r.label}
+            </Link>
+          ))}
+        </span>
       </div>
 
       <AdminOrdersTable rows={rows} />
 
       <p className="t-body-muted" style={{ marginTop: 16, textAlign: 'center' }}>
-        Showing {rows.length} of {rows.length} orders.
+        Showing {rows.length} {rows.length === 1 ? 'order' : 'orders'} · {rangeLabel.toLowerCase()}
       </p>
     </>
   );

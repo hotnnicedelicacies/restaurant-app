@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { redirect } from 'next/navigation';
 import { getServerClient, getServiceClient } from '@/lib/supabase/server';
 import { siteConfig } from '@/constants/siteConfig';
+import { getHours } from '@/lib/data/hours';
 import AdminNavLink from './AdminNavLink';
 import AdminSignOut from './AdminSignOut';
 
@@ -26,21 +27,45 @@ export default async function AdminPanelLayout({ children }: { children: React.R
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/admin/sign-in');
 
-  // Profile data — display name + store-open status for the kitchen pill
+  // Profile data + a derived "kitchen open" state from the configured
+  // trading hours. The pill is a notification, not a control — admin
+  // pauses the store via /admin/settings (store_open flag).
   const svc = getServiceClient();
-  const [{ data: profile }, { data: storeOpenRow }, { data: liveOrders }] = await Promise.all([
+  const [{ data: profile }, { data: storeOpenRow }, { data: liveOrders }, hours] = await Promise.all([
     svc.from('profiles').select('display_name').eq('id', user.id).single(),
     svc.from('settings').select('value').eq('key', 'store_open').maybeSingle(),
     svc
       .from('orders')
-      .select('status', { count: 'exact', head: false })
+      .select('status')
       .in('status', ['received', 'preparing', 'on_its_way']),
+    getHours(),
   ]);
-  const storeOpen = (storeOpenRow?.value as boolean | undefined) ?? true;
-  const displayName = profile?.display_name ?? user.email ?? 'Admin';
 
-  // Map { received: n, ... } so the nav can show a live order count
+  const displayName = profile?.display_name ?? user.email ?? 'Admin';
   const liveCount = (liveOrders ?? []).length;
+
+  // Compute whether the kitchen is currently within trading hours.
+  // (The store_open setting is a hard manual override on top.)
+  const now = new Date();
+  const today = now.toLocaleDateString('en-GB', { weekday: 'long' });
+  const [openH, openM] = hours.open.split(':').map(Number);
+  const [closeH, closeM] = hours.close.split(':').map(Number);
+  const openMin = openH * 60 + (openM || 0);
+  const closeMin = closeH * 60 + (closeM || 0);
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+  const isTradingDay = hours.days.includes(today as (typeof hours.days)[number]);
+  const isWithinHours = isTradingDay && nowMin >= openMin && nowMin < closeMin;
+  const storeOpenOverride = (storeOpenRow?.value as boolean | undefined) ?? true;
+  const kitchenOpen = isWithinHours && storeOpenOverride;
+  const kitchenLabel = !storeOpenOverride
+    ? 'Kitchen paused · /settings'
+    : !isTradingDay
+      ? `Closed today · opens ${hours.daysShort.split('–')[0].trim()}`
+      : !isWithinHours
+        ? nowMin < openMin
+          ? `Opens at ${hours.open}`
+          : `Closed for the night · ${hours.timeShort}`
+        : 'Kitchen open · accepting orders';
 
   return (
     <div className="admin-shell">
@@ -57,13 +82,12 @@ export default async function AdminPanelLayout({ children }: { children: React.R
 
             <div className="admin-header__center">
               <span
-                className={`kitchen-status ${storeOpen ? '' : 'kitchen-status--closed'}`}
-                aria-label={storeOpen ? 'Kitchen open · accepting orders' : 'Kitchen closed'}
+                className={`kitchen-status ${kitchenOpen ? '' : 'kitchen-status--closed'}`}
+                aria-label={kitchenLabel}
+                style={{ cursor: 'default' }}
               >
                 <span className="kitchen-status__dot" />
-                <span>
-                  {storeOpen ? 'Kitchen open · accepting orders' : 'Kitchen closed'}
-                </span>
+                <span>{kitchenLabel}</span>
               </span>
             </div>
 
