@@ -22,10 +22,10 @@ export default function ForgotPasswordPage() {
     >
       <ForgotPasswordForm />
 
-      <div className="mt-7 border-t border-[--color-border] pt-5 text-center">
+      <div className="mt-7 border-t border-rule pt-5 text-center">
         <Link
           href={siteConfig.routes.signIn}
-          className="pb-px font-serif text-[13.5px] italic text-[--color-ink-muted] border-b border-[--color-border]"
+          className="pb-px font-serif text-[13.5px] italic text-ink-muted border-b border-rule"
         >
           ← Back to sign in
         </Link>

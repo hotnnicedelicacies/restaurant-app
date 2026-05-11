@@ -34,7 +34,7 @@ export default function SectionHead({
         <p
           className={cn(
             'mb-3 font-mono text-[10px] uppercase tracking-[0.22em]',
-            onDark ? 'text-[--color-bronze]' : 'text-[--color-bronze-deep]'
+            onDark ? 'text-bronze' : 'text-bronze-deep'
           )}
         >
           {eyebrow}
@@ -43,7 +43,7 @@ export default function SectionHead({
       <h2
         className={cn(
           'm-0 font-serif text-[clamp(28px,4vw,42px)] font-medium leading-[1.04] tracking-[-0.005em] [&_em]:font-normal [&_em]:italic',
-          onDark ? 'text-[--color-cream]' : 'text-[--color-walnut]'
+          onDark ? 'text-cream' : 'text-walnut'
         )}
       >
         {title}
@@ -52,7 +52,7 @@ export default function SectionHead({
         <p
           className={cn(
             'm-0 mt-1.5 font-serif text-[15px] italic',
-            onDark ? 'text-[#F1E5CDB3]' : 'text-[--color-ink-muted]'
+            onDark ? 'text-[#F1E5CDB3]' : 'text-ink-muted'
           )}
         >
           {sub}

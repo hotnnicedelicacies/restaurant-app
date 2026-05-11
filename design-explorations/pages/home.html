@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hot N Nice Delicacies — Made with love, delivered hot</title>
+<link rel="icon" href="../../app/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+
+<!-- ================= MOCKUP BANNER (remove when porting to code) ================= -->
+<div class="mockup-banner">
+  <b>MOCKUP · v1</b> · Home · Walnut &amp; Cream
+  <a href="./index.html">← All pages</a>
+</div>
+
+<!-- ================= HEADER ================= -->
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="./home.html" class="site-header__logo">
+      <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+    </a>
+    <nav class="site-header__nav">
+      <a href="./home.html" class="is-active">Home</a>
+      <a href="./menu.html">Menu</a>
+      <a href="./about.html">About</a>
+      <a href="./contact.html">Contact</a>
+    </nav>
+    <a href="./menu.html" class="site-header__cta">Order now</a>
+    <button class="site-header__burger" aria-label="Open menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <img class="hero__img" src="../../assets/hero-food.jpg" alt="A spread of Hot N Nice home-cooked dishes">
+  <div class="hero__overlay"></div>
+  <div class="container hero__inner">
+    <div class="hero__top">
+      <span class="hero__eyebrow">A Home Kitchen · Middlesbrough · Est. 2019</span>
+      <span class="hero__issue">№ 11 · 11.05.26 · Tue – Sun</span>
+    </div>
+    <div class="hero__body">
+      <h1 class="hero__headline">Italian &amp; West African,<br>cooked from scratch, <em>delivered hot.</em></h1>
+      <p class="hero__deck">No shortcuts. No frozen meals. A five-star kitchen on its feet from ten o'clock every morning — bringing dinner to your door across Teesside.</p>
+      <div class="hero__cta-row">
+        <a href="./menu.html" class="btn btn-primary">See today's menu</a>
+        <a href="https://wa.me/447776320068" class="link-underline">or message us on WhatsApp</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DAY BAND ================= -->
+<!-- ADMIN: settings.opening_days, settings.opening_hours, settings.same_day_cutoff -->
+<div class="day-band">
+  <div class="container day-band__inner">
+    <span class="day-band__meta"><b>Tue – Sun</b>12 – 8pm · Order by 10am for same-day delivery</span>
+    <a href="./menu.html" class="day-band__cta">View today's menu</a>
+  </div>
+</div>
+
+<!-- ================= BILL OF FARE ================= -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__eyebrow">Vol. 01 · The Eleventh of May</div>
+      <h2 class="section-head__title">Today's <em>Bill of Fare</em></h2>
+      <p class="section-head__sub">Cooked this morning · Delivered hot</p>
+      <span class="ornament"></span>
+    </div>
+
+    <div class="bill-of-fare">
+
+      <article class="fare-row">
+        <img class="fare-row__img" src="../../assets/meals/jollof-rice-with-protein-of-choice-and-plantain-1.png" alt="Jollof rice with chicken and plantain">
+        <div class="fare-row__content">
+          <div class="fare-row__text">
+            <span class="fare-row__num">№ 01 · Rice</span>
+            <h3 class="fare-row__name">Jollof Rice with Plantain</h3>
+            <p class="fare-row__desc">Fragrant tomato-based jollof with your choice of chicken, beef or fish, alongside caramelised fried plantain.</p>
+            <div class="fare-row__tags">
+              <span class="fare-row__tag">Protein choice</span>
+              <span class="fare-row__tag">Gluten-free</span>
+            </div>
+          </div>
+          <div class="fare-row__right">
+            <span class="fare-row__price">£10</span>
+            <a href="./item-detail.html?id=jollof" class="fare-row__add">Add to order →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="fare-row">
+        <img class="fare-row__img" src="../../assets/meals/plantain-lasagna.jpeg" alt="Plantain lasagna">
+        <div class="fare-row__content">
+          <div class="fare-row__text">
+            <span class="fare-row__num">№ 02 · Pasta</span>
+            <h3 class="fare-row__name">Plantain Lasagna</h3>
+            <p class="fare-row__desc">A house twist on classic lasagna — sweet ripe plantain in place of pasta, layered with seasoned mince and béchamel, baked until golden.</p>
+            <div class="fare-row__tags">
+              <span class="fare-row__tag">House signature</span>
+              <span class="fare-row__tag">Contains dairy</span>
+            </div>
+          </div>
+          <div class="fare-row__right">
+            <span class="fare-row__price">£25</span>
+            <a href="./item-detail.html?id=plantain-lasagna" class="fare-row__add">Add to order →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="fare-row">
+        <img class="fare-row__img" src="../../assets/meals/roasted-tilapia-fish.jpeg" alt="Roasted tilapia platter">
+        <div class="fare-row__content">
+          <div class="fare-row__text">
+            <span class="fare-row__num">№ 03 · Grill</span>
+            <h3 class="fare-row__name">Roasted Tilapia Platter</h3>
+            <p class="fare-row__desc">Whole tilapia, marinated in our pepper-and-spice rub, fire-roasted to a crisp finish — served with seasoned sides.</p>
+            <div class="fare-row__tags">
+              <span class="fare-row__tag">Spicy</span>
+              <span class="fare-row__tag">Pescatarian</span>
+            </div>
+          </div>
+          <div class="fare-row__right">
+            <span class="fare-row__price">£25</span>
+            <a href="./item-detail.html?id=roasted-tilapia" class="fare-row__add">Add to order →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="fare-row">
+        <img class="fare-row__img" src="../../assets/meals/suya.jpeg" alt="Suya sticks">
+        <div class="fare-row__content">
+          <div class="fare-row__text">
+            <span class="fare-row__num">№ 04 · Grill</span>
+            <h3 class="fare-row__name">Suya Sticks</h3>
+            <p class="fare-row__desc">Smoky, peppery grilled beef skewers in our bold spice blend, served with sliced onions and tomatoes.</p>
+            <div class="fare-row__tags">
+              <span class="fare-row__tag">Spicy</span>
+            </div>
+          </div>
+          <div class="fare-row__right">
+            <span class="fare-row__price">£5</span>
+            <a href="./item-detail.html?id=suya" class="fare-row__add">Add to order →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="fare-row">
+        <img class="fare-row__img" src="../../assets/meals/edikaikong-1.png" alt="Edikaikong soup">
+        <div class="fare-row__content">
+          <div class="fare-row__text">
+            <span class="fare-row__num">№ 05 · Soup</span>
+            <h3 class="fare-row__name">Edikaikong</h3>
+            <p class="fare-row__desc">Highly nutritious leafy green soup packed with ugu and waterleaf, loaded with seafood and assorted meat.</p>
+            <div class="fare-row__tags">
+              <span class="fare-row__tag">High protein</span>
+              <span class="fare-row__tag">Contains seafood</span>
+            </div>
+          </div>
+          <div class="fare-row__right">
+            <span class="fare-row__price">£15</span>
+            <a href="./item-detail.html?id=edikaikong" class="fare-row__add">Add to order →</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="fare-row">
+        <img class="fare-row__img" src="../../assets/meals/small-chops.jpeg" alt="Small chops platter">
+        <div class="fare-row__content">
+          <div class="fare-row__text">
+            <span class="fare-row__num">№ 06 · Party</span>
+            <h3 class="fare-row__name">Small Chops Platter</h3>
+            <p class="fare-row__desc">Bite-sized party favourites: puff-puff, samosa, spring rolls, and peppered chicken. Built for sharing.</p>
+            <div class="fare-row__tags">
+              <span class="fare-row__tag">Shareable</span>
+              <span class="fare-row__tag">Party</span>
+            </div>
+          </div>
+          <div class="fare-row__right">
+            <span class="fare-row__price">£25</span>
+            <a href="./item-detail.html?id=small-chops" class="fare-row__add">Add to order →</a>
+          </div>
+        </div>
+      </article>
+
+      <div class="bill-of-fare__footer">
+        <a href="./menu.html" class="btn btn-ghost">See the full menu</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HYGIENE SECTION (pronounced) ================= -->
+<section class="hygiene-section">
+  <span class="hygiene-section__corner">Independently rated</span>
+  <div class="container hygiene-section__inner">
+    <div class="hygiene-section__stars">★ ★ ★ ★ ★</div>
+    <div class="hygiene-section__eyebrow">Food Standards Agency</div>
+    <h2 class="hygiene-section__title">Five-Star <em>Food Hygiene</em> Rating</h2>
+    <p class="hygiene-section__sub">Independently inspected and verified by the UK Food Standards Agency — because every kitchen deserves nothing less than spotless.</p>
+    <a href="https://ratings.food.gov.uk/business/1913815/hot-n-nice-delicacies" target="_blank" rel="noopener noreferrer" class="hygiene-section__verify">Verify on food.gov.uk →</a>
+  </div>
+</section>
+
+<!-- ================= KITCHEN STORY ================= -->
+<section class="section section--soft">
+  <div class="container">
+    <div class="kitchen-story">
+      <div class="kitchen-story__media">
+        <img src="../../assets/meals/jollof-rice-with-protein-of-choice-and-plantain.jpeg" alt="Jollof rice plated from the kitchen">
+      </div>
+      <div class="kitchen-story__text">
+        <span class="kitchen-story__eyebrow">From the kitchen</span>
+        <h2 class="kitchen-story__title">A small kitchen, <em>cooking honestly.</em></h2>
+        <div class="kitchen-story__body">
+          <p>We're a family kitchen in Middlesbrough, cooking <b>Italian classics and West African staples</b> from scratch every morning. Our pots go on by ten o'clock — and what you see on the menu today is what we have prepared today.</p>
+          <p>No shortcuts. <em>No frozen meals.</em> Just dinner, made with care, and delivered hot to your door across Teesside.</p>
+        </div>
+        <div>
+          <a href="./about.html" class="link-underline">Read our story →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HOW IT WORKS ================= -->
+<section class="section">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__eyebrow">How it works</div>
+      <h2 class="section-head__title">Three steps, <em>before dinner.</em></h2>
+      <span class="ornament"></span>
+    </div>
+    <div class="how-it-works">
+      <div class="how-step">
+        <div class="how-step__num">i.</div>
+        <h3 class="how-step__title">Order by ten o'clock</h3>
+        <p class="how-step__desc">Browse today's kitchen and place your order online before 10am for same-day delivery.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-step__num">ii.</div>
+        <h3 class="how-step__title">We cook fresh</h3>
+        <p class="how-step__desc">Pots go on at ten. Every meal is made from scratch — no frozen, no microwave.</p>
+      </div>
+      <div class="how-step">
+        <div class="how-step__num">iii.</div>
+        <h3 class="how-step__title">Delivered <em>hot</em></h3>
+        <p class="how-step__desc">Brought to your door between twelve and eight, Tuesday through Sunday.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DELIVERY AREAS ================= -->
+<section class="section section--soft">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__eyebrow">Delivery</div>
+      <h2 class="section-head__title">Across <em>Teesside</em></h2>
+      <span class="ornament"></span>
+    </div>
+    <!-- ADMIN: delivery_zones[].name, delivery_zones[].base_fee, delivery_zones[].is_quoted -->
+    <div class="delivery-card">
+      <p class="delivery-card__areas">
+        Middlesbrough<span class="delivery-card__sep">·</span>Stockton-on-Tees<span class="delivery-card__sep">·</span>Redcar<span class="delivery-card__sep">·</span>Thornaby<span class="delivery-card__sep">·</span>Billingham
+      </p>
+      <p class="delivery-card__price">Delivery from £5 within Middlesbrough.</p>
+      <p class="delivery-card__note">Surrounding areas — final price depends on your postcode. <a href="./contact.html">Get in touch for a quote.</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CTA BAND ================= -->
+<section class="cta-band">
+  <div class="container">
+    <div class="cta-band__eyebrow">Ready when you are</div>
+    <h2 class="cta-band__title">Tonight's dinner, <em>handled.</em></h2>
+    <p class="cta-band__sub">Place your order before ten and we'll have it at your door hot, between twelve and eight.</p>
+    <a href="./menu.html" class="cta-band__cta">Place your order</a>
+    <!-- ADMIN: settings.contact.whatsapp, settings.contact.phone, settings.contact.email -->
+    <div class="cta-band__channels">
+      <a href="https://wa.me/447776320068">WhatsApp · +44 7776 320068</a>
+      <a href="tel:+447776320068">Call · +44 7776 320068</a>
+      <a href="mailto:hotnnicedelicacies@gmail.com">Email</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__grid">
+      <div class="site-footer__brand">
+        <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+        <p class="site-footer__tagline">A small home kitchen in Middlesbrough — Italian &amp; West African, delivered hot.</p>
+        <div class="site-footer__hygiene">
+          <span class="site-footer__hygiene-stars">★ ★ ★ ★ ★  Hygiene · FSA</span>
+          <a href="https://ratings.food.gov.uk/business/1913815/hot-n-nice-delicacies" target="_blank" rel="noopener noreferrer">Verify our rating →</a>
+        </div>
+      </div>
+
+      <div>
+        <h4 class="site-footer__col-title">Visit</h4>
+        <ul>
+          <li><a href="./home.html">Home</a></li>
+          <li><a href="./menu.html">Menu</a></li>
+          <li><a href="./about.html">About</a></li>
+          <li><a href="./contact.html">Contact</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="site-footer__col-title">Contact</h4>
+        <ul>
+          <li><a href="tel:+447776320068">+44 7776 320068</a></li>
+          <li><a href="https://wa.me/447776320068">WhatsApp</a></li>
+          <li><a href="mailto:hotnnicedelicacies@gmail.com">Email us</a></li>
+          <li><a href="https://instagram.com/hotnnicedelicacies" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h4 class="site-footer__col-title">Hours</h4>
+        <ul>
+          <li>Tuesday – Sunday</li>
+          <li>12pm – 8pm</li>
+          <li>Order by 10am for same-day</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="site-footer__copy">
+      <span>© 2026 Hot N Nice Delicacies · Middlesbrough, UK</span>
+      <span><a href="./terms.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Terms</a> · <a href="./privacy.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Privacy</a> · <a href="./refund-policy.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Refunds</a> · <a href="./cookie-notice.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Cookies</a></span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ COOKIE BANNER (GDPR/PECR) ============ -->
+<!--
+  Shown on first visit on every customer-facing page. Dismissal preference
+  stored in localStorage (`hnn_consent`) so it doesn't reappear. Because we
+  only use strictly-necessary cookies in v1, this is informational with a
+  single Accept button + a link to manage / Cookie Notice. If we add optional
+  cookies later, the banner gains Reject and Manage buttons too.
+-->
+<div class="cookie-banner" id="cookie-banner">
+  <div class="cookie-banner__eyebrow">A note about cookies</div>
+  <p class="cookie-banner__title">We use a few <em>essential</em> cookies.</p>
+  <p class="cookie-banner__body">
+    Just what's needed to remember your basket, keep you signed in, and process payments safely. <b style="color: var(--cream); font-style: normal; font-weight: 500;">No tracking. No advertising. No analytics</b> — see our <a href="./cookie-notice.html">Cookie Notice</a> for details.
+  </p>
+  <div class="cookie-banner__actions">
+    <a href="./cookie-notice.html" class="cookie-banner__btn cookie-banner__btn--ghost">Read the notice</a>
+    <button type="button" class="cookie-banner__btn" id="cookie-accept">Got it</button>
+  </div>
+</div>
+
+<script>
+  (function() {
+    const banner = document.getElementById('cookie-banner');
+    const accept = document.getElementById('cookie-accept');
+    if (localStorage.getItem('hnn_consent') === 'v1') {
+      banner.classList.add('is-hidden');
+    }
+    accept.addEventListener('click', () => {
+      localStorage.setItem('hnn_consent', 'v1');
+      banner.classList.add('is-hidden');
+    });
+  })();
+</script>
+
+</body>
+</html>

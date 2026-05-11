@@ -14,17 +14,17 @@ export default function CartPage() {
     <>
       <SiteHeader />
       <main>
-        <nav aria-label="Breadcrumb" className="border-b border-[--color-border] bg-[--color-cream-soft]">
+        <nav aria-label="Breadcrumb" className="border-b border-rule bg-cream-soft">
           <div className="container flex items-center gap-2.5 py-3.5 font-serif text-[13px]">
-            <a href={siteConfig.routes.home} className="italic text-[--color-ink-muted] transition-colors hover:text-[--color-walnut]">
+            <a href={siteConfig.routes.home} className="italic text-ink-muted transition-colors hover:text-walnut">
               Home
             </a>
-            <span className="text-[--color-bronze]">·</span>
-            <a href={siteConfig.routes.menu} className="italic text-[--color-ink-muted] transition-colors hover:text-[--color-walnut]">
+            <span className="text-bronze">·</span>
+            <a href={siteConfig.routes.menu} className="italic text-ink-muted transition-colors hover:text-walnut">
               Menu
             </a>
-            <span className="text-[--color-bronze]">·</span>
-            <span className="font-medium tracking-[0.08em] text-[--color-walnut] [font-variant:small-caps]">Your basket</span>
+            <span className="text-bronze">·</span>
+            <span className="font-medium tracking-[0.08em] text-walnut [font-variant:small-caps]">Your basket</span>
           </div>
         </nav>
 

@@ -21,6 +21,10 @@
   --color-ink-muted:    #4a3a2c;
   --color-bronze:       #A56F40;
   --color-bronze-deep:  #7E5530;
+  --color-rule:         rgba(45, 31, 24, 0.18);
+  --color-rule-light:   rgba(241, 229, 205, 0.22);
+  --color-success:      #1e7d3f;
+  --color-danger:       #8B2A1A;
 
   /* --- Semantic role tokens (consumed by shadcn-ui components) --- */
   --color-background:           var(--color-cream);

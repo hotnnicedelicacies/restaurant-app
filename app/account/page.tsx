@@ -44,31 +44,31 @@ export default async function AccountPage() {
           <div className="grid items-start gap-[clamp(28px,4vw,56px)] md:grid-cols-[240px_1fr]">
             {/* SIDEBAR */}
             <aside className="sticky top-[92px] flex flex-col gap-1">
-              <p className="m-0 mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-[--color-bronze-deep]">
+              <p className="m-0 mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-bronze-deep">
                 My account
               </p>
               <Link
                 href="#orders"
-                className="border-l-2 border-[--color-bronze] bg-[--color-cream-soft] px-3.5 py-2.5 font-serif text-[15px] font-medium text-[--color-walnut]"
+                className="border-l-2 border-bronze bg-cream-soft px-3.5 py-2.5 font-serif text-[15px] font-medium text-walnut"
               >
                 Orders
               </Link>
               <Link
                 href="#addresses"
-                className="border-l-2 border-transparent px-3.5 py-2.5 font-serif text-[15px] font-medium text-[--color-ink-muted] transition-colors hover:bg-[--color-cream-soft] hover:text-[--color-walnut]"
+                className="border-l-2 border-transparent px-3.5 py-2.5 font-serif text-[15px] font-medium text-ink-muted transition-colors hover:bg-cream-soft hover:text-walnut"
               >
                 Saved addresses
               </Link>
               <Link
                 href="#profile"
-                className="border-l-2 border-transparent px-3.5 py-2.5 font-serif text-[15px] font-medium text-[--color-ink-muted] transition-colors hover:bg-[--color-cream-soft] hover:text-[--color-walnut]"
+                className="border-l-2 border-transparent px-3.5 py-2.5 font-serif text-[15px] font-medium text-ink-muted transition-colors hover:bg-cream-soft hover:text-walnut"
               >
                 Profile &amp; password
               </Link>
-              <form action={signOutAction} className="mt-3 border-t border-[--color-border] pt-4">
+              <form action={signOutAction} className="mt-3 border-t border-rule pt-4">
                 <button
                   type="submit"
-                  className="px-3.5 font-serif text-[14px] italic text-[--color-ink-muted] transition-colors hover:text-[#8B2A1A]"
+                  className="px-3.5 font-serif text-[14px] italic text-ink-muted transition-colors hover:text-[#8B2A1A]"
                 >
                   Sign out
                 </button>
@@ -120,12 +120,12 @@ function AccountSection({
 }) {
   return (
     <section id={id} className="scroll-mt-[92px]">
-      <header className="mb-6 flex items-baseline justify-between gap-4 border-b border-[--color-walnut] pb-3.5">
-        <h2 className="m-0 font-serif text-[clamp(24px,3.2vw,32px)] font-medium tracking-[-0.005em] text-[--color-walnut] [&_em]:font-normal [&_em]:italic">
+      <header className="mb-6 flex items-baseline justify-between gap-4 border-b border-walnut pb-3.5">
+        <h2 className="m-0 font-serif text-[clamp(24px,3.2vw,32px)] font-medium tracking-[-0.005em] text-walnut [&_em]:font-normal [&_em]:italic">
           {title}
         </h2>
         {count && (
-          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[--color-bronze-deep]">
+          <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-bronze-deep">
             {count}
           </span>
         )}
@@ -148,13 +148,13 @@ function EmptyState({
 }) {
   return (
     <div className="mx-auto max-w-[480px] py-[clamp(48px,8vw,96px)] text-center">
-      <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-[--color-bronze-deep]">
+      <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-bronze-deep">
         {eyebrow}
       </p>
-      <h3 className="m-0 mb-3 font-serif text-[clamp(26px,3.4vw,36px)] font-medium tracking-[-0.005em] text-[--color-walnut] [&_em]:font-normal [&_em]:italic">
+      <h3 className="m-0 mb-3 font-serif text-[clamp(26px,3.4vw,36px)] font-medium tracking-[-0.005em] text-walnut [&_em]:font-normal [&_em]:italic">
         {title}
       </h3>
-      <p className="m-0 mb-7 font-serif text-[16px] italic leading-[1.5] text-[--color-ink-muted]">
+      <p className="m-0 mb-7 font-serif text-[16px] italic leading-[1.5] text-ink-muted">
         {body}
       </p>
       <HeritageButton href={cta.href} variant="primary">
@@ -173,12 +173,12 @@ function ProfileForm({
 }) {
   const [first = '', last = ''] = (profile?.display_name ?? '').split(' ', 2);
   return (
-    <div className="rounded-[2px] border border-[--color-border] bg-[--color-cream] p-6 sm:p-8">
-      <header className="mb-5 flex items-baseline justify-between gap-3 border-b border-[--color-border] pb-3.5">
-        <h3 className="m-0 font-serif text-[clamp(20px,2.4vw,24px)] font-medium text-[--color-walnut] [&_em]:font-normal [&_em]:italic">
+    <div className="rounded-[2px] border border-rule bg-cream p-6 sm:p-8">
+      <header className="mb-5 flex items-baseline justify-between gap-3 border-b border-rule pb-3.5">
+        <h3 className="m-0 font-serif text-[clamp(20px,2.4vw,24px)] font-medium text-walnut [&_em]:font-normal [&_em]:italic">
           Your <em>details</em>
         </h3>
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[--color-bronze-deep]">№ 01</span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-bronze-deep">№ 01</span>
       </header>
 
       {/* TODO Phase 3: wire this form to a server action that updates `profiles` */}
@@ -187,19 +187,19 @@ function ProfileForm({
         <ProfileField label="Last name" defaultValue={last} name="last" />
         <ProfileField label="Email" defaultValue={email} name="email" type="email" disabled />
         <ProfileField label="Phone" defaultValue={profile?.phone ?? ''} name="phone" type="tel" />
-        <label className="col-span-full flex cursor-pointer items-start gap-2.5 font-serif text-[14px] italic leading-[1.5] text-[--color-ink-muted]">
+        <label className="col-span-full flex cursor-pointer items-start gap-2.5 font-serif text-[14px] italic leading-[1.5] text-ink-muted">
           <input
             type="checkbox"
             name="notify_status_changes"
             defaultChecked={profile?.notify_status_changes ?? true}
-            className="mt-0.5 h-[18px] w-[18px] accent-[--color-walnut]"
+            className="mt-0.5 h-[18px] w-[18px] accent-walnut"
           />
           <span>Email me when my orders change status (out for delivery, delivered, etc.)</span>
         </label>
         <button
           type="submit"
           disabled
-          className="mt-3 w-fit min-w-[200px] cursor-not-allowed rounded-[2px] bg-[--color-walnut] px-5 py-[14px] font-serif text-[14px] font-semibold uppercase tracking-[0.16em] text-[--color-cream] [font-variant:small-caps] opacity-60 sm:col-span-2"
+          className="mt-3 w-fit min-w-[200px] cursor-not-allowed rounded-[2px] bg-walnut px-5 py-[14px] font-serif text-[14px] font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] opacity-60 sm:col-span-2"
           title="Saving profiles will be wired in Phase 3"
         >
           Save profile
@@ -224,7 +224,7 @@ function ProfileField({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="font-serif text-[13px] font-medium tracking-[0.14em] text-[--color-walnut] [font-variant:small-caps]">
+      <label className="font-serif text-[13px] font-medium tracking-[0.14em] text-walnut [font-variant:small-caps]">
         {label}
       </label>
       <input
@@ -232,7 +232,7 @@ function ProfileField({
         type={type}
         defaultValue={defaultValue}
         disabled={disabled}
-        className="w-full rounded-[2px] border border-[--color-border] bg-transparent px-3.5 py-3 font-serif text-[16px] text-[--color-walnut] outline-none transition-colors focus:border-[--color-walnut] disabled:opacity-60"
+        className="w-full rounded-[2px] border border-rule bg-transparent px-3.5 py-3 font-serif text-[16px] text-walnut outline-none transition-colors focus:border-walnut disabled:opacity-60"
       />
     </div>
   );

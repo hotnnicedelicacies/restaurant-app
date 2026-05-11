@@ -31,7 +31,7 @@ export default function AuthCard({
 }: Props) {
   return (
     <>
-      <header className="sticky top-0 z-50 bg-[--color-walnut] text-[--color-cream]">
+      <header className="sticky top-0 z-50 bg-walnut text-cream">
         <div className="container flex h-[68px] items-center justify-between gap-6">
           <Link href={siteConfig.routes.home} className="flex items-center" aria-label="Home">
             <Image
@@ -43,13 +43,13 @@ export default function AuthCard({
             />
           </Link>
           {topLabel && (
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[--color-bronze]">
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-bronze">
               {topLabel}
             </span>
           )}
           <Link
             href={siteConfig.routes.home}
-            className="border-b border-[rgba(241,229,205,0.22)] pb-px font-serif text-[14px] italic text-[--color-cream] transition-colors hover:border-[--color-bronze] hover:text-[--color-bronze]"
+            className="border-b border-[rgba(241,229,205,0.22)] pb-px font-serif text-[14px] italic text-cream transition-colors hover:border-bronze hover:text-bronze"
           >
             ← Back to site
           </Link>
@@ -58,12 +58,12 @@ export default function AuthCard({
 
       <section
         className={`flex min-h-[calc(100vh-68px)] items-start justify-center px-4 py-[clamp(40px,6vw,88px)] sm:items-center ${
-          onDark ? 'bg-[--color-walnut]' : 'bg-[--color-cream-soft]'
+          onDark ? 'bg-walnut' : 'bg-cream-soft'
         }`}
       >
-        <div className="relative w-full max-w-[460px] rounded-[2px] border border-[--color-border] bg-[--color-cream] p-[clamp(28px,4vw,48px)]">
+        <div className="relative w-full max-w-[460px] rounded-[2px] border border-rule bg-cream p-[clamp(28px,4vw,48px)]">
           {adminBadge && (
-            <div className="absolute left-5 top-5 font-mono text-[9px] uppercase tracking-[0.24em] text-[--color-bronze-deep]">
+            <div className="absolute left-5 top-5 font-mono text-[9px] uppercase tracking-[0.24em] text-bronze-deep">
               Admin
             </div>
           )}
@@ -73,15 +73,15 @@ export default function AuthCard({
           </div>
 
           {eyebrow && (
-            <p className="mb-3 text-center font-mono text-[10px] uppercase tracking-[0.22em] text-[--color-bronze-deep]">
+            <p className="mb-3 text-center font-mono text-[10px] uppercase tracking-[0.22em] text-bronze-deep">
               {eyebrow}
             </p>
           )}
-          <h1 className="m-0 mb-2 text-center font-serif text-[clamp(28px,3.8vw,36px)] font-medium leading-[1.08] tracking-[-0.005em] text-[--color-walnut] [&_em]:font-normal [&_em]:italic">
+          <h1 className="m-0 mb-2 text-center font-serif text-[clamp(28px,3.8vw,36px)] font-medium leading-[1.08] tracking-[-0.005em] text-walnut [&_em]:font-normal [&_em]:italic">
             {title}
           </h1>
           {sub && (
-            <p className="m-0 mx-auto mb-7 max-w-[36ch] text-center font-serif text-[15px] italic leading-[1.5] text-[--color-ink-muted]">
+            <p className="m-0 mx-auto mb-7 max-w-[36ch] text-center font-serif text-[15px] italic leading-[1.5] text-ink-muted">
               {sub}
             </p>
           )}

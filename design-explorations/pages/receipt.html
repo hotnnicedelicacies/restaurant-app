@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Receipt № HNN-2B9M-0917 — Hot N Nice Delicacies</title>
+<link rel="icon" href="../../app/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+
+<div class="mockup-banner">
+  <b>MOCKUP · v1</b> · Receipt · Walnut &amp; Cream · also the PDF template
+  <a href="./index.html">← All pages</a>
+</div>
+
+<!--
+  Receipt page. Reached from:
+  - Order confirmation email ("Download receipt")
+  - Account → past order → "View receipt"
+  - Admin order detail → "Print receipt"
+
+  Same HTML template renders the PDF that's attached to the order confirmation email
+  and downloaded from admin. @media print rules below strip the chrome for a clean A4.
+-->
+
+<!-- HEADER (slim — hidden when printing) -->
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="./home.html" class="site-header__logo"><img src="../../public/logo.png" alt="Hot N Nice Delicacies"></a>
+    <span class="t-mono-on-dark" style="letter-spacing: 0.22em;">Receipt</span>
+    <a href="./account.html" style="color: var(--cream); font-family: var(--font-serif); font-style: italic; font-size: 14px; border-bottom: 1px solid var(--rule-light); padding-bottom: 2px;">← Back to my account</a>
+  </div>
+</header>
+
+<div class="receipt-page">
+
+  <!-- ACTIONS (hidden in print) -->
+  <div class="receipt-actions">
+    <div class="receipt-actions__left">For your records · We've also emailed a copy.</div>
+    <div class="receipt-actions__right">
+      <button type="button" class="receipt-btn" onclick="window.print();">Print</button>
+      <a href="#" class="receipt-btn">Download PDF</a>
+      <a href="#" class="receipt-btn receipt-btn--primary">Email me a copy</a>
+    </div>
+  </div>
+
+  <!-- RECEIPT DOCUMENT -->
+  <article class="receipt">
+
+    <div class="receipt__paid-stamp">Paid</div>
+
+    <header class="receipt__header">
+      <div class="receipt__brand">
+        <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+        <div class="receipt__brand-meta">
+          A home kitchen · Middlesbrough<br>
+          hotnnicedelicacies@gmail.com<br>
+          +44 7776 320068
+        </div>
+      </div>
+      <div class="receipt__doc-info">
+        <div class="receipt__doc-type">Receipt</div>
+        <div class="receipt__ref">№ HNN-2B9M-0917</div>
+        <div class="receipt__date">Issued · Saturday 4 May 2026</div>
+      </div>
+    </header>
+
+    <h1 class="receipt__title">Receipt for your <em>order</em></h1>
+    <p class="receipt__title-sub">Thank you for ordering with us. This is your record of payment.</p>
+
+    <!-- PARTIES -->
+    <div class="receipt__parties">
+      <div>
+        <div class="receipt__party-label">Billed to</div>
+        <p class="receipt__party-name">Sarah Whitfield</p>
+        <p class="receipt__party-lines">
+          42 Linthorpe Road, Flat 3B<br>
+          Middlesbrough · TS1 3AB<br>
+          sarah.whitfield@example.co.uk<br>
+          +44 7700 900123
+        </p>
+      </div>
+      <div>
+        <div class="receipt__party-label">Delivered to</div>
+        <p class="receipt__party-name">Sarah Whitfield</p>
+        <p class="receipt__party-lines">
+          42 Linthorpe Road, Flat 3B<br>
+          Middlesbrough · TS1 3AB<br>
+          <b>Delivered</b> Sat 4 May, 12:34pm<br>
+          Window 12:00 – 14:00
+        </p>
+      </div>
+    </div>
+
+    <!-- ITEMIZED TABLE -->
+    <table class="receipt__table">
+      <thead>
+        <tr>
+          <th>Item</th>
+          <th class="receipt__qty-col">Qty</th>
+          <th class="receipt__unit-col">Unit</th>
+          <th class="receipt__total-col">Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <div class="receipt__item-name">Plantain Lasagna</div>
+            <div class="receipt__item-meta">Size · Regular</div>
+          </td>
+          <td class="receipt__qty">1</td>
+          <td style="text-align: right; padding-right: 12px;">£25.00</td>
+          <td>£25.00</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="receipt__item-name">Edikaikong</div>
+            <div class="receipt__item-meta">Standard portion</div>
+          </td>
+          <td class="receipt__qty">1</td>
+          <td style="text-align: right; padding-right: 12px;">£15.00</td>
+          <td>£15.00</td>
+        </tr>
+        <tr>
+          <td>
+            <div class="receipt__item-name">Puff Puff <em>Platter</em></div>
+            <div class="receipt__item-meta">Lightly sweet · shareable</div>
+            <div class="receipt__item-note">"Extra crispy if possible — birthday surprise."</div>
+          </td>
+          <td class="receipt__qty">1</td>
+          <td style="text-align: right; padding-right: 12px;">£10.00</td>
+          <td>£10.00</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- TOTALS -->
+    <div class="receipt__totals">
+      <div class="receipt__total-row"><span>Subtotal</span><span>£50.00</span></div>
+      <div class="receipt__total-row receipt__total-row--muted"><span>Delivery <em>· Middlesbrough TS1</em></span><span>£5.00</span></div>
+      <div class="receipt__total-row receipt__total-row--grand"><span>Total paid</span><span>£55.00</span></div>
+    </div>
+
+    <!-- PAYMENT INFO -->
+    <div class="receipt__payment">
+      <div>
+        <div class="receipt__payment-label">Payment method</div>
+        <p class="receipt__payment-value">
+          <b>Visa</b> ending 4242<br>
+          <em>Processed securely by Stripe</em>
+        </p>
+      </div>
+      <div>
+        <div class="receipt__payment-label">Payment status</div>
+        <p class="receipt__payment-value">
+          <b style="color: #1e7d3f;">Paid in full</b><br>
+          <em>Receipt: Sat 4 May, 10:47am</em>
+        </p>
+      </div>
+    </div>
+
+    <!-- THANK YOU -->
+    <p class="receipt__thanks">"No shortcuts. No frozen meals. Just dinner. Thank you for ordering."</p>
+
+    <!-- FOOTER -->
+    <footer class="receipt__footer">
+      <div class="receipt__footer-hygiene">★ ★ ★ ★ ★  Food Hygiene · Food Standards Agency</div>
+      Hot N Nice Delicacies · Middlesbrough, UK<br>
+      Questions about this receipt? <a href="mailto:hotnnicedelicacies@gmail.com">hotnnicedelicacies@gmail.com</a> · <a href="tel:+447776320068">+44 7776 320068</a>
+    </footer>
+
+  </article>
+</div>
+
+<!-- FOOTER (hidden in print) -->
+<footer class="site-footer" style="padding-top: 32px;">
+  <div class="container">
+    <div class="site-footer__copy" style="border: 0; padding-top: 0;">
+      <span>© 2026 Hot N Nice Delicacies · Middlesbrough, UK</span>
+      <span>★★★★★ Food Hygiene · FSA</span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

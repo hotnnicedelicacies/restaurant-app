@@ -18,6 +18,13 @@ import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { config as loadEnv } from 'dotenv';
+import WebSocket from 'ws';
+
+// Node < 22 lacks native WebSocket; Supabase JS client requires one even
+// when we don't use realtime. Polyfill globally before creating the client.
+if (typeof globalThis.WebSocket === 'undefined') {
+  globalThis.WebSocket = WebSocket;
+}
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, '..', '..');
@@ -43,6 +50,9 @@ const BUCKET = 'menu-images';
 const args = process.argv.slice(2);
 const adminFlag = args.indexOf('--admin');
 const adminEmail = adminFlag >= 0 ? args[adminFlag + 1] : null;
+const createAdminFlag = args.indexOf('--create-admin');
+const createAdminEmail = createAdminFlag >= 0 ? args[createAdminFlag + 1] : null;
+const createAdminPassword = createAdminFlag >= 0 ? args[createAdminFlag + 2] : null;
 
 // --- Helpers ---
 function log(emoji, msg) {
@@ -115,6 +125,53 @@ function addonsToJson(seed) {
       price_delta_gbp: a.priceDeltaGbp,
     })),
   };
+}
+
+async function createAdmin(email, password) {
+  log('👤', `Creating + admin-marking ${email}…`);
+  // Try to create the user (auto-confirms email)
+  const { data: created, error: createErr } = await supabase.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: { display_name: email.split('@')[0] },
+  });
+
+  let userId = created?.user?.id ?? null;
+
+  if (createErr) {
+    if (createErr.message.toLowerCase().includes('already')) {
+      // User exists — look them up and continue to admin-flag them
+      log('  ⚠', `User exists; flagging admin only.`);
+      const { data, error } = await supabase.auth.admin.listUsers({ page: 1, perPage: 200 });
+      if (error) {
+        log('  ✗', error.message);
+        return;
+      }
+      const existing = data.users.find((u) => u.email === email);
+      if (!existing) {
+        log('  ✗', `Could not locate existing user with email ${email}.`);
+        return;
+      }
+      userId = existing.id;
+    } else {
+      log('  ✗', createErr.message);
+      return;
+    }
+  } else {
+    log('  ✓', `User created.`);
+  }
+
+  if (!userId) return;
+  const { error: updateErr } = await supabase
+    .from('profiles')
+    .update({ is_admin: true })
+    .eq('id', userId);
+  if (updateErr) {
+    log('  ✗', `Could not flag is_admin: ${updateErr.message}`);
+    return;
+  }
+  log('  ✓', `${email} is now an admin. Sign in with the password you provided.`);
 }
 
 async function seedAdmin(email) {
@@ -256,6 +313,11 @@ async function seedItems(ITEMS, categoryIdBySlug) {
 // --- Run ---
 async function main() {
   console.log('\n=== Hot N Nice · Supabase seed ===\n');
+
+  if (createAdminEmail && createAdminPassword) {
+    await createAdmin(createAdminEmail, createAdminPassword);
+    return;
+  }
 
   if (adminEmail) {
     await seedAdmin(adminEmail);

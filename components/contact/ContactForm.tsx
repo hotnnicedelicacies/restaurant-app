@@ -35,12 +35,12 @@ export default function ContactForm() {
   };
 
   return (
-    <div className="rounded-[2px] border border-[--color-border] bg-[--color-cream] p-6 sm:p-8">
-      <header className="mb-5 flex items-baseline justify-between gap-3 border-b border-[--color-border] pb-3.5">
-        <h2 className="m-0 font-serif text-[clamp(20px,2.4vw,24px)] font-medium text-[--color-walnut] [&_em]:font-normal [&_em]:italic">
+    <div className="rounded-[2px] border border-rule bg-cream p-6 sm:p-8">
+      <header className="mb-5 flex items-baseline justify-between gap-3 border-b border-rule pb-3.5">
+        <h2 className="m-0 font-serif text-[clamp(20px,2.4vw,24px)] font-medium text-walnut [&_em]:font-normal [&_em]:italic">
           Send us a <em>message</em>
         </h2>
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[--color-bronze-deep]">№ 01</span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-bronze-deep">№ 01</span>
       </header>
 
       <form onSubmit={onSubmit} className="flex flex-col gap-4">
@@ -56,7 +56,7 @@ export default function ContactForm() {
         </div>
         <Field label="Email" name="email" type="email" required placeholder="you@example.co.uk" />
         <div className="flex flex-col gap-1.5">
-          <label className="font-serif text-[13px] font-medium tracking-[0.14em] text-[--color-walnut] [font-variant:small-caps]">
+          <label className="font-serif text-[13px] font-medium tracking-[0.14em] text-walnut [font-variant:small-caps]">
             What's it about?
           </label>
           <select name="topic" className={INPUT_CLS} required defaultValue="">
@@ -70,7 +70,7 @@ export default function ContactForm() {
           </select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="font-serif text-[13px] font-medium tracking-[0.14em] text-[--color-walnut] [font-variant:small-caps]">
+          <label className="font-serif text-[13px] font-medium tracking-[0.14em] text-walnut [font-variant:small-caps]">
             Your message
           </label>
           <textarea
@@ -84,11 +84,11 @@ export default function ContactForm() {
         <button
           type="submit"
           disabled={submitting}
-          className="mt-1 rounded-[2px] border-0 bg-[--color-walnut] px-5 py-[14px] font-serif text-[14px] font-semibold uppercase tracking-[0.16em] text-[--color-cream] [font-variant:small-caps] transition-colors hover:bg-[--color-bronze-deep] disabled:opacity-60"
+          className="mt-1 rounded-[2px] border-0 bg-walnut px-5 py-[14px] font-serif text-[14px] font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] transition-colors hover:bg-bronze-deep disabled:opacity-60"
         >
           {submitting ? 'Opening WhatsApp…' : 'Send message'}
         </button>
-        <p className="m-0 text-center text-[--color-ink-muted] italic font-serif text-[13px]">
+        <p className="m-0 text-center text-ink-muted italic font-serif text-[13px]">
           For anything urgent about a live order, message us on{' '}
           <a
             href={`https://wa.me/${siteConfig.contact.whatsapp}`}
@@ -106,7 +106,7 @@ export default function ContactForm() {
 }
 
 const INPUT_CLS =
-  'w-full rounded-[2px] border border-[--color-border] bg-transparent px-3.5 py-3 font-serif text-[16px] text-[--color-walnut] outline-none transition-colors focus:border-[--color-walnut] placeholder:italic placeholder:text-[--color-ink-muted]';
+  'w-full rounded-[2px] border border-rule bg-transparent px-3.5 py-3 font-serif text-[16px] text-walnut outline-none transition-colors focus:border-walnut placeholder:italic placeholder:text-ink-muted';
 
 function Field({
   label,
@@ -125,10 +125,10 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="font-serif text-[13px] font-medium tracking-[0.14em] text-[--color-walnut] [font-variant:small-caps]">
+      <label className="font-serif text-[13px] font-medium tracking-[0.14em] text-walnut [font-variant:small-caps]">
         {label}
         {sublabel && (
-          <small className="ml-1.5 font-serif text-[12px] italic tracking-normal text-[--color-ink-muted] [font-variant:normal]">
+          <small className="ml-1.5 font-serif text-[12px] italic tracking-normal text-ink-muted [font-variant:normal]">
             {sublabel}
           </small>
         )}

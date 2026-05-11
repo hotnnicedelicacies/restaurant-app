@@ -68,24 +68,24 @@ export default async function ItemDetailPage({ params }: Props) {
       <SiteHeader />
       <main>
         {/* Breadcrumb */}
-        <nav aria-label="Breadcrumb" className="border-b border-[--color-border] bg-[--color-cream-soft]">
+        <nav aria-label="Breadcrumb" className="border-b border-rule bg-cream-soft">
           <div className="container flex flex-wrap items-center gap-2.5 py-3.5 font-serif text-[13px]">
-            <Link href={siteConfig.routes.home} className="italic text-[--color-ink-muted] transition-colors hover:text-[--color-walnut]">
+            <Link href={siteConfig.routes.home} className="italic text-ink-muted transition-colors hover:text-walnut">
               Home
             </Link>
-            <span className="text-[--color-bronze]">·</span>
-            <Link href={siteConfig.routes.menu} className="italic text-[--color-ink-muted] transition-colors hover:text-[--color-walnut]">
+            <span className="text-bronze">·</span>
+            <Link href={siteConfig.routes.menu} className="italic text-ink-muted transition-colors hover:text-walnut">
               Menu
             </Link>
-            <span className="text-[--color-bronze]">·</span>
+            <span className="text-bronze">·</span>
             <Link
               href={`${siteConfig.routes.menu}#${item.categorySlug}`}
-              className="italic text-[--color-ink-muted] transition-colors hover:text-[--color-walnut]"
+              className="italic text-ink-muted transition-colors hover:text-walnut"
             >
               {item.categoryName}
             </Link>
-            <span className="text-[--color-bronze]">·</span>
-            <span className="font-medium tracking-[0.08em] text-[--color-walnut] [font-variant:small-caps]">
+            <span className="text-bronze">·</span>
+            <span className="font-medium tracking-[0.08em] text-walnut [font-variant:small-caps]">
               {item.name}
             </span>
           </div>
@@ -107,37 +107,37 @@ export default async function ItemDetailPage({ params }: Props) {
                 />
                 <div
                   aria-hidden
-                  className="pointer-events-none absolute -bottom-4 -right-4 left-4 top-4 -z-10 hidden rounded-[2px] border border-[--color-bronze] opacity-[0.35] md:block"
+                  className="pointer-events-none absolute -bottom-4 -right-4 left-4 top-4 -z-10 hidden rounded-[2px] border border-bronze opacity-[0.35] md:block"
                 />
               </div>
 
               {/* RIGHT: info + customise */}
               <div className="flex flex-col gap-4">
-                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[--color-bronze-deep]">
+                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-bronze-deep">
                   {item.categoryName}
                   {item.badges.length > 0 && ` · ${item.badges.join(' · ')}`}
                 </span>
-                <h1 className="m-0 font-serif text-[clamp(32px,4.5vw,48px)] font-medium leading-[1.04] tracking-[-0.005em] text-[--color-walnut] [&_em]:font-normal [&_em]:italic">
+                <h1 className="m-0 font-serif text-[clamp(32px,4.5vw,48px)] font-medium leading-[1.04] tracking-[-0.005em] text-walnut [&_em]:font-normal [&_em]:italic">
                   {item.name}
                 </h1>
-                <p className="m-0 max-w-[56ch] font-serif text-[17px] italic leading-[1.6] text-[--color-ink-muted]">
+                <p className="m-0 max-w-[56ch] font-serif text-[17px] italic leading-[1.6] text-ink-muted">
                   {item.longDescription ?? item.description}
                 </p>
 
                 {(item.dietaryTags.length > 0 || item.allergenTags.length > 0 || !item.isAvailable) && (
                   <div className="flex flex-wrap gap-1.5">
                     {item.dietaryTags.map((tag) => (
-                      <span key={tag} className="rounded-[2px] border border-[--color-border] px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.18em] text-[--color-walnut]">
+                      <span key={tag} className="rounded-[2px] border border-rule px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.18em] text-walnut">
                         {tag}
                       </span>
                     ))}
                     {item.allergenTags.map((tag) => (
-                      <span key={tag} className="rounded-[2px] border border-[--color-border] px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.18em] text-[--color-walnut]">
+                      <span key={tag} className="rounded-[2px] border border-rule px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.18em] text-walnut">
                         {tag}
                       </span>
                     ))}
                     {item.isAvailable ? (
-                      <span className="rounded-[2px] border border-[--color-border] px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.18em] text-[--color-walnut]">
+                      <span className="rounded-[2px] border border-rule px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.18em] text-walnut">
                         Available today
                       </span>
                     ) : (
@@ -148,11 +148,11 @@ export default async function ItemDetailPage({ params }: Props) {
                   </div>
                 )}
 
-                <div className="mt-1 flex items-baseline gap-3 border-y border-[--color-border] py-4">
-                  <span className="font-serif text-[32px] font-semibold tracking-[-0.005em] text-[--color-walnut]">
+                <div className="mt-1 flex items-baseline gap-3 border-y border-rule py-4">
+                  <span className="font-serif text-[32px] font-semibold tracking-[-0.005em] text-walnut">
                     {formatGBP(item.priceGbp)}
                   </span>
-                  <span className="font-serif text-[13px] italic text-[--color-ink-muted]">
+                  <span className="font-serif text-[13px] italic text-ink-muted">
                     Base price · before add-ons
                   </span>
                 </div>
@@ -176,7 +176,7 @@ export default async function ItemDetailPage({ params }: Props) {
 
         {/* Related items */}
         {related.length > 0 && (
-          <section className="bg-[--color-cream-soft] py-[clamp(56px,8vw,96px)]">
+          <section className="bg-cream-soft py-[clamp(56px,8vw,96px)]">
             <div className="container">
               <SectionHead eyebrow="Pair it with" title={<>You might also <em>like</em></>} className="mb-10" />
               <div className="mx-auto grid max-w-[1000px] gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -191,14 +191,14 @@ export default async function ItemDetailPage({ params }: Props) {
                         className="aspect-square w-full rounded-[2px] object-cover"
                       />
                     </Link>
-                    <h3 className="m-0 font-serif text-[17px] font-medium text-[--color-walnut]">{r.name}</h3>
+                    <h3 className="m-0 font-serif text-[17px] font-medium text-walnut">{r.name}</h3>
                     <div className="mt-0.5 flex items-center justify-between gap-3">
-                      <span className="font-serif text-[15px] font-semibold text-[--color-walnut]">
+                      <span className="font-serif text-[15px] font-semibold text-walnut">
                         {formatGBP(r.priceGbp)}
                       </span>
                       <Link
                         href={siteConfig.routes.itemDetail(r.slug)}
-                        className="border-b border-[--color-bronze-deep] pb-px font-serif text-[13px] italic text-[--color-bronze-deep]"
+                        className="border-b border-bronze-deep pb-px font-serif text-[13px] italic text-bronze-deep"
                       >
                         Add to order →
                       </Link>

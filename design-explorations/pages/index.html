@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hot N Nice · Mockup Index</title>
+<link rel="stylesheet" href="../shared/styles.css">
+<style>
+  body { background: #161513; color: #e8e0d0; min-height: 100vh; }
+  .index-wrap { max-width: 760px; margin: 0 auto; padding: 56px 32px 80px; }
+  .index-eyebrow { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.22em; color: #c69b6a; text-transform: uppercase; margin-bottom: 12px; }
+  .index-title { font-family: var(--font-serif); font-weight: 400; font-size: 38px; line-height: 1.08; letter-spacing: -0.005em; color: #f4f0e8; margin: 0 0 14px; }
+  .index-title em { font-style: italic; color: #c69b6a; }
+  .index-sub { font-family: var(--font-serif); font-style: italic; color: #b5ab97; max-width: 580px; margin: 0 0 40px; line-height: 1.55; }
+  .index-section { margin-bottom: 40px; }
+  .index-section h2 { font-family: var(--font-serif); font-weight: 500; font-size: 16px; font-variant: small-caps; letter-spacing: 0.18em; color: #c69b6a; margin: 0 0 16px; padding-bottom: 12px; border-bottom: 1px solid rgba(198, 155, 106, 0.22); }
+  .index-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; }
+  .index-list li { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 12px 0; border-bottom: 1px dashed rgba(255,255,255,0.08); }
+  .index-list li:last-child { border-bottom: none; }
+  .index-list a { font-family: var(--font-serif); font-size: 18px; color: #f4f0e8; transition: color 200ms ease; }
+  .index-list a:hover { color: #c69b6a; }
+  .index-list a.is-todo { color: rgba(244, 240, 232, 0.35); pointer-events: none; cursor: not-allowed; }
+  .index-status { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: #909088; }
+  .index-status.ready { color: #c69b6a; }
+  .index-status.todo { color: rgba(255,255,255,0.3); }
+  .index-foot { margin-top: 56px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.08); font-family: var(--font-serif); font-style: italic; font-size: 13px; color: #908874; line-height: 1.6; }
+  .index-foot a { color: #c69b6a; border-bottom: 1px solid #c69b6a; padding-bottom: 1px; font-style: italic; }
+  .palette-row { display: flex; gap: 8px; margin: 24px 0 32px; }
+  .swatch { width: 28px; height: 28px; border-radius: 50%; box-shadow: 0 0 0 1px rgba(255,255,255,0.06); }
+  .swatch-label { font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.4); margin-top: 6px; }
+</style>
+</head>
+<body>
+
+<div class="index-wrap">
+  <div class="index-eyebrow">Hot N Nice Delicacies · Customer-Facing Mockups</div>
+  <h1 class="index-title">Walnut &amp; Cream — <em>review &amp; iterate</em></h1>
+  <p class="index-sub">Static HTML mockups of every customer-facing page, built on the locked v3-β direction. Once the design and copy are signed off here, we port to Next.js with confidence.</p>
+
+  <div class="palette-row">
+    <div><div class="swatch" style="background:#F1E5CD"></div><div class="swatch-label">Cream</div></div>
+    <div><div class="swatch" style="background:#2D1F18"></div><div class="swatch-label">Walnut</div></div>
+    <div><div class="swatch" style="background:#A56F40"></div><div class="swatch-label">Bronze</div></div>
+    <div><div class="swatch" style="background:#7E5530"></div><div class="swatch-label">Bronze-deep</div></div>
+    <div><div class="swatch" style="background:#4a3a2c"></div><div class="swatch-label">Ink-muted</div></div>
+  </div>
+
+  <div class="index-section">
+    <h2>Pages</h2>
+    <ul class="index-list">
+      <li><a href="./home.html">Home</a><span class="index-status ready">Ready</span></li>
+      <li><a href="./menu.html">Menu (browse + filter)</a><span class="index-status ready">Ready</span></li>
+      <li><a href="./item-detail.html">Item detail (interactive)</a><span class="index-status ready">Ready</span></li>
+      <li><a href="./cart.html">Cart</a><span class="index-status ready">Ready</span></li>
+      <li><a href="./checkout.html">Checkout (Stripe + COD)</a><span class="index-status ready">Ready · v2</span></li>
+      <li><a href="./confirmation.html">Order confirmation</a><span class="index-status ready">Ready · v2</span></li>
+      <li><a href="./track-order.html">Order tracking (login-less + account opt-in)</a><span class="index-status ready">Ready · v2</span></li>
+      <li><a href="./about.html">About</a><span class="index-status ready">Ready</span></li>
+      <li><a href="./contact.html">Contact</a><span class="index-status ready">Ready</span></li>
+      <li><a href="./track-order.html">Track order (now with cancel-flow demo)</a><span class="index-status ready">Ready · v2</span></li>
+      <li><a href="./home.html">Home (now with cookie banner)</a><span class="index-status ready">Ready · v3</span></li>
+    </ul>
+  </div>
+
+  <div class="index-section">
+    <h2>Legal · UK GDPR / PECR</h2>
+    <ul class="index-list">
+      <li><a href="./privacy.html">Privacy Policy</a><span class="index-status ready">Template · for lawyer review</span></li>
+      <li><a href="./terms.html">Terms of Service</a><span class="index-status ready">Template · for lawyer review</span></li>
+      <li><a href="./refund-policy.html">Refund &amp; Cancellation Policy</a><span class="index-status ready">Template · for lawyer review</span></li>
+      <li><a href="./cookie-notice.html">Cookie Notice</a><span class="index-status ready">Template · for lawyer review</span></li>
+    </ul>
+  </div>
+
+  <div class="index-section">
+    <h2>Auth &amp; account</h2>
+    <ul class="index-list">
+      <li><a href="./sign-up.html">Sign up</a><span class="index-status ready">Ready</span></li>
+      <li><a href="./sign-in.html">Sign in</a><span class="index-status ready">Ready</span></li>
+      <li><a href="./forgot-password.html">Forgot password</a><span class="index-status ready">Ready</span></li>
+      <li><a href="./account.html">My account (orders / addresses / profile)</a><span class="index-status ready">Ready</span></li>
+      <li><a href="./receipt.html">Receipt (also the PDF template)</a><span class="index-status ready">Ready</span></li>
+    </ul>
+  </div>
+
+  <div class="index-section">
+    <h2>Admin · Kitchen control</h2>
+    <ul class="index-list">
+      <li><a href="./admin-sign-in.html">Admin sign in</a><span class="index-status ready">Ready</span></li>
+      <li><a href="./admin-orders.html">Orders dashboard (with filters)</a><span class="index-status ready">Ready</span></li>
+      <li><a href="./admin-order-detail.html">Order detail (now with confirmation modal)</a><span class="index-status ready">Ready · v2</span></li>
+      <li><a href="./admin-payments.html#cod">Payments &amp; COD reconciliation (bulk + single)</a><span class="index-status ready">Ready</span></li>
+      <li><a href="./admin-menu.html">Menu management (CRUD list + toggles)</a><span class="index-status ready">Ready</span></li>
+      <li><a href="./admin-menu-edit.html">Menu item edit (gallery + variants + addons)</a><span class="index-status ready">Ready · v2</span></li>
+      <li><a href="./admin-categories.html">Menu categories (CRUD + edit modal)</a><span class="index-status ready">Ready</span></li>
+      <li><a href="./admin-zones.html">Delivery zones (CRUD + edit modal)</a><span class="index-status ready">Ready</span></li>
+      <li><a href="./admin-settings.html">Settings (hours, contact, flags, hygiene, content)</a><span class="index-status ready">Ready · v2</span></li>
+      <li><a href="./admin-settings-advanced.html">Advanced settings (Stripe, email DNS, account, danger zone)</a><span class="index-status ready">Ready</span></li>
+    </ul>
+  </div>
+
+  <div class="index-section">
+    <h2>References</h2>
+    <ul class="index-list">
+      <li><a href="../brand-spec.md">brand-spec.md</a><span class="index-status">Design system source of truth</span></li>
+      <li><a href="../admin-settings.md">admin-settings.md</a><span class="index-status">Admin-controlled fields catalogue</span></li>
+      <li><a href="../directions-v3.html">directions-v3.html</a><span class="index-status">Chromatic exploration</span></li>
+      <li><a href="../directions-v2.html">directions-v2.html</a><span class="index-status">Substantial-restraint exploration</span></li>
+      <li><a href="../directions-v1.html">directions-v1.html</a><span class="index-status">Initial 3 directions</span></li>
+    </ul>
+  </div>
+
+  <p class="index-foot">
+    Feedback on the homepage? Note section, paste here or tell me directly. Once you're happy with home, I'll build out menu + item detail in the next turn — the design system is locked once approved, so subsequent pages move fast.
+  </p>
+</div>
+
+</body>
+</html>

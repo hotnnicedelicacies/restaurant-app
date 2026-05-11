@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Order confirmed — Hot N Nice Delicacies</title>
+<link rel="icon" href="../../app/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+
+<div class="mockup-banner">
+  <b>MOCKUP · v1</b> · Confirmation · Walnut &amp; Cream
+  <a href="./index.html">← All pages</a>
+</div>
+
+<!-- ================= HEADER ================= -->
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="./home.html" class="site-header__logo">
+      <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+    </a>
+    <nav class="site-header__nav">
+      <a href="./home.html">Home</a>
+      <a href="./menu.html">Menu</a>
+      <a href="./about.html">About</a>
+      <a href="./contact.html">Contact</a>
+    </nav>
+    <a href="./menu.html" class="site-header__cta">Order again</a>
+    <button class="site-header__burger" aria-label="Open menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ================= CONFIRMATION ================= -->
+<section class="confirmation">
+  <div class="container">
+
+    <div class="confirmation__card">
+      <div class="confirmation__mark" aria-hidden="true"></div>
+      <div class="confirmation__eyebrow">Order received · The Eleventh of May</div>
+      <h1 class="confirmation__title">Thank you, <em>Sarah.</em></h1>
+      <p class="confirmation__sub">
+        Your order is in. The kitchen has it on the pass — you'll get a text when it leaves the kitchen, and another when it's at your door.
+      </p>
+
+      <span class="confirmation__order-no">Order № HNN-3F7K-1142</span>
+
+      <span class="confirmation__divider"></span>
+
+      <!-- Status timeline -->
+      <div class="status-timeline" aria-label="Order progress">
+        <div class="status-step is-current">
+          <div class="status-step__dot">i</div>
+          <p class="status-step__label">Received</p>
+          <p class="status-step__time">10:47am</p>
+        </div>
+        <div class="status-step is-pending">
+          <div class="status-step__dot">ii</div>
+          <p class="status-step__label">Preparing</p>
+          <p class="status-step__time">~11:00am</p>
+        </div>
+        <div class="status-step is-pending">
+          <div class="status-step__dot">iii</div>
+          <p class="status-step__label">On its way</p>
+          <p class="status-step__time">~12:30pm</p>
+        </div>
+        <div class="status-step is-pending">
+          <div class="status-step__dot">iv</div>
+          <p class="status-step__label">Delivered</p>
+          <p class="status-step__time">12:00 – 14:00 window</p>
+        </div>
+      </div>
+
+      <!-- Order meta -->
+      <div class="confirmation__meta-grid">
+        <div>
+          <div class="confirmation__meta-label">Delivering to</div>
+          <div class="confirmation__meta-value">
+            <b>Sarah Whitfield</b><br>
+            42 Linthorpe Road, Flat 3B<br>
+            Middlesbrough · TS1 3AB
+          </div>
+        </div>
+        <div>
+          <div class="confirmation__meta-label">When</div>
+          <div class="confirmation__meta-value">
+            <b>Today</b> · Mon 11 May<br>
+            Window · 12:00 – 14:00<br>
+            <em style="color: var(--ink-muted)">Cooked this morning</em>
+          </div>
+        </div>
+        <div>
+          <div class="confirmation__meta-label">Paid</div>
+          <div class="confirmation__meta-value">
+            <b>£64.00</b><br>
+            Card ending 4242<br>
+            <em style="color: var(--ink-muted)">Receipt sent to email</em>
+          </div>
+        </div>
+      </div>
+
+      <div class="confirmation__cta-row">
+        <a href="./track-order.html?ref=HNN-3F7K-1142" class="btn btn-primary">Track your order →</a>
+        <a href="./menu.html" class="btn btn-ghost">Browse the menu</a>
+      </div>
+
+      <p class="t-body-muted" style="margin-top: 24px;">
+        We've also sent a confirmation to <b style="color: var(--walnut);">sarah.whitfield@example.co.uk</b> — your invoice is attached as a PDF.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= ACCOUNT-CREATION OPT-IN ================= -->
+<!--
+  Per Hot N Nice v1 scope: customer accounts are included. This is the soft opt-in
+  after a successful order — users already have their tracking link, but
+  creating an account unlocks reorder + saved address + history.
+  Supabase Auth email + password (built-in forgot-password flow handles reset).
+-->
+<section class="account-band">
+  <div class="container account-band__inner">
+    <div class="account-band__text">
+      <span class="account-band__eyebrow">After your order arrives</span>
+      <h2 class="account-band__title">Save your details for <em>next time</em>.</h2>
+      <p class="account-band__body">
+        Create a quick account and your next order is one tap. Email and a password — that's all we need.
+      </p>
+      <ul class="account-band__perks">
+        <li>One-tap reorder of anything you've had before</li>
+        <li>Saved delivery address — no retyping</li>
+        <li>Order history and receipts in one place</li>
+      </ul>
+    </div>
+
+    <form class="account-band__form" action="./account.html">
+      <div class="form-field">
+        <label class="form-field__label" for="signup-email">Email</label>
+        <input id="signup-email" class="form-field__input" type="email" placeholder="you@example.co.uk" value="sarah.whitfield@example.co.uk" required>
+      </div>
+      <div class="form-field">
+        <label class="form-field__label" for="signup-password">Choose a password <small>· at least 8 characters</small></label>
+        <div class="password-input">
+          <input id="signup-password" class="form-field__input" type="password" minlength="8" placeholder="••••••••" required>
+          <button type="button" class="password-toggle" aria-label="Show password" data-target="signup-password">Show</button>
+        </div>
+      </div>
+      <button type="submit" class="summary__cta" style="margin-top: 4px;">Create my account</button>
+      <p class="account-band__alt">
+        Already have one? <a href="./sign-in.html">Sign in →</a>
+      </p>
+    </form>
+  </div>
+</section>
+
+<script>
+  // Password show/hide
+  document.querySelectorAll('.password-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      const showing = input.type === 'text';
+      input.type = showing ? 'password' : 'text';
+      btn.textContent = showing ? 'Show' : 'Hide';
+      btn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+    });
+  });
+</script>
+
+<!-- ================= WHILE YOU WAIT ================= -->
+<section class="section section--soft">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__eyebrow">While you wait</div>
+      <h2 class="section-head__title">A note from the <em>kitchen</em></h2>
+      <span class="ornament"></span>
+    </div>
+
+    <div class="kitchen-story" style="max-width: 980px;">
+      <div class="kitchen-story__media">
+        <img src="../../assets/meals/jollof-rice-with-protein-of-choice-and-plantain.jpeg" alt="Jollof rice plated">
+      </div>
+      <div class="kitchen-story__text">
+        <span class="kitchen-story__eyebrow">Behind the scenes</span>
+        <h3 class="kitchen-story__title">Everything you ordered is <em>made fresh.</em></h3>
+        <div class="kitchen-story__body">
+          <p>Your jollof has been on a low simmer since ten o'clock. The plantain is being caramelised to order. The suya is on the grill now.</p>
+          <p>If anything changes — a slight delay, an ingredient swap, a question about your special instructions — we'll text you on <b>+44 7700 900123</b>.</p>
+          <p>Thank you for ordering with us.</p>
+        </div>
+        <div>
+          <a href="https://wa.me/447776320068" class="link-underline">Need to change something? Message us →</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__grid">
+      <div class="site-footer__brand">
+        <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+        <p class="site-footer__tagline">A small home kitchen in Middlesbrough — Italian &amp; West African, delivered hot.</p>
+        <div class="site-footer__hygiene">
+          <span class="site-footer__hygiene-stars">★ ★ ★ ★ ★  Hygiene · FSA</span>
+          <a href="https://ratings.food.gov.uk/business/1913815/hot-n-nice-delicacies" target="_blank" rel="noopener noreferrer">Verify our rating →</a>
+        </div>
+      </div>
+      <div>
+        <h4 class="site-footer__col-title">Visit</h4>
+        <ul>
+          <li><a href="./home.html">Home</a></li>
+          <li><a href="./menu.html">Menu</a></li>
+          <li><a href="./about.html">About</a></li>
+          <li><a href="./contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="site-footer__col-title">Contact</h4>
+        <ul>
+          <li><a href="tel:+447776320068">+44 7776 320068</a></li>
+          <li><a href="https://wa.me/447776320068">WhatsApp</a></li>
+          <li><a href="mailto:hotnnicedelicacies@gmail.com">Email us</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="site-footer__col-title">Hours</h4>
+        <ul>
+          <li>Tuesday – Sunday</li>
+          <li>12pm – 8pm</li>
+          <li>Order by 10am for same-day</li>
+        </ul>
+      </div>
+    </div>
+    <div class="site-footer__copy">
+      <span>© 2026 Hot N Nice Delicacies · Middlesbrough, UK</span>
+      <span><a href="./terms.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Terms</a> · <a href="./privacy.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Privacy</a> · <a href="./refund-policy.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Refunds</a> · <a href="./cookie-notice.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Cookies</a></span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

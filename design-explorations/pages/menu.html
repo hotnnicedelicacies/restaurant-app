@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menu — Hot N Nice Delicacies</title>
+<link rel="icon" href="../../app/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+
+<div class="mockup-banner">
+  <b>MOCKUP · v1</b> · Menu · Walnut &amp; Cream
+  <a href="./index.html">← All pages</a>
+</div>
+
+<!-- ================= HEADER ================= -->
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="./home.html" class="site-header__logo">
+      <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+    </a>
+    <nav class="site-header__nav">
+      <a href="./home.html">Home</a>
+      <a href="./menu.html" class="is-active">Menu</a>
+      <a href="./about.html">About</a>
+      <a href="./contact.html">Contact</a>
+    </nav>
+    <a href="./cart.html" class="site-header__cta">Cart · 0</a>
+    <button class="site-header__burger" aria-label="Open menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ================= PAGE HERO ================= -->
+<section class="page-hero">
+  <div class="container">
+    <!-- ADMIN: settings.business_hours.opening_days, settings.business_hours.same_day_cutoff -->
+    <div class="page-hero__eyebrow">Vol. 01 · Today's Kitchen · Tue – Sun</div>
+    <h1 class="page-hero__title">Today's <em>Menu</em></h1>
+    <p class="page-hero__sub">Cooked this morning · Order by 10am for same-day delivery to Teesside.</p>
+  </div>
+</section>
+
+<!-- ================= TOOLBAR ================= -->
+<div class="menu-toolbar">
+  <div class="container">
+    <div class="menu-toolbar__inner">
+      <div class="menu-toolbar__search">
+        <svg class="menu-toolbar__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3" stroke-linecap="round"/></svg>
+        <input type="search" class="menu-toolbar__search-input" placeholder="Search dishes — jollof, suya, lasagna…">
+      </div>
+      <div class="menu-toolbar__chips">
+        <button class="menu-chip is-active">All</button>
+        <button class="menu-chip">Vegetarian</button>
+        <button class="menu-chip">Gluten-free</button>
+        <button class="menu-chip">Spicy</button>
+        <button class="menu-chip">Pescatarian</button>
+        <button class="menu-chip">Shareable</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= CATEGORY JUMP NAV ================= -->
+<nav class="category-jump" aria-label="Jump to category">
+  <div class="container">
+    <div class="category-jump__inner">
+      <a href="#rice" class="category-jump__link is-active">Rice</a>
+      <a href="#pasta" class="category-jump__link">Pasta</a>
+      <a href="#grill" class="category-jump__link">Grill</a>
+      <a href="#soup" class="category-jump__link">Soup</a>
+      <a href="#swallow" class="category-jump__link">Swallow</a>
+      <a href="#sides" class="category-jump__link">Sides</a>
+      <a href="#snacks" class="category-jump__link">Snacks</a>
+      <a href="#breakfast" class="category-jump__link">Breakfast</a>
+    </div>
+  </div>
+</nav>
+
+<!-- ================= MENU SECTIONS ================= -->
+<section class="section">
+  <div class="container">
+
+    <!-- ========== RICE ========== -->
+    <article id="rice" class="menu-category">
+      <div class="menu-category__head">
+        <h2 class="menu-category__title">Rice</h2>
+        <span class="menu-category__count">04 dishes</span>
+      </div>
+      <div class="bill-of-fare">
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/jollof-rice-with-protein-of-choice-and-plantain-1.png" alt="Jollof rice with plantain">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 01 · Signature</span>
+              <h3 class="fare-row__name">Jollof Rice with Plantain</h3>
+              <p class="fare-row__desc">Fragrant tomato-based jollof with your choice of chicken, beef or fish, alongside caramelised plantain.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Protein choice</span>
+                <span class="fare-row__tag">Gluten-free</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£10</span>
+              <a href="./item-detail.html?id=jollof" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/ofada-rice-and-ayamase-sauce-1.png" alt="Ofada rice and ayamase sauce">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 02</span>
+              <h3 class="fare-row__name">Ofada Rice &amp; Ayamase Sauce</h3>
+              <p class="fare-row__desc">Unpolished, locally-grown rice paired with a bold, smoky green pepper sauce — deeply flavourful.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Spicy</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£15</span>
+              <a href="./item-detail.html?id=ofada" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/fried-rice-1.png" alt="Fried rice">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 03</span>
+              <h3 class="fare-row__name">Fried Rice</h3>
+              <p class="fare-row__desc">Stir-fried rice loaded with colourful vegetables, prawns, and savoury seasoning.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Contains seafood</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£12</span>
+              <a href="./item-detail.html?id=fried-rice" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/white-rice-and-stew.jpeg" alt="White rice and stew">
+            <!-- ADMIN: menu_item.is_available_today = false -->
+            <div class="fare-row__soldout">Sold out today</div>
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 04</span>
+              <h3 class="fare-row__name">White Rice &amp; Stew</h3>
+              <p class="fare-row__desc">Fluffy steamed white rice paired with a hearty, slow-cooked tomato-based stew.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Protein choice</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£12</span>
+              <a href="#" class="fare-row__add" style="opacity:0.4; pointer-events:none;">Sold out</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </article>
+
+    <!-- ========== PASTA ========== -->
+    <article id="pasta" class="menu-category">
+      <div class="menu-category__head">
+        <h2 class="menu-category__title">Pasta</h2>
+        <span class="menu-category__count">03 dishes</span>
+      </div>
+      <div class="bill-of-fare">
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/plantain-lasagna.jpeg" alt="Plantain lasagna">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 05 · House signature</span>
+              <h3 class="fare-row__name">Plantain Lasagna</h3>
+              <p class="fare-row__desc">A twist on classic lasagna — sweet ripe plantain in place of pasta, layered with seasoned mince and béchamel, baked golden.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Contains dairy</span>
+                <span class="fare-row__tag">House signature</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£25</span>
+              <a href="./item-detail.html?id=plantain-lasagna" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/lasagna-1.png" alt="Classic lasagna">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 06</span>
+              <h3 class="fare-row__name">Classic Lasagna</h3>
+              <p class="fare-row__desc">Oven-baked pasta layered with rich meat sauce, creamy béchamel, and golden melted cheese.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Contains dairy</span>
+                <span class="fare-row__tag">Contains gluten</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£20</span>
+              <a href="./item-detail.html?id=lasagna" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/spaghetti-bolognaise.jpeg" alt="Spaghetti bolognaise">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 07</span>
+              <h3 class="fare-row__name">Spaghetti Bolognaise</h3>
+              <p class="fare-row__desc">Classic spaghetti topped with a rich, slow-cooked meat sauce and aromatic herbs.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Contains gluten</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£20</span>
+              <a href="./item-detail.html?id=spaghetti" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </article>
+
+    <!-- ========== GRILL ========== -->
+    <article id="grill" class="menu-category">
+      <div class="menu-category__head">
+        <h2 class="menu-category__title">Grill</h2>
+        <span class="menu-category__count">04 dishes</span>
+      </div>
+      <div class="bill-of-fare">
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/roasted-tilapia-fish.jpeg" alt="Roasted tilapia">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 08</span>
+              <h3 class="fare-row__name">Roasted Tilapia Platter</h3>
+              <p class="fare-row__desc">Whole tilapia marinated in peppers and spices, fire-roasted to a crispy finish, with seasoned sides.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Spicy</span>
+                <span class="fare-row__tag">Pescatarian</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£25</span>
+              <a href="./item-detail.html?id=roasted-tilapia" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/roasted-yam-and-plantain-with-tilapia-fish.jpeg" alt="Roasted yam and plantain with tilapia">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 09</span>
+              <h3 class="fare-row__name">Roasted Yam &amp; Tilapia</h3>
+              <p class="fare-row__desc">Fire-roasted yam and plantain served alongside seasoned grilled tilapia — a classic combination, bold flavour.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Pescatarian</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£30</span>
+              <a href="./item-detail.html?id=roasted-yam-tilapia" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/suya.jpeg" alt="Suya sticks">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 10</span>
+              <h3 class="fare-row__name">Suya Sticks</h3>
+              <p class="fare-row__desc">Smoky, peppery grilled beef skewers in a bold spice blend, with sliced onions and tomatoes.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Spicy</span>
+                <span class="fare-row__tag">Shareable</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£5</span>
+              <a href="./item-detail.html?id=suya" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/suya-burger.jpeg" alt="Suya burger">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 11 · Fusion</span>
+              <h3 class="fare-row__name">Suya Burger</h3>
+              <p class="fare-row__desc">A bold fusion burger stacked with a spiced grilled beef patty, caramelised onions, fresh toppings, toasted bun.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Spicy</span>
+                <span class="fare-row__tag">Contains gluten</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£15</span>
+              <a href="./item-detail.html?id=suya-burger" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </article>
+
+    <!-- ========== SOUP ========== -->
+    <article id="soup" class="menu-category">
+      <div class="menu-category__head">
+        <h2 class="menu-category__title">Soup</h2>
+        <span class="menu-category__count">08 dishes</span>
+      </div>
+      <div class="bill-of-fare">
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/edikaikong-1.png" alt="Edikaikong">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 12</span>
+              <h3 class="fare-row__name">Edikaikong</h3>
+              <p class="fare-row__desc">Highly nutritious leafy green soup packed with ugu and waterleaf, loaded with seafood and assorted meat.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">High protein</span>
+                <span class="fare-row__tag">Contains seafood</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£15</span>
+              <a href="./item-detail.html?id=edikaikong" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/afang-soup-1.png" alt="Afang soup">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 13</span>
+              <h3 class="fare-row__name">Afang Soup</h3>
+              <p class="fare-row__desc">A delicate, earthy soup made with afang leaves, waterleaf, and assorted proteins — layered, complex flavour.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">High protein</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£15</span>
+              <a href="./item-detail.html?id=afang" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/oha-soup.jpeg" alt="Oha soup">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 14</span>
+              <h3 class="fare-row__name">Oha Soup</h3>
+              <p class="fare-row__desc">Delicate, earthy soup with tender oha leaves and cocoyam thickener, rich with assorted meats.</p>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£15</span>
+              <a href="./item-detail.html?id=oha" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/banga-soup-1.png" alt="Banga soup">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 15</span>
+              <h3 class="fare-row__name">Banga Soup</h3>
+              <p class="fare-row__desc">Thick, aromatic palm-nut soup slow-cooked with fresh fish and hand-picked spices.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Pescatarian</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£10</span>
+              <a href="./item-detail.html?id=banga" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/efo-riro-1.png" alt="Efo riro">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 16</span>
+              <h3 class="fare-row__name">Efo Riro</h3>
+              <p class="fare-row__desc">A rich, hearty spinach stew loaded with assorted meats, smoked fish, and aromatic peppers.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Spicy</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£10</span>
+              <a href="./item-detail.html?id=efo-riro" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/okra-soup.jpeg" alt="Okra soup">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 17</span>
+              <h3 class="fare-row__name">Okra Soup</h3>
+              <p class="fare-row__desc">Silky, draw okra soup cooked with assorted meat and seafood — warming, wholesome, full of depth.</p>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£10</span>
+              <a href="./item-detail.html?id=okra" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/ofe-akwu-1.png" alt="Ofe akwu">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 18</span>
+              <h3 class="fare-row__name">Ofe Akwu</h3>
+              <p class="fare-row__desc">Rich, flavourful palm-nut soup simmered with assorted meat and crayfish — warming, deeply comforting.</p>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£10</span>
+              <a href="./item-detail.html?id=ofe-akwu" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/ogbono-soy-1.png" alt="Ogbono soup">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 19</span>
+              <h3 class="fare-row__name">Ogbono Soup</h3>
+              <p class="fare-row__desc">Draw soup made from ground ogbono seeds with a soy-enriched twist — thick, hearty, deeply satisfying.</p>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£10</span>
+              <a href="./item-detail.html?id=ogbono" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </article>
+
+    <!-- ========== SWALLOW ========== -->
+    <article id="swallow" class="menu-category">
+      <div class="menu-category__head">
+        <h2 class="menu-category__title">Swallow</h2>
+        <span class="menu-category__count">03 sides</span>
+      </div>
+      <div class="bill-of-fare">
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/pounded-yam.jpeg" alt="Pounded yam">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 20</span>
+              <h3 class="fare-row__name">Pounded Yam</h3>
+              <p class="fare-row__desc">Silky, smooth yam dough pounded to perfection — pair with any rich soup.</p>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£7</span>
+              <a href="./item-detail.html?id=pounded-yam" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/fufu-1.png" alt="Fufu">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 21</span>
+              <h3 class="fare-row__name">Fufu</h3>
+              <p class="fare-row__desc">Smooth, stretchy cassava dough — soft, satisfying, perfect with any hearty soup.</p>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£8</span>
+              <a href="./item-detail.html?id=fufu" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/garri-1.png" alt="Garri">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 22</span>
+              <h3 class="fare-row__name">Garri</h3>
+              <p class="fare-row__desc">Light cassava flakes served with cold water, sugar, groundnuts, and milk — a wholesome snack.</p>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£5</span>
+              <a href="./item-detail.html?id=garri" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </article>
+
+    <!-- ========== SIDES ========== -->
+    <article id="sides" class="menu-category">
+      <div class="menu-category__head">
+        <h2 class="menu-category__title">Sides</h2>
+        <span class="menu-category__count">04 dishes</span>
+      </div>
+      <div class="bill-of-fare">
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/abacha-1.png" alt="Abacha">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 23</span>
+              <h3 class="fare-row__name">Special Abacha (African Salad)</h3>
+              <p class="fare-row__desc">Vibrant salad of shredded dried cassava, palm oil, garden eggs, fermented beans, and crayfish.</p>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£15</span>
+              <a href="./item-detail.html?id=abacha" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/moi-moi-1.png" alt="Moi moi">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 24</span>
+              <h3 class="fare-row__name">Moi Moi</h3>
+              <p class="fare-row__desc">Steamed bean pudding made with blended black-eyed peas, peppers, onions, and a choice of fillings.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Vegetarian option</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£3</span>
+              <a href="./item-detail.html?id=moi-moi" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/tomato-stew.jpeg" alt="Tomato stew">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 25</span>
+              <h3 class="fare-row__name">Tomato Stew</h3>
+              <p class="fare-row__desc">Classic tomato-based stew slow-cooked with blended peppers, onions, and your choice of protein.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Protein choice</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£8</span>
+              <a href="./item-detail.html?id=tomato-stew" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/okpa.jpeg" alt="Okpa">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 26</span>
+              <h3 class="fare-row__name">Okpa</h3>
+              <p class="fare-row__desc">Dense, satisfying Bambara nut pudding steamed to perfection — wholesome, filling, full of flavour.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Vegetarian</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£5</span>
+              <a href="./item-detail.html?id=okpa" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </article>
+
+    <!-- ========== SNACKS ========== -->
+    <article id="snacks" class="menu-category">
+      <div class="menu-category__head">
+        <h2 class="menu-category__title">Snacks &amp; Party</h2>
+        <span class="menu-category__count">03 dishes</span>
+      </div>
+      <div class="bill-of-fare">
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/small-chops.jpeg" alt="Small chops">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 27</span>
+              <h3 class="fare-row__name">Small Chops Platter</h3>
+              <p class="fare-row__desc">An assorted platter of bite-sized party favourites: puff-puff, samosa, spring rolls, and peppered chicken.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Shareable</span>
+                <span class="fare-row__tag">Party</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£25</span>
+              <a href="./item-detail.html?id=small-chops" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/puff-puff.jpeg" alt="Puff puff">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 28</span>
+              <h3 class="fare-row__name">Puff Puff Platter</h3>
+              <p class="fare-row__desc">Soft, golden deep-fried dough balls — light, lightly sweetened, impossible to resist.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Vegetarian</span>
+                <span class="fare-row__tag">Shareable</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£10</span>
+              <a href="./item-detail.html?id=puff-puff" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/meat-pie-1.png" alt="Meat pie">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 29</span>
+              <h3 class="fare-row__name">Meat Pie</h3>
+              <p class="fare-row__desc">Flaky, golden pastry filled with seasoned minced meat, diced potatoes and carrots — a satisfying baked treat.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Contains gluten</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£2</span>
+              <a href="./item-detail.html?id=meat-pie" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </article>
+
+    <!-- ========== BREAKFAST ========== -->
+    <article id="breakfast" class="menu-category">
+      <div class="menu-category__head">
+        <h2 class="menu-category__title">Breakfast</h2>
+        <span class="menu-category__count">02 dishes</span>
+      </div>
+      <div class="bill-of-fare">
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/akara-and-akamu-1.png" alt="Akara and akamu">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 30</span>
+              <h3 class="fare-row__name">Special Akara &amp; Akamu</h3>
+              <p class="fare-row__desc">Crispy deep-fried bean cakes paired with smooth, warm fermented corn porridge — hearty, comforting.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Vegetarian</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£15</span>
+              <a href="./item-detail.html?id=akara-akamu" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+        <article class="fare-row">
+          <div class="fare-row__img-wrap">
+            <img class="fare-row__img" src="../../assets/meals/oatmeal-1.png" alt="Oatmeal">
+          </div>
+          <div class="fare-row__content">
+            <div class="fare-row__text">
+              <span class="fare-row__num">№ 31</span>
+              <h3 class="fare-row__name">Oatmeal</h3>
+              <p class="fare-row__desc">Creamy, slow-cooked oats served warm — a wholesome, filling way to start the day.</p>
+              <div class="fare-row__tags">
+                <span class="fare-row__tag">Vegetarian</span>
+                <span class="fare-row__tag">Vegan option</span>
+              </div>
+            </div>
+            <div class="fare-row__right">
+              <span class="fare-row__price">£5</span>
+              <a href="./item-detail.html?id=oatmeal" class="fare-row__add">Add to order →</a>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<!-- ================= CTA BAND ================= -->
+<section class="cta-band">
+  <div class="container">
+    <div class="cta-band__eyebrow">Ready when you are</div>
+    <h2 class="cta-band__title">Tonight's dinner, <em>handled.</em></h2>
+    <p class="cta-band__sub">Place your order before ten and we'll have it at your door hot, between twelve and eight.</p>
+    <a href="./cart.html" class="cta-band__cta">Review your order</a>
+    <!-- ADMIN: settings.contact.whatsapp, settings.contact.phone, settings.contact.email -->
+    <div class="cta-band__channels">
+      <a href="https://wa.me/447776320068">WhatsApp · +44 7776 320068</a>
+      <a href="tel:+447776320068">Call · +44 7776 320068</a>
+      <a href="mailto:hotnnicedelicacies@gmail.com">Email</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__grid">
+      <div class="site-footer__brand">
+        <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+        <p class="site-footer__tagline">A small home kitchen in Middlesbrough — Italian &amp; West African, delivered hot.</p>
+        <div class="site-footer__hygiene">
+          <span class="site-footer__hygiene-stars">★ ★ ★ ★ ★  Hygiene · FSA</span>
+          <a href="https://ratings.food.gov.uk/business/1913815/hot-n-nice-delicacies" target="_blank" rel="noopener noreferrer">Verify our rating →</a>
+        </div>
+      </div>
+      <div>
+        <h4 class="site-footer__col-title">Visit</h4>
+        <ul>
+          <li><a href="./home.html">Home</a></li>
+          <li><a href="./menu.html">Menu</a></li>
+          <li><a href="./about.html">About</a></li>
+          <li><a href="./contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="site-footer__col-title">Contact</h4>
+        <ul>
+          <li><a href="tel:+447776320068">+44 7776 320068</a></li>
+          <li><a href="https://wa.me/447776320068">WhatsApp</a></li>
+          <li><a href="mailto:hotnnicedelicacies@gmail.com">Email us</a></li>
+          <li><a href="https://instagram.com/hotnnicedelicacies" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="site-footer__col-title">Hours</h4>
+        <ul>
+          <li>Tuesday – Sunday</li>
+          <li>12pm – 8pm</li>
+          <li>Order by 10am for same-day</li>
+        </ul>
+      </div>
+    </div>
+    <div class="site-footer__copy">
+      <span>© 2026 Hot N Nice Delicacies · Middlesbrough, UK</span>
+      <span><a href="./terms.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Terms</a> · <a href="./privacy.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Privacy</a> · <a href="./refund-policy.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Refunds</a> · <a href="./cookie-notice.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Cookies</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Category jump nav — highlight active link as you scroll
+  (function() {
+    const links = document.querySelectorAll('.category-jump__link');
+    const sections = Array.from(links).map(l => document.querySelector(l.getAttribute('href')));
+    function onScroll() {
+      const offset = 200;
+      let activeIdx = 0;
+      sections.forEach((s, i) => { if (s && s.getBoundingClientRect().top - offset < 0) activeIdx = i; });
+      links.forEach((l, i) => l.classList.toggle('is-active', i === activeIdx));
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    links.forEach(l => l.addEventListener('click', () => setTimeout(onScroll, 400)));
+  })();
+</script>
+
+</body>
+</html>

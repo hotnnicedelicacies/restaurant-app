@@ -42,27 +42,27 @@ export default function CookieBanner() {
     <div
       role="dialog"
       aria-label="Cookie notice"
-      className="fixed bottom-4 left-4 right-4 z-[60] mx-auto max-w-[560px] rounded-[4px] bg-[--color-walnut] p-5 text-[--color-cream] shadow-[0_24px_60px_rgba(0,0,0,0.35)] sm:p-6"
+      className="fixed bottom-4 left-4 right-4 z-[60] mx-auto max-w-[560px] rounded-[4px] bg-walnut p-5 text-cream shadow-[0_24px_60px_rgba(0,0,0,0.35)] sm:p-6"
       style={{ animation: 'cookieIn 280ms cubic-bezier(0.16, 1, 0.3, 1)' }}
     >
       <div
-        className="mb-1.5 font-mono text-[9px] uppercase tracking-[0.22em] text-[--color-bronze]"
+        className="mb-1.5 font-mono text-[9px] uppercase tracking-[0.22em] text-bronze"
         aria-hidden
       >
         A note about cookies
       </div>
-      <h2 className="m-0 mb-1.5 font-serif text-[17px] font-medium leading-tight text-[--color-cream]">
-        We use a few <em className="not-italic text-[--color-bronze] italic">essential</em> cookies.
+      <h2 className="m-0 mb-1.5 font-serif text-[17px] font-medium leading-tight text-cream">
+        We use a few <em className="not-italic text-bronze italic">essential</em> cookies.
       </h2>
       <p className="m-0 mb-4 font-serif text-[14px] italic leading-[1.55] text-[#F1E5CDD2]">
         Just what's needed to remember your basket, keep you signed in, and process payments safely.{' '}
-        <b className="font-medium text-[--color-cream] not-italic">
+        <b className="font-medium text-cream not-italic">
           No tracking. No advertising. No analytics
         </b>{' '}
         — see our{' '}
         <Link
           href={siteConfig.routes.legal.cookies}
-          className="text-[--color-bronze] underline decoration-[--color-bronze] underline-offset-[3px]"
+          className="text-bronze underline decoration-bronze underline-offset-[3px]"
         >
           Cookie Notice
         </Link>{' '}
@@ -71,14 +71,14 @@ export default function CookieBanner() {
       <div className="flex flex-wrap gap-2">
         <Link
           href={siteConfig.routes.legal.cookies}
-          className="flex-1 rounded-[2px] border border-[rgba(241,229,205,0.22)] bg-transparent px-4 py-[11px] text-center font-serif text-[13px] font-semibold uppercase tracking-[0.14em] text-[--color-cream] [font-variant:small-caps] transition-colors hover:bg-[rgba(241,229,205,0.12)]"
+          className="flex-1 rounded-[2px] border border-[rgba(241,229,205,0.22)] bg-transparent px-4 py-[11px] text-center font-serif text-[13px] font-semibold uppercase tracking-[0.14em] text-cream [font-variant:small-caps] transition-colors hover:bg-[rgba(241,229,205,0.12)]"
         >
           Read the notice
         </Link>
         <button
           type="button"
           onClick={accept}
-          className="flex-1 rounded-[2px] border-0 bg-[--color-bronze] px-4 py-[11px] font-serif text-[13px] font-semibold uppercase tracking-[0.14em] text-[--color-walnut] [font-variant:small-caps] transition-colors hover:bg-[--color-cream]"
+          className="flex-1 rounded-[2px] border-0 bg-bronze px-4 py-[11px] font-serif text-[13px] font-semibold uppercase tracking-[0.14em] text-walnut [font-variant:small-caps] transition-colors hover:bg-cream"
         >
           Got it
         </button>

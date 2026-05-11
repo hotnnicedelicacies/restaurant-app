@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orders — Admin · Hot N Nice</title>
+<link rel="icon" href="../../app/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body class="admin-shell">
+
+<div class="mockup-banner">
+  <b>MOCKUP · v1</b> · Admin · Orders dashboard
+  <a href="./index.html">← All pages</a>
+</div>
+
+<!-- ADMIN HEADER -->
+<header class="admin-header">
+  <div class="container">
+    <div class="admin-header__row">
+      <div class="admin-header__brand">
+        <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+        <div class="admin-header__brand-text">
+          <span class="admin-header__brand-name">Hot N Nice</span>
+          <span class="admin-header__brand-badge">Kitchen control · Admin</span>
+        </div>
+      </div>
+
+      <div class="admin-header__center">
+        <!-- ADMIN: settings.flags.accept_new_orders -->
+        <button type="button" class="kitchen-status" aria-label="Kitchen status toggle">
+          <span class="kitchen-status__dot"></span>
+          <span>Kitchen open · accepting orders</span>
+        </button>
+      </div>
+
+      <div class="admin-header__right">
+        <span class="admin-header__user">Anike Whitfield</span>
+        <a href="./admin-sign-in.html" class="admin-header__signout">Sign out</a>
+      </div>
+    </div>
+  </div>
+
+  <nav class="admin-nav">
+    <div class="container">
+      <div class="admin-nav__inner">
+        <a href="./admin-orders.html" class="admin-nav__link is-active">Orders <span class="admin-nav__count">3</span></a>
+        <a href="./admin-menu.html" class="admin-nav__link">Menu</a>
+        <a href="./admin-zones.html" class="admin-nav__link">Delivery zones</a>
+        <a href="./admin-payments.html" class="admin-nav__link">Payments <span class="admin-nav__count">2</span></a>
+        <a href="./admin-settings.html" class="admin-nav__link">Settings</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main class="admin-content">
+  <div class="container">
+
+    <!-- COD reconciliation banner (only shown if there are uncollected COD orders) -->
+    <div class="cod-banner">
+      <p class="cod-banner__text"><b>2 COD orders</b> awaiting cash reconciliation from yesterday's deliveries.</p>
+      <a href="./admin-payments.html#cod" class="cod-banner__btn" style="text-decoration: none;">Reconcile now →</a>
+    </div>
+
+    <div class="admin-page-head">
+      <div class="admin-page-head__text">
+        <div class="admin-page-head__eyebrow">Monday 11 May · The Eleventh of May</div>
+        <h1 class="admin-page-head__title">Today's <em>orders</em></h1>
+      </div>
+      <div class="admin-page-head__actions">
+        <button type="button" class="receipt-btn">Export CSV</button>
+        <button type="button" class="receipt-btn receipt-btn--primary">+ New order</button>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="admin-toolbar">
+      <div class="admin-toolbar__search">
+        <svg class="admin-toolbar__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3" stroke-linecap="round"/></svg>
+        <input type="search" placeholder="Search by order №, customer name, phone, or email…">
+      </div>
+      <button class="admin-filter is-active">All <span class="admin-filter__count">8</span></button>
+      <button class="admin-filter">Received <span class="admin-filter__count">1</span></button>
+      <button class="admin-filter">Preparing <span class="admin-filter__count">2</span></button>
+      <button class="admin-filter">On its way <span class="admin-filter__count">1</span></button>
+      <button class="admin-filter">Delivered <span class="admin-filter__count">3</span></button>
+      <button class="admin-filter">Cancelled <span class="admin-filter__count">1</span></button>
+      <select class="admin-filter" style="cursor: pointer;">
+        <option>Today</option>
+        <option>This week</option>
+        <option>This month</option>
+        <option>Custom range…</option>
+      </select>
+    </div>
+
+    <!-- Orders table -->
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th>№ / Time</th>
+            <th>Customer</th>
+            <th>Items</th>
+            <th>Payment</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+
+          <tr onclick="window.location='./admin-order-detail.html'">
+            <td>
+              <div class="admin-table__ref">HNN-9R2X-1208</div>
+              <div class="admin-table__time">12:08pm · 3m ago</div>
+            </td>
+            <td>
+              <div class="admin-table__customer">
+                <b>Emily Hartshorn</b>
+                <em>TS1 4DD · +44 7700 900456</em>
+              </div>
+            </td>
+            <td>
+              <div class="admin-table__items">Suya × 3 · Small Chops Platter · Puff Puff Platter</div>
+            </td>
+            <td><span class="pill pill--card">Card</span></td>
+            <td class="admin-table__total">£40.00</td>
+            <td><span class="pill pill--received">Received</span></td>
+            <td class="admin-table__actions"><a href="./admin-order-detail.html" class="admin-table__action">Open →</a></td>
+          </tr>
+
+          <tr onclick="window.location='./admin-order-detail.html'">
+            <td>
+              <div class="admin-table__ref">HNN-3F7K-1142</div>
+              <div class="admin-table__time">10:47am · 1h 24m ago</div>
+            </td>
+            <td>
+              <div class="admin-table__customer">
+                <b>Sarah Whitfield</b>
+                <em>TS1 3AB · +44 7700 900123</em>
+              </div>
+            </td>
+            <td>
+              <div class="admin-table__items">Jollof Rice with Plantain · Plantain Lasagna · Suya × 2</div>
+            </td>
+            <td><span class="pill pill--card">Card</span></td>
+            <td class="admin-table__total">£64.00</td>
+            <td><span class="pill pill--out">On its way</span></td>
+            <td class="admin-table__actions"><a href="./admin-order-detail.html" class="admin-table__action">Open →</a></td>
+          </tr>
+
+          <tr onclick="window.location='./admin-order-detail.html'">
+            <td>
+              <div class="admin-table__ref">HNN-7M2B-1031</div>
+              <div class="admin-table__time">10:31am · 1h 40m ago</div>
+            </td>
+            <td>
+              <div class="admin-table__customer">
+                <b>David Okonkwo</b>
+                <em>TS18 2BL · +44 7700 900789</em>
+              </div>
+            </td>
+            <td>
+              <div class="admin-table__items">Edikaikong · Pounded Yam · Suya × 2</div>
+            </td>
+            <td><span class="pill pill--cod">COD</span></td>
+            <td class="admin-table__total">£35.00</td>
+            <td><span class="pill pill--preparing">Preparing</span></td>
+            <td class="admin-table__actions"><a href="./admin-order-detail.html" class="admin-table__action">Open →</a></td>
+          </tr>
+
+          <tr onclick="window.location='./admin-order-detail.html'">
+            <td>
+              <div class="admin-table__ref">HNN-4K8N-1015</div>
+              <div class="admin-table__time">10:15am · 1h 56m ago</div>
+            </td>
+            <td>
+              <div class="admin-table__customer">
+                <b>Rebecca Lin</b>
+                <em>TS3 7HQ · +44 7700 900234</em>
+              </div>
+            </td>
+            <td>
+              <div class="admin-table__items">Ofada Rice &amp; Ayamase · Plantain Lasagna · Moi Moi</div>
+            </td>
+            <td><span class="pill pill--card">Card</span></td>
+            <td class="admin-table__total">£43.00</td>
+            <td><span class="pill pill--preparing">Preparing</span></td>
+            <td class="admin-table__actions"><a href="./admin-order-detail.html" class="admin-table__action">Open →</a></td>
+          </tr>
+
+          <tr onclick="window.location='./admin-order-detail.html'">
+            <td>
+              <div class="admin-table__ref">HNN-2P9L-0902</div>
+              <div class="admin-table__time">9:02am · 3h 9m ago</div>
+            </td>
+            <td>
+              <div class="admin-table__customer">
+                <b>James Hawthorn</b>
+                <em>TS17 6QP · +44 7700 900345</em>
+              </div>
+            </td>
+            <td>
+              <div class="admin-table__items">Roasted Tilapia Platter · Banga Soup · Fufu</div>
+            </td>
+            <td><span class="pill pill--card">Card</span></td>
+            <td class="admin-table__total">£40.00</td>
+            <td><span class="pill pill--delivered">Delivered</span></td>
+            <td class="admin-table__actions"><a href="./admin-order-detail.html" class="admin-table__action">Open →</a></td>
+          </tr>
+
+          <tr onclick="window.location='./admin-order-detail.html'">
+            <td>
+              <div class="admin-table__ref">HNN-8H4V-0847</div>
+              <div class="admin-table__time">8:47am · 3h 25m ago</div>
+            </td>
+            <td>
+              <div class="admin-table__customer">
+                <b>Tamara Ofili</b>
+                <em>TS5 4LP · +44 7700 900567</em>
+              </div>
+            </td>
+            <td>
+              <div class="admin-table__items">Akara &amp; Akamu · Oatmeal · Meat Pie × 3</div>
+            </td>
+            <td><span class="pill pill--cod">COD</span></td>
+            <td class="admin-table__total">£26.00</td>
+            <td><span class="pill pill--delivered">Delivered</span></td>
+            <td class="admin-table__actions"><a href="./admin-order-detail.html" class="admin-table__action">Open →</a></td>
+          </tr>
+
+          <tr onclick="window.location='./admin-order-detail.html'">
+            <td>
+              <div class="admin-table__ref">HNN-6Q3W-0815</div>
+              <div class="admin-table__time">8:15am · 3h 57m ago</div>
+            </td>
+            <td>
+              <div class="admin-table__customer">
+                <b>Patrick Yusuf</b>
+                <em>TS4 3HJ · +44 7700 900678</em>
+              </div>
+            </td>
+            <td>
+              <div class="admin-table__items">Jollof Rice · White Rice &amp; Stew · Small Chops</div>
+            </td>
+            <td><span class="pill pill--card">Card</span></td>
+            <td class="admin-table__total">£47.00</td>
+            <td><span class="pill pill--delivered">Delivered</span></td>
+            <td class="admin-table__actions"><a href="./admin-order-detail.html" class="admin-table__action">Open →</a></td>
+          </tr>
+
+          <tr onclick="window.location='./admin-order-detail.html'" style="opacity: 0.6;">
+            <td>
+              <div class="admin-table__ref">HNN-1J5T-0758</div>
+              <div class="admin-table__time">7:58am · cancelled 8:14am</div>
+            </td>
+            <td>
+              <div class="admin-table__customer">
+                <b>Olivia Brookes</b>
+                <em>TS1 5AA · +44 7700 900789</em>
+              </div>
+            </td>
+            <td>
+              <div class="admin-table__items">Roasted Tilapia Platter</div>
+            </td>
+            <td><span class="pill pill--card">Card</span></td>
+            <td class="admin-table__total" style="text-decoration: line-through;">£25.00</td>
+            <td><span class="pill pill--cancelled">Cancelled</span></td>
+            <td class="admin-table__actions"><a href="./admin-order-detail.html" class="admin-table__action">Open →</a></td>
+          </tr>
+
+        </tbody>
+      </table>
+    </div>
+
+    <p class="t-body-muted" style="margin-top: 16px; text-align: center;">
+      Showing 8 of 8 orders for <b style="color: var(--walnut);">Monday 11 May</b>. <a href="#" class="link-underline">See older orders →</a>
+    </p>
+
+  </div>
+</main>
+
+<!-- Slim admin footer -->
+<footer style="background: var(--walnut); color: rgba(241, 229, 205, 0.55); padding: 16px 0; font-family: var(--font-serif); font-style: italic; font-size: 12px; text-align: center;">
+  <div class="container">
+    Hot N Nice Admin · v1.0 · Signed in as Anike Whitfield · <a href="./home.html" style="color: rgba(241, 229, 205, 0.7); border-bottom: 1px solid rgba(241, 229, 205, 0.25); padding-bottom: 1px;">View customer site →</a>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create account — Hot N Nice Delicacies</title>
+<link rel="icon" href="../../app/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+
+<div class="mockup-banner">
+  <b>MOCKUP · v1</b> · Sign up · Walnut &amp; Cream
+  <a href="./index.html">← All pages</a>
+</div>
+
+<!-- HEADER (slim) -->
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="./home.html" class="site-header__logo"><img src="../../public/logo.png" alt="Hot N Nice Delicacies"></a>
+    <span class="t-mono-on-dark" style="letter-spacing: 0.22em;">Create your account</span>
+    <a href="./home.html" style="color: var(--cream); font-family: var(--font-serif); font-style: italic; font-size: 14px; border-bottom: 1px solid var(--rule-light); padding-bottom: 2px;">← Back to site</a>
+  </div>
+</header>
+
+<!-- AUTH PAGE -->
+<section class="auth-page">
+  <div class="auth-card">
+    <div class="auth-card__brand">
+      <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+    </div>
+    <div class="auth-card__eyebrow">An account · one tap reorder</div>
+    <h1 class="auth-card__title">Create an <em>account</em></h1>
+    <p class="auth-card__sub">Saved address, order history, reorder in a tap. Takes about thirty seconds.</p>
+
+    <form class="auth-form" action="./account.html">
+      <div class="form-field">
+        <label class="form-field__label" for="su-name">Full name</label>
+        <input id="su-name" class="form-field__input" type="text" placeholder="Sarah Whitfield" required autocomplete="name">
+      </div>
+
+      <div class="form-field">
+        <label class="form-field__label" for="su-email">Email</label>
+        <input id="su-email" class="form-field__input" type="email" placeholder="you@example.co.uk" required autocomplete="email">
+      </div>
+
+      <div class="form-field">
+        <label class="form-field__label" for="su-password">Choose a password <small>· at least 8 characters</small></label>
+        <div class="password-input">
+          <input id="su-password" class="form-field__input" type="password" minlength="8" placeholder="••••••••" required autocomplete="new-password">
+          <button type="button" class="password-toggle" aria-label="Show password" data-target="su-password">Show</button>
+        </div>
+      </div>
+
+      <label class="auth-form__checkbox">
+        <input type="checkbox" required>
+        <span>I agree to the <a href="./terms.html">Terms</a> and <a href="./privacy.html">Privacy Policy</a>, and to receiving order-related emails from Hot N Nice Delicacies.</span>
+      </label>
+
+      <button type="submit" class="auth-form__submit">Create my account</button>
+    </form>
+
+    <div class="auth-card__divider"><span>Already have one</span></div>
+    <p class="auth-card__footer">Sign in to your account — <a href="./sign-in.html">Sign in →</a></p>
+  </div>
+</section>
+
+<!-- Minimal footer -->
+<footer class="site-footer" style="padding-top: 32px;">
+  <div class="container">
+    <div class="site-footer__copy" style="border: 0; padding-top: 0;">
+      <span>© 2026 Hot N Nice Delicacies · Middlesbrough, UK</span>
+      <span>★★★★★ Food Hygiene · FSA</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.querySelectorAll('.password-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      const showing = input.type === 'text';
+      input.type = showing ? 'password' : 'text';
+      btn.textContent = showing ? 'Show' : 'Hide';
+    });
+  });
+</script>
+
+</body>
+</html>

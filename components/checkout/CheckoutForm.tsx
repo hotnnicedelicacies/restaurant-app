@@ -173,25 +173,25 @@ export default function CheckoutForm() {
 
   // --- Loading state until cart hydrates ---
   if (!mounted) {
-    return <div className="h-[600px] animate-pulse rounded-[2px] bg-[--color-cream-soft]" />;
+    return <div className="h-[600px] animate-pulse rounded-[2px] bg-cream-soft" />;
   }
 
   // --- Empty cart guard ---
   if (cartLines.length === 0) {
     return (
       <div className="mx-auto max-w-[480px] py-[clamp(48px,8vw,96px)] text-center">
-        <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-[--color-bronze-deep]">
+        <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-bronze-deep">
           Empty basket
         </p>
-        <h2 className="m-0 mb-3 font-serif text-[clamp(26px,3.4vw,36px)] font-medium text-[--color-walnut]">
+        <h2 className="m-0 mb-3 font-serif text-[clamp(26px,3.4vw,36px)] font-medium text-walnut">
           Nothing to <em className="font-normal italic">checkout</em>.
         </h2>
-        <p className="m-0 mb-7 font-serif text-[16px] italic leading-[1.5] text-[--color-ink-muted]">
+        <p className="m-0 mb-7 font-serif text-[16px] italic leading-[1.5] text-ink-muted">
           Add something from today's menu first.
         </p>
         <Link
           href={siteConfig.routes.menu}
-          className="inline-block rounded-[2px] bg-[--color-walnut] px-7 py-3.5 font-serif text-[14px] font-semibold uppercase tracking-[0.16em] text-[--color-cream] [font-variant:small-caps]"
+          className="inline-block rounded-[2px] bg-walnut px-7 py-3.5 font-serif text-[14px] font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps]"
         >
           See today's menu →
         </Link>
@@ -249,8 +249,8 @@ export default function CheckoutForm() {
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <Field label="City / town" name="city" value={form.city} onChange={(v) => setForm((f) => ({ ...f, city: v }))} required />
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-serif text-[13px] font-medium tracking-[0.14em] text-[--color-walnut] [font-variant:small-caps]">
-                      Postcode <small className="ml-1 font-serif text-[12px] italic tracking-normal text-[--color-ink-muted] [font-variant:normal]">· checks delivery</small>
+                    <label className="font-serif text-[13px] font-medium tracking-[0.14em] text-walnut [font-variant:small-caps]">
+                      Postcode <small className="ml-1 font-serif text-[12px] italic tracking-normal text-ink-muted [font-variant:normal]">· checks delivery</small>
                     </label>
                     <input
                       name="postcode"
@@ -258,7 +258,7 @@ export default function CheckoutForm() {
                       onChange={(e) => setForm((f) => ({ ...f, postcode: e.target.value.toUpperCase() }))}
                       required
                       placeholder="TS1 3AB"
-                      className="w-full rounded-[2px] border border-[--color-border] bg-transparent px-3.5 py-3 font-serif text-[16px] uppercase text-[--color-walnut] outline-none transition-colors focus:border-[--color-walnut]"
+                      className="w-full rounded-[2px] border border-rule bg-transparent px-3.5 py-3 font-serif text-[16px] uppercase text-walnut outline-none transition-colors focus:border-walnut"
                     />
                   </div>
                 </div>
@@ -266,14 +266,14 @@ export default function CheckoutForm() {
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="flex flex-col gap-1.5">
-                    <label className="font-serif text-[13px] font-medium tracking-[0.14em] text-[--color-walnut] [font-variant:small-caps]">
+                    <label className="font-serif text-[13px] font-medium tracking-[0.14em] text-walnut [font-variant:small-caps]">
                       Delivery day
                     </label>
                     <select
                       value={form.deliveryDate}
                       onChange={(e) => setForm((f) => ({ ...f, deliveryDate: e.target.value }))}
                       required
-                      className="w-full rounded-[2px] border border-[--color-border] bg-transparent px-3.5 py-3 font-serif text-[16px] text-[--color-walnut] outline-none focus:border-[--color-walnut]"
+                      className="w-full rounded-[2px] border border-rule bg-transparent px-3.5 py-3 font-serif text-[16px] text-walnut outline-none focus:border-walnut"
                     >
                       <option value="">Choose a date…</option>
                       {nextSevenDays().map((d) => (
@@ -282,20 +282,20 @@ export default function CheckoutForm() {
                     </select>
                   </div>
                   <div className="grid grid-cols-2 gap-2 sm:grid-cols-1 sm:gap-1.5">
-                    <label className="col-span-2 font-serif text-[13px] font-medium tracking-[0.14em] text-[--color-walnut] [font-variant:small-caps] sm:col-span-1">
+                    <label className="col-span-2 font-serif text-[13px] font-medium tracking-[0.14em] text-walnut [font-variant:small-caps] sm:col-span-1">
                       Delivery window
                     </label>
                     <select
                       value={form.deliveryWindowStart}
                       onChange={(e) => setForm((f) => ({ ...f, deliveryWindowStart: e.target.value }))}
-                      className="rounded-[2px] border border-[--color-border] bg-transparent px-3.5 py-3 font-serif text-[16px] text-[--color-walnut] outline-none focus:border-[--color-walnut]"
+                      className="rounded-[2px] border border-rule bg-transparent px-3.5 py-3 font-serif text-[16px] text-walnut outline-none focus:border-walnut"
                     >
                       {DELIVERY_WINDOWS.map((w) => <option key={w.start} value={w.start}>{w.start}</option>)}
                     </select>
                     <select
                       value={form.deliveryWindowEnd}
                       onChange={(e) => setForm((f) => ({ ...f, deliveryWindowEnd: e.target.value }))}
-                      className="rounded-[2px] border border-[--color-border] bg-transparent px-3.5 py-3 font-serif text-[16px] text-[--color-walnut] outline-none focus:border-[--color-walnut]"
+                      className="rounded-[2px] border border-rule bg-transparent px-3.5 py-3 font-serif text-[16px] text-walnut outline-none focus:border-walnut"
                     >
                       {DELIVERY_WINDOWS.map((w) => <option key={w.end} value={w.end}>{w.end}</option>)}
                     </select>
@@ -303,15 +303,15 @@ export default function CheckoutForm() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="font-serif text-[13px] font-medium tracking-[0.14em] text-[--color-walnut] [font-variant:small-caps]">
-                    Notes for the kitchen / driver <small className="ml-1 font-serif text-[12px] italic tracking-normal text-[--color-ink-muted] [font-variant:normal]">· optional</small>
+                  <label className="font-serif text-[13px] font-medium tracking-[0.14em] text-walnut [font-variant:small-caps]">
+                    Notes for the kitchen / driver <small className="ml-1 font-serif text-[12px] italic tracking-normal text-ink-muted [font-variant:normal]">· optional</small>
                   </label>
                   <textarea
                     value={form.deliveryNotes}
                     onChange={(e) => setForm((f) => ({ ...f, deliveryNotes: e.target.value }))}
                     placeholder="Buzz at the gate, leave on the porch, ring on arrival…"
                     rows={3}
-                    className="w-full rounded-[2px] border border-[--color-border] bg-transparent px-3.5 py-3 font-serif text-[15px] italic leading-[1.55] text-[--color-walnut] outline-none focus:border-[--color-walnut]"
+                    className="w-full rounded-[2px] border border-rule bg-transparent px-3.5 py-3 font-serif text-[15px] italic leading-[1.55] text-walnut outline-none focus:border-walnut"
                   />
                 </div>
               </div>
@@ -340,7 +340,7 @@ export default function CheckoutForm() {
                   disabled={!codAvailable}
                 />
               </div>
-              <p className="mt-4 text-center font-serif text-[13px] italic text-[--color-ink-muted]">
+              <p className="mt-4 text-center font-serif text-[13px] italic text-ink-muted">
                 By placing your order you agree to our{' '}
                 <Link href={siteConfig.routes.legal.terms} className="link-underline">Terms</Link>,{' '}
                 <Link href={siteConfig.routes.legal.refund} className="link-underline">Refund Policy</Link> and{' '}
@@ -351,7 +351,7 @@ export default function CheckoutForm() {
             <button
               type="submit"
               disabled={submitting || zoneStatus !== 'matched' || !meetsMin}
-              className="mt-2 w-full rounded-[2px] bg-[--color-walnut] px-5 py-4 font-serif text-[15px] font-semibold uppercase tracking-[0.16em] text-[--color-cream] [font-variant:small-caps] transition-colors hover:bg-[--color-bronze-deep] disabled:opacity-50"
+              className="mt-2 w-full rounded-[2px] bg-walnut px-5 py-4 font-serif text-[15px] font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] transition-colors hover:bg-bronze-deep disabled:opacity-50"
             >
               {submitting ? 'Placing order…' : `Place order · ${formatGBP(total)}`}
             </button>
@@ -361,17 +361,17 @@ export default function CheckoutForm() {
 
       {/* Summary */}
       <aside className="sticky top-[92px]">
-        <div className="rounded-[2px] border border-[--color-border] bg-[--color-cream] p-6">
-          <header className="mb-4 flex items-baseline justify-between gap-3 border-b border-[--color-border] pb-3.5">
-            <h2 className="m-0 font-serif text-[22px] font-medium text-[--color-walnut]">
+        <div className="rounded-[2px] border border-rule bg-cream p-6">
+          <header className="mb-4 flex items-baseline justify-between gap-3 border-b border-rule pb-3.5">
+            <h2 className="m-0 font-serif text-[22px] font-medium text-walnut">
               Your <em className="italic font-normal">order</em>
             </h2>
-            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-[--color-bronze-deep]">
+            <span className="font-mono text-[10px] uppercase tracking-[0.18em] text-bronze-deep">
               {cartCount} item{cartCount === 1 ? '' : 's'}
             </span>
           </header>
 
-          <div className="mb-4 flex flex-col gap-3 border-b border-[--color-border] pb-4">
+          <div className="mb-4 flex flex-col gap-3 border-b border-rule pb-4">
             {cartLines.map((l) => (
               <div key={l.id} className="grid grid-cols-[44px_1fr_auto] items-start gap-3">
                 <Image
@@ -382,18 +382,18 @@ export default function CheckoutForm() {
                   className="aspect-square w-11 rounded-[2px] object-cover"
                 />
                 <div className="min-w-0">
-                  <h3 className="m-0 font-serif text-[15px] font-medium leading-tight text-[--color-walnut]">{l.name}</h3>
+                  <h3 className="m-0 font-serif text-[15px] font-medium leading-tight text-walnut">{l.name}</h3>
                   {(Object.keys(l.variantsChosen).length > 0 || l.addonsChosen.length > 0) && (
-                    <p className="m-0 mt-0.5 font-serif text-[12.5px] italic leading-[1.4] text-[--color-ink-muted]">
+                    <p className="m-0 mt-0.5 font-serif text-[12.5px] italic leading-[1.4] text-ink-muted">
                       {[
                         ...Object.entries(l.variantsChosen).map(([k, v]) => `${k}: ${v.label}`),
                         ...(l.addonsChosen.length > 0 ? [l.addonsChosen.map((a) => a.label).join(', ')] : []),
                       ].join(' · ')}
                     </p>
                   )}
-                  <span className="font-mono text-[11px] text-[--color-ink-muted]">× {l.quantity}</span>
+                  <span className="font-mono text-[11px] text-ink-muted">× {l.quantity}</span>
                 </div>
-                <span className="whitespace-nowrap font-serif text-[15px] font-semibold text-[--color-walnut]">
+                <span className="whitespace-nowrap font-serif text-[15px] font-semibold text-walnut">
                   {formatGBP(l.unitPriceGbp * l.quantity)}
                 </span>
               </div>
@@ -405,7 +405,7 @@ export default function CheckoutForm() {
             <SummaryRow
               label={
                 <span>
-                  Delivery {zone && <em className="italic text-[--color-ink-muted]">· {zone.name}</em>}
+                  Delivery {zone && <em className="italic text-ink-muted">· {zone.name}</em>}
                 </span>
               }
               value={zone ? formatGBP(deliveryFee) : '—'}
@@ -414,8 +414,8 @@ export default function CheckoutForm() {
             <SummaryRow label="Total" value={formatGBP(total)} grand />
           </div>
 
-          <div className="text-center font-serif text-[12px] italic leading-[1.5] text-[--color-ink-muted]">
-            <b className="block font-medium not-italic tracking-[0.12em] text-[--color-bronze-deep] [font-variant:small-caps]">
+          <div className="text-center font-serif text-[12px] italic leading-[1.5] text-ink-muted">
+            <b className="block font-medium not-italic tracking-[0.12em] text-bronze-deep [font-variant:small-caps]">
               Cooked this morning
             </b>
             Delivered hot to your door
@@ -458,12 +458,12 @@ function nextSevenDays(): { iso: string; label: string }[] {
 
 function Section({ num, title, children }: { num: string; title: React.ReactNode; children: React.ReactNode }) {
   return (
-    <section className="rounded-[2px] border border-[--color-border] bg-[--color-cream] p-6 sm:p-7">
-      <header className="mb-5 flex items-baseline justify-between gap-3 border-b border-[--color-border] pb-3.5">
-        <h2 className="m-0 font-serif text-[clamp(20px,2.4vw,24px)] font-medium text-[--color-walnut] [&_em]:font-normal [&_em]:italic">
+    <section className="rounded-[2px] border border-rule bg-cream p-6 sm:p-7">
+      <header className="mb-5 flex items-baseline justify-between gap-3 border-b border-rule pb-3.5">
+        <h2 className="m-0 font-serif text-[clamp(20px,2.4vw,24px)] font-medium text-walnut [&_em]:font-normal [&_em]:italic">
           {title}
         </h2>
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[--color-bronze-deep]">№ {num}</span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-bronze-deep">№ {num}</span>
       </header>
       {children}
     </section>
@@ -478,10 +478,10 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={name} className="font-serif text-[13px] font-medium tracking-[0.14em] text-[--color-walnut] [font-variant:small-caps]">
+      <label htmlFor={name} className="font-serif text-[13px] font-medium tracking-[0.14em] text-walnut [font-variant:small-caps]">
         {label}
         {sublabel && (
-          <small className="ml-1.5 font-serif text-[12px] italic tracking-normal text-[--color-ink-muted] [font-variant:normal]">
+          <small className="ml-1.5 font-serif text-[12px] italic tracking-normal text-ink-muted [font-variant:normal]">
             {sublabel}
           </small>
         )}
@@ -494,7 +494,7 @@ function Field({
         onChange={(e) => onChange(e.target.value)}
         required={required}
         placeholder={placeholder}
-        className="w-full rounded-[2px] border border-[--color-border] bg-transparent px-3.5 py-3 font-serif text-[16px] text-[--color-walnut] outline-none transition-colors focus:border-[--color-walnut] placeholder:italic placeholder:text-[--color-ink-muted]"
+        className="w-full rounded-[2px] border border-rule bg-transparent px-3.5 py-3 font-serif text-[16px] text-walnut outline-none transition-colors focus:border-walnut placeholder:italic placeholder:text-ink-muted"
       />
     </div>
   );
@@ -511,20 +511,20 @@ function PaymentOption({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`grid grid-cols-[auto_1fr_auto] items-start gap-4 rounded-[2px] border bg-[--color-cream] p-[18px] text-left transition-colors ${
+      className={`grid grid-cols-[auto_1fr_auto] items-start gap-4 rounded-[2px] border bg-cream p-[18px] text-left transition-colors ${
         checked
-          ? 'border-[--color-walnut] bg-[--color-cream-soft] shadow-[inset_0_0_0_1px_var(--color-walnut)]'
-          : 'border-[--color-border] hover:border-[--color-walnut]'
-      } ${disabled ? 'cursor-not-allowed opacity-50 hover:border-[--color-border]' : ''}`}
+          ? 'border-walnut bg-cream-soft shadow-[inset_0_0_0_1px_var(--color-walnut)]'
+          : 'border-rule hover:border-walnut'
+      } ${disabled ? 'cursor-not-allowed opacity-50 hover:border-rule' : ''}`}
     >
-      <span className="relative mt-1 inline-block h-5 w-5 rounded-full border border-[--color-walnut]">
-        {checked && <span className="absolute inset-1 rounded-full bg-[--color-walnut]" />}
+      <span className="relative mt-1 inline-block h-5 w-5 rounded-full border border-walnut">
+        {checked && <span className="absolute inset-1 rounded-full bg-walnut" />}
       </span>
       <span className="flex min-w-0 flex-col gap-1">
-        <h3 className="m-0 font-serif text-[17px] font-medium text-[--color-walnut]">{title}</h3>
-        <p className="m-0 font-serif text-[14px] italic text-[--color-ink-muted]">{description}</p>
+        <h3 className="m-0 font-serif text-[17px] font-medium text-walnut">{title}</h3>
+        <p className="m-0 font-serif text-[14px] italic text-ink-muted">{description}</p>
       </span>
-      <span className="pt-1 font-mono text-[9px] uppercase tracking-[0.18em] text-[--color-bronze-deep]">{badge}</span>
+      <span className="pt-1 font-mono text-[9px] uppercase tracking-[0.18em] text-bronze-deep">{badge}</span>
     </button>
   );
 }
@@ -533,7 +533,7 @@ function SummaryRow({ label, value, muted, grand }: {
   label: React.ReactNode; value: string; muted?: boolean; grand?: boolean;
 }) {
   return (
-    <div className={`flex justify-between font-serif text-[15px] text-[--color-walnut] ${muted ? 'italic text-[--color-ink-muted]' : ''} ${grand ? 'mt-1.5 border-t border-[--color-border] pt-3 text-[20px] font-semibold not-italic text-[--color-walnut]' : ''}`}>
+    <div className={`flex justify-between font-serif text-[15px] text-walnut ${muted ? 'italic text-ink-muted' : ''} ${grand ? 'mt-1.5 border-t border-rule pt-3 text-[20px] font-semibold not-italic text-walnut' : ''}`}>
       <span>{label}</span>
       <span>{value}</span>
     </div>
@@ -555,8 +555,8 @@ function ZoneBanner({
   if (status === 'matched' && zone) {
     const belowMin = subtotal < zone.minOrderGbp;
     return (
-      <div className={`rounded-[2px] border-l-[3px] px-4 py-3 ${belowMin ? 'border-[#8B2A1A] bg-[rgba(139,42,26,0.06)]' : 'border-[--color-bronze] bg-[--color-cream-soft]'}`}>
-        <p className="m-0 font-serif text-[14px] text-[--color-walnut]">
+      <div className={`rounded-[2px] border-l-[3px] px-4 py-3 ${belowMin ? 'border-[#8B2A1A] bg-[rgba(139,42,26,0.06)]' : 'border-bronze bg-cream-soft'}`}>
+        <p className="m-0 font-serif text-[14px] text-walnut">
           {belowMin ? (
             <>Add <b className="font-medium">{formatGBP(zone.minOrderGbp - subtotal)}</b> to reach the {formatGBP(zone.minOrderGbp)} minimum for {zone.name}.</>
           ) : (
@@ -564,7 +564,7 @@ function ZoneBanner({
           )}
         </p>
         {!belowMin && (
-          <p className="m-0 font-serif text-[13px] italic text-[--color-ink-muted]">
+          <p className="m-0 font-serif text-[13px] italic text-ink-muted">
             Estimated {zone.prepTimeMin}–{zone.prepTimeMax} minutes from kitchen to door.
           </p>
         )}
@@ -592,8 +592,8 @@ function ZoneBanner({
 
   return (
     <div className="rounded-[2px] border-l-[3px] border-[#8B2A1A] bg-[rgba(139,42,26,0.06)] px-4 py-3">
-      <p className="m-0 mb-1 font-serif text-[14px] font-medium text-[--color-walnut]">Outside our usual delivery area</p>
-      <p className="m-0 font-serif text-[13px] italic text-[--color-ink-muted]">
+      <p className="m-0 mb-1 font-serif text-[14px] font-medium text-walnut">Outside our usual delivery area</p>
+      <p className="m-0 font-serif text-[13px] italic text-ink-muted">
         We don't deliver to this postcode by default — but get in touch with your order details and we may be able to arrange it.{' '}
         <a
           href={`https://wa.me/${siteConfig.contact.whatsapp}?text=${message}`}

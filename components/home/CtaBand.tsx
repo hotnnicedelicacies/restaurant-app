@@ -16,14 +16,14 @@ interface Props {
  */
 export default function CtaBand({ eyebrow, title, sub, cta, showChannels = true }: Props) {
   return (
-    <section className="bg-[--color-walnut] py-[clamp(64px,9vw,112px)] text-center text-[--color-cream]">
+    <section className="bg-walnut py-[clamp(64px,9vw,112px)] text-center text-cream">
       <div className="container">
         {eyebrow && (
-          <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.22em] text-[--color-bronze]">
+          <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.22em] text-bronze">
             {eyebrow}
           </p>
         )}
-        <h2 className="m-0 mx-auto mb-3 max-w-[800px] font-serif text-[clamp(32px,5vw,56px)] font-medium leading-[1.04] tracking-[-0.005em] text-[--color-cream] [&_em]:font-normal [&_em]:italic [&_em]:text-[--color-bronze]">
+        <h2 className="m-0 mx-auto mb-3 max-w-[800px] font-serif text-[clamp(32px,5vw,56px)] font-medium leading-[1.04] tracking-[-0.005em] text-cream [&_em]:font-normal [&_em]:italic [&_em]:text-bronze">
           {title}
         </h2>
         {sub && (
@@ -33,7 +33,7 @@ export default function CtaBand({ eyebrow, title, sub, cta, showChannels = true 
         )}
         <a
           href={cta.href}
-          className="inline-block rounded-[2px] bg-[--color-bronze] px-8 py-4 font-serif text-[15px] font-semibold uppercase tracking-[0.16em] text-[--color-walnut] [font-variant:small-caps] transition-colors hover:bg-[--color-cream] hover:text-[--color-walnut]"
+          className="inline-block rounded-[2px] bg-bronze px-8 py-4 font-serif text-[15px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] transition-colors hover:bg-cream hover:text-walnut"
         >
           {cta.label}
         </a>
@@ -44,19 +44,19 @@ export default function CtaBand({ eyebrow, title, sub, cta, showChannels = true 
               href={`https://wa.me/${siteConfig.contact.whatsapp}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="border-b border-[rgba(241,229,205,0.3)] pb-px text-[#F1E5CDD9] transition-colors hover:border-[--color-bronze] hover:text-[--color-bronze]"
+              className="border-b border-[rgba(241,229,205,0.3)] pb-px text-[#F1E5CDD9] transition-colors hover:border-bronze hover:text-bronze"
             >
               WhatsApp · {siteConfig.contact.whatsappDisplay}
             </a>
             <a
               href={`tel:${siteConfig.contact.phone}`}
-              className="border-b border-[rgba(241,229,205,0.3)] pb-px text-[#F1E5CDD9] transition-colors hover:border-[--color-bronze] hover:text-[--color-bronze]"
+              className="border-b border-[rgba(241,229,205,0.3)] pb-px text-[#F1E5CDD9] transition-colors hover:border-bronze hover:text-bronze"
             >
               Call · {siteConfig.contact.phone}
             </a>
             <a
               href={`mailto:${siteConfig.contact.email}`}
-              className="border-b border-[rgba(241,229,205,0.3)] pb-px text-[#F1E5CDD9] transition-colors hover:border-[--color-bronze] hover:text-[--color-bronze]"
+              className="border-b border-[rgba(241,229,205,0.3)] pb-px text-[#F1E5CDD9] transition-colors hover:border-bronze hover:text-bronze"
             >
               Email
             </a>
