@@ -6,12 +6,14 @@
    ============================================================ */
 
 @theme {
-  /* --- Typography (loaded via next/font in app/layout.tsx) --- */
-  --font-display: var(--font-cormorant), 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
-  --font-body:    var(--font-cormorant), 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  /* --- Typography (loaded via next/font in app/layout.tsx) ---
+     Stack matches design-explorations/shared/styles.css verbatim:
+     Cormorant Garamond → Times New Roman → Georgia → serif. */
+  --font-display: var(--font-cormorant), 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
+  --font-body:    var(--font-cormorant), 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
   --font-sans:    var(--font-geist-sans), -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-mono:    var(--font-geist-mono), ui-monospace, 'SF Mono', monospace;
-  --font-serif:   var(--font-cormorant), 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  --font-serif:   var(--font-cormorant), 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
 
   /* --- Walnut & Cream palette (contrast-audited) --- */
   --color-cream:        #F1E5CD;

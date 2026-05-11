@@ -13,6 +13,10 @@ const cormorant = Cormorant_Garamond({
   weight: ['300', '400', '500', '600', '700'],
   style: ['normal', 'italic'],
   display: 'swap',
+  preload: true,
+  // Used by next/font for the size-adjusted CSS fallback shown during swap.
+  // Matches the design stack (Times New Roman first, then Georgia).
+  fallback: ['Times New Roman', 'Georgia', 'serif'],
 });
 
 const geistSans = Geist({
