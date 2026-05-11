@@ -144,10 +144,14 @@ export async function createOrder(input: CreateOrderInput): Promise<CreateOrderR
   }
 
   // 6. Insert line items
+  const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
   const { error: itemsErr } = await supabase.from('order_items').insert(
     data.lines.map((l, i) => ({
       order_id: order.id,
-      menu_item_id: l.menuItemId,
+      // Legacy carts (pre-DB-cutover) stored the slug here. The column is a
+      // nullable FK to menu_items.id — fall back to null if it's not a UUID
+      // so checkout still works while the customer's stale cart drains.
+      menu_item_id: UUID_RE.test(l.menuItemId) ? l.menuItemId : null,
       name: l.name,
       unit_price_gbp: l.unitPriceGbp,
       quantity: l.quantity,

@@ -8,6 +8,8 @@ import { Menu, X } from 'lucide-react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { siteConfig } from '@/constants/siteConfig';
 import { cn } from '@/lib/utils';
+import HeaderCartLink from './HeaderCartLink';
+import HeaderAuthLink from './HeaderAuthLink';
 
 type Nav = { label: string; href: string };
 
@@ -77,22 +79,29 @@ export default function SiteHeader({
           })}
         </nav>
 
-        <Link
-          href={cta.href}
-          className="hidden rounded-[2px] bg-bronze px-[18px] py-[10px] font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] transition-colors hover:bg-cream hover:text-walnut md:inline-block"
-        >
-          {cta.label}
-        </Link>
+        <div className="hidden items-center gap-2 md:flex">
+          <HeaderAuthLink tone="onDark" />
+          <HeaderCartLink tone="onDark" />
+          <Link
+            href={cta.href}
+            className="ml-1 rounded-[2px] bg-bronze px-[18px] py-[10px] font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] transition-colors hover:bg-cream hover:text-walnut"
+          >
+            {cta.label}
+          </Link>
+        </div>
 
-        {/* Mobile burger */}
-        <button
-          className="inline-flex h-8 w-8 items-center justify-center text-cream md:hidden"
-          onClick={() => setMobileOpen((v) => !v)}
-          aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={mobileOpen}
-        >
-          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        {/* Mobile: cart + burger */}
+        <div className="flex items-center gap-1 md:hidden">
+          <HeaderCartLink tone="onDark" />
+          <button
+            className="inline-flex h-8 w-8 items-center justify-center text-cream"
+            onClick={() => setMobileOpen((v) => !v)}
+            aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+            aria-expanded={mobileOpen}
+          >
+            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile nav */}
@@ -125,10 +134,14 @@ export default function SiteHeader({
                   </Link>
                 );
               })}
+              <div className="mt-2 flex items-center justify-between border-t border-[rgba(241,229,205,0.18)] pt-3">
+                <HeaderAuthLink tone="onDark" withLabel onClick={() => setMobileOpen(false)} />
+                <HeaderCartLink tone="onDark" withLabel onClick={() => setMobileOpen(false)} />
+              </div>
               <Link
                 href={cta.href}
                 onClick={() => setMobileOpen(false)}
-                className="mt-2 rounded-[2px] bg-bronze px-5 py-3 text-center font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps]"
+                className="mt-1 rounded-[2px] bg-bronze px-5 py-3 text-center font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps]"
               >
                 {cta.label}
               </Link>
