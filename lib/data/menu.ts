@@ -10,6 +10,7 @@
  */
 
 import { getServerClient } from '@/lib/supabase/server';
+import { getStorageUrl } from '@/lib/supabase/storage';
 import type { Database, VariantsBlob, AddonsBlob } from '@/lib/supabase/types';
 import { meals as legacyMeals } from '@/constants/meals';
 import type { StaticImageData } from 'next/image';
@@ -151,8 +152,8 @@ function dbToView(item: DbItem): MenuItemView {
     description: item.description,
     longDescription: item.long_description,
     priceGbp: Number(item.price_gbp),
-    image: item.image_path ?? '',
-    galleryPaths: item.gallery_paths,
+    image: getStorageUrl(item.image_path),
+    galleryPaths: item.gallery_paths.map((p) => getStorageUrl(p)),
     isAvailable: item.is_available_today,
     isCodEligible: item.is_cod_eligible,
     isFeatured: item.is_featured,
