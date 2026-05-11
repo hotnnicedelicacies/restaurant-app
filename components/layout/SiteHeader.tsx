@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { siteConfig } from '@/constants/siteConfig';
 import { cn } from '@/lib/utils';
 import HeaderCartLink from './HeaderCartLink';
+import HeaderAuthLink from './HeaderAuthLink';
 
 type Nav = { label: string; href: string };
 
@@ -78,11 +79,12 @@ export default function SiteHeader({
           })}
         </nav>
 
-        <div className="hidden items-center gap-3 md:flex">
+        <div className="hidden items-center gap-2 md:flex">
+          <HeaderAuthLink tone="onDark" />
           <HeaderCartLink tone="onDark" />
           <Link
             href={cta.href}
-            className="rounded-[2px] bg-bronze px-[18px] py-[10px] font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] transition-colors hover:bg-cream hover:text-walnut"
+            className="ml-1 rounded-[2px] bg-bronze px-[18px] py-[10px] font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] transition-colors hover:bg-cream hover:text-walnut"
           >
             {cta.label}
           </Link>
@@ -132,10 +134,14 @@ export default function SiteHeader({
                   </Link>
                 );
               })}
+              <div className="mt-2 flex items-center justify-between border-t border-[rgba(241,229,205,0.18)] pt-3">
+                <HeaderAuthLink tone="onDark" withLabel onClick={() => setMobileOpen(false)} />
+                <HeaderCartLink tone="onDark" withLabel onClick={() => setMobileOpen(false)} />
+              </div>
               <Link
                 href={cta.href}
                 onClick={() => setMobileOpen(false)}
-                className="mt-2 rounded-[2px] bg-bronze px-5 py-3 text-center font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps]"
+                className="mt-1 rounded-[2px] bg-bronze px-5 py-3 text-center font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps]"
               >
                 {cta.label}
               </Link>

@@ -46,7 +46,13 @@ export interface MenuItemView {
 }
 
 function isSupabaseConfigured() {
-  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  // Accept either the new (publishable) or legacy (anon) key name so this
+  // works on the live env and any older preview deploys.
+  return Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+      (process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+  );
 }
 
 // --- Fallback data adapters from constants/meals.ts -----------------------
