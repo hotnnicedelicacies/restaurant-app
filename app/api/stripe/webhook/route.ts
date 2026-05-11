@@ -3,6 +3,10 @@ import { headers } from 'next/headers';
 import type Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/server';
 import { getServiceClient } from '@/lib/supabase/server';
+import { getOrderByRef } from '@/lib/data/orders';
+import { sendEmail } from '@/lib/email/send';
+import { orderConfirmationEmail } from '@/lib/email/templates';
+import { siteConfig } from '@/constants/siteConfig';
 
 /**
  * Stripe webhook handler.
@@ -56,7 +60,29 @@ export async function POST(request: Request) {
           })
           .eq('id', orderId);
 
-        // TODO Phase 5: trigger confirmation email via Resend
+        // Send confirmation email (best-effort; logged but not blocking)
+        const ref = pi.metadata.order_ref;
+        if (ref) {
+          const order = await getOrderByRef(ref);
+          if (order) {
+            const email = orderConfirmationEmail(order);
+            await sendEmail({
+              to: order.customer.email,
+              subject: email.subject,
+              html: email.html,
+              text: email.text,
+            });
+            // Notify admin too (best-effort)
+            const adminTo = process.env.ORDER_NOTIFICATION_EMAIL || siteConfig.email.notificationToDefault;
+            if (adminTo) {
+              await sendEmail({
+                to: adminTo,
+                subject: `New order · ${order.ref} · ${email.subject.replace('Order received · ', '')}`,
+                html: email.html,
+              });
+            }
+          }
+        }
         break;
       }
 

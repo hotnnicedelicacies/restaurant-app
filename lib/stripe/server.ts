@@ -13,8 +13,7 @@ export function getStripe(): Stripe {
     throw new Error('STRIPE_SECRET_KEY is not set. Cannot create Stripe client.');
   }
   _stripe = new Stripe(key, {
-    // Pin a known-good API version. Update as Stripe releases new ones.
-    apiVersion: '2025-04-30.basil' as Stripe.LatestApiVersion,
+    apiVersion: '2026-04-22.dahlia',
     typescript: true,
     appInfo: {
       name: 'Hot N Nice Delicacies',

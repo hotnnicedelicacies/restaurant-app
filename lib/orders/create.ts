@@ -5,6 +5,9 @@ import { getServerClient, getServiceClient } from '@/lib/supabase/server';
 import { matchZoneByPostcode } from '@/lib/data/zones';
 import { getStripe } from '@/lib/stripe/server';
 import { siteConfig } from '@/constants/siteConfig';
+import { sendEmail } from '@/lib/email/send';
+import { orderConfirmationEmail } from '@/lib/email/templates';
+import { getOrderByRef } from '@/lib/data/orders';
 
 // --- Schema for incoming order payload ---
 
@@ -208,6 +211,30 @@ export async function createOrder(input: CreateOrderInput): Promise<CreateOrderR
     }
   }
 
-  // 9. COD: order is good as-is
+  // 9. COD: order is good — send confirmation + admin notification email
+  try {
+    const fullOrder = await getOrderByRef(ref);
+    if (fullOrder) {
+      const email = orderConfirmationEmail(fullOrder);
+      await sendEmail({
+        to: fullOrder.customer.email,
+        subject: email.subject,
+        html: email.html,
+        text: email.text,
+      });
+      const adminTo = process.env.ORDER_NOTIFICATION_EMAIL || siteConfig.email.notificationToDefault;
+      if (adminTo) {
+        await sendEmail({
+          to: adminTo,
+          subject: `New COD order · ${fullOrder.ref}`,
+          html: email.html,
+        });
+      }
+    }
+  } catch (err) {
+    // Don't fail the order if email send breaks
+    console.error('[createOrder] COD confirmation email failed:', err);
+  }
+
   return { ok: true, ref, orderId: order.id };
 }
