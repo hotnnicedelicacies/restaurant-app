@@ -216,7 +216,7 @@ function CartRow({
               </button>
             </div>
             <Link
-              href={siteConfig.routes.itemDetail(line.slug)}
+              href={`${siteConfig.routes.itemDetail(line.slug)}?edit=${line.id}`}
               className="border-b border-bronze-deep pb-px font-serif text-[13px] italic text-bronze-deep transition-colors hover:border-walnut hover:text-walnut"
             >
               Edit options

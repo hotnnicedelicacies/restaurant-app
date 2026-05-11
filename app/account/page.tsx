@@ -9,6 +9,7 @@ import { getServerClient } from '@/lib/supabase/server';
 import { siteConfig } from '@/constants/siteConfig';
 import { formatLongDate } from '@/lib/utils';
 import { signOutAction } from '@/lib/auth/actions';
+import AddressManager from '@/components/account/AddressManager';
 
 export const metadata: Metadata = {
   title: 'My account',
@@ -21,6 +22,23 @@ export default async function AccountPage() {
   if (!user) redirect(siteConfig.routes.signIn);
 
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+  const { data: addressRows } = await supabase
+    .from('addresses')
+    .select('*')
+    .eq('profile_id', user.id)
+    .order('is_default', { ascending: false })
+    .order('created_at', { ascending: false });
+  const addresses = (addressRows ?? []).map((a) => ({
+    id: a.id,
+    label: a.label,
+    recipientName: a.recipient_name,
+    line1: a.line1,
+    line2: a.line2,
+    city: a.city,
+    postcode: a.postcode,
+    phone: a.phone,
+    isDefault: a.is_default,
+  }));
   const memberSince = user.created_at ? formatLongDate(user.created_at) : '';
 
   return (
@@ -86,13 +104,12 @@ export default async function AccountPage() {
                 />
               </AccountSection>
 
-              <AccountSection id="addresses" title={<>Saved <em>addresses</em></>} count="0 saved">
-                <EmptyState
-                  eyebrow="No saved addresses"
-                  title={<>Save your <em>first address</em> at checkout.</>}
-                  body="On your first order we'll offer to save the delivery address so reorders are one tap."
-                  cta={{ label: 'Add an address now', href: '#profile' }}
-                />
+              <AccountSection
+                id="addresses"
+                title={<>Saved <em>addresses</em></>}
+                count={`${addresses.length} saved`}
+              >
+                <AddressManager addresses={addresses} />
               </AccountSection>
 
               <AccountSection id="profile" title={<>Profile &amp; <em>password</em></>}>

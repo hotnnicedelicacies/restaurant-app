@@ -3,8 +3,7 @@ import SiteHeader from '@/components/layout/SiteHeader';
 import SiteFooter from '@/components/layout/SiteFooter';
 import PageHero from '@/components/layout/PageHero';
 import CtaBand from '@/components/home/CtaBand';
-import FareRow, { type FareRowItem } from '@/components/menu/FareRow';
-import MenuToolbar from '@/components/menu/MenuToolbar';
+import MenuBrowser from '@/components/menu/MenuBrowser';
 import { getCategoriesWithItems } from '@/lib/data/menu';
 import { siteConfig } from '@/constants/siteConfig';
 import { absoluteUrl, formatGBP } from '@/lib/utils';
@@ -20,22 +19,6 @@ export const metadata: Metadata = {
     images: [absoluteUrl('/og-image.jpg')],
   },
 };
-
-function toFareRowItem(item: import('@/lib/data/menu').MenuItemView, index: number): FareRowItem {
-  const num = String(index + 1).padStart(2, '0');
-  return {
-    slug: item.slug,
-    numLabel: `№ ${num} · ${item.categoryName}`,
-    name: item.name,
-    description: item.description,
-    price: item.priceGbp,
-    image: item.image,
-    imageAlt: item.name,
-    tags: [...item.dietaryTags, ...item.allergenTags],
-    badges: item.badges,
-    available: item.isAvailable,
-  };
-}
 
 const DIETARY_SCHEMA_MAP: Record<string, string> = {
   vegetarian: 'https://schema.org/VegetarianDiet',
@@ -76,8 +59,6 @@ export default async function MenuPage() {
     })),
   };
 
-  let counter = 0;
-
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(menuSchema) }} />
@@ -89,66 +70,27 @@ export default async function MenuPage() {
           sub="Cooked this morning · Order by 10am for same-day delivery to Teesside."
         />
 
-        <MenuToolbar
-          categories={categories.map((c) => ({
-            slug: c.slug,
-            name: c.name,
-            count: (itemsByCategory[c.slug] ?? []).length,
-          }))}
-        />
-
-        <section className="py-[clamp(40px,6vw,72px)]">
-          <div className="container">
-            <p className="mb-4 mt-1 max-w-prose font-serif text-[14px] italic text-ink-muted">
-              Tip · Tap any dish to customise it before adding to your order. Sold-out items appear greyed out and can't be added today.
-            </p>
-
-            {categories.map((cat) => {
-              const items = itemsByCategory[cat.slug] ?? [];
-              if (items.length === 0) return null;
-              return (
-                <article id={cat.slug} key={cat.slug} className="mb-[clamp(48px,6vw,72px)] scroll-mt-[140px] last:mb-0">
-                  <header className="mb-6 flex items-baseline justify-between gap-4 border-b border-walnut pb-3.5">
-                    <h2 className="m-0 font-serif text-[clamp(24px,3vw,32px)] font-medium tracking-[-0.005em] text-walnut">
-                      {cat.name}
-                    </h2>
-                    <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-bronze-deep">
-                      {String(items.length).padStart(2, '0')} dishes
-                    </span>
-                  </header>
-
-                  <div className="mx-auto max-w-[880px]">
-                    {items.map((it, j) => (
-                      <FareRow
-                        key={it.slug}
-                        item={toFareRowItem(it, counter++)}
-                        divider={j < items.length - 1}
-                      />
-                    ))}
-                  </div>
-                </article>
-              );
-            })}
-
-            {categories.length === 0 && (
-              <div className="mx-auto max-w-[480px] py-[clamp(48px,8vw,96px)] text-center">
-                <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-bronze-deep">
-                  Kitchen closed
-                </p>
-                <h2 className="m-0 mb-3 font-serif text-[clamp(26px,3.4vw,36px)] font-medium text-walnut">
-                  No menu items <em className="italic font-normal">just now</em>.
-                </h2>
-                <p className="m-0 font-serif text-[16px] italic leading-[1.5] text-ink-muted">
-                  The kitchen is being set up. Check back shortly — or message us on{' '}
-                  <a href={`https://wa.me/${siteConfig.contact.whatsapp}`} className="link-underline">
-                    WhatsApp
-                  </a>
-                  .
-                </p>
-              </div>
-            )}
-          </div>
-        </section>
+        {categories.length === 0 ? (
+          <section className="container py-[clamp(48px,8vw,96px)]">
+            <div className="mx-auto max-w-[480px] text-center">
+              <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-bronze-deep">
+                Kitchen closed
+              </p>
+              <h2 className="m-0 mb-3 font-serif text-[clamp(26px,3.4vw,36px)] font-medium text-walnut">
+                No menu items <em className="italic font-normal">just now</em>.
+              </h2>
+              <p className="m-0 font-serif text-[16px] italic leading-[1.5] text-ink-muted">
+                The kitchen is being set up. Check back shortly — or message us on{' '}
+                <a href={`https://wa.me/${siteConfig.contact.whatsapp}`} className="link-underline">
+                  WhatsApp
+                </a>
+                .
+              </p>
+            </div>
+          </section>
+        ) : (
+          <MenuBrowser categories={categories} itemsByCategory={itemsByCategory} />
+        )}
 
         <CtaBand
           eyebrow="Ready when you are"

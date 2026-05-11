@@ -13,7 +13,7 @@ import { formatLongDate, absoluteUrl } from '@/lib/utils';
 import { getFeaturedItems, type MenuItemView } from '@/lib/data/menu';
 import { type FareRowItem } from '@/components/menu/FareRow';
 
-import heroImg from '@/assets/hero-food.jpg';
+import heroImg from '@/assets/hero-food.png';
 import storyImg from '@/assets/meals/jollof-rice-with-protein-of-choice-and-plantain.jpeg';
 
 function toFareRowItem(item: MenuItemView, index: number): FareRowItem {

@@ -1,37 +1,33 @@
 'use client';
 
-import { useState, type FormEvent } from 'react';
+import { useState, useRef, type FormEvent } from 'react';
 import { toast } from 'sonner';
 import { siteConfig } from '@/constants/siteConfig';
+import { submitContact } from '@/lib/contact/submit';
 
-/**
- * Contact form. Posts to `/api/contact` in Phase 5; for now, builds a
- * pre-filled WhatsApp message and opens it in a new tab (matching the
- * existing fallback). Heritage form styling.
- */
 export default function ContactForm() {
   const [submitting, setSubmitting] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const form = new FormData(e.currentTarget);
-    const name = form.get('name');
-    const phone = form.get('phone');
-    const email = form.get('email');
-    const topic = form.get('topic');
-    const message = form.get('message');
-
     setSubmitting(true);
-    const text = encodeURIComponent(
-      `Hi! ${name}.\n\nTopic: ${topic}\n\n${message}\n\nEmail: ${email}${
-        phone ? `\nPhone: ${phone}` : ''
-      }`
-    );
-    toast.success('Opening WhatsApp with your message…');
-    setTimeout(() => {
-      window.open(`https://wa.me/${siteConfig.contact.whatsapp}?text=${text}`, '_blank');
-      setSubmitting(false);
-    }, 600);
+    const form = new FormData(e.currentTarget);
+    const res = await submitContact({
+      name: String(form.get('name') ?? ''),
+      email: String(form.get('email') ?? ''),
+      phone: String(form.get('phone') ?? ''),
+      topic: String(form.get('topic') ?? ''),
+      message: String(form.get('message') ?? ''),
+      website: String(form.get('website') ?? ''),
+    });
+    setSubmitting(false);
+    if (!res.ok) {
+      toast.error(res.error);
+      return;
+    }
+    toast.success("Message sent — we'll reply by email.");
+    formRef.current?.reset();
   };
 
   return (
@@ -43,7 +39,16 @@ export default function ContactForm() {
         <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-bronze-deep">№ 01</span>
       </header>
 
-      <form onSubmit={onSubmit} className="flex flex-col gap-4">
+      <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-4">
+        {/* Honeypot — hidden from real users; bots will fill it. */}
+        <input
+          type="text"
+          name="website"
+          autoComplete="off"
+          tabIndex={-1}
+          aria-hidden="true"
+          className="pointer-events-none absolute -left-[9999px] h-0 w-0 opacity-0"
+        />
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Your name" name="name" required placeholder="e.g., Sarah Whitfield" />
           <Field
@@ -86,7 +91,7 @@ export default function ContactForm() {
           disabled={submitting}
           className="mt-1 rounded-[2px] border-0 bg-walnut px-5 py-[14px] font-serif text-[14px] font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] transition-colors hover:bg-bronze-deep disabled:opacity-60"
         >
-          {submitting ? 'Opening WhatsApp…' : 'Send message'}
+          {submitting ? 'Sending…' : 'Send message'}
         </button>
         <p className="m-0 text-center text-ink-muted italic font-serif text-[13px]">
           For anything urgent about a live order, message us on{' '}

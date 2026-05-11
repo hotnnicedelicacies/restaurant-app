@@ -83,7 +83,7 @@ export default function AboutPage() {
                   wouldn't be honest, and it wouldn't taste like ours."
                 </blockquote>
                 <span className="pl-6 font-serif text-[13px] font-medium tracking-[0.14em] text-bronze-deep [font-variant:small-caps]">
-                  — Anike, head of the kitchen
+                  — Peace, head of the kitchen
                 </span>
               </div>
             </div>

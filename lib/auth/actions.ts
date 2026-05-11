@@ -46,11 +46,26 @@ export async function signInAction(formData: FormData): Promise<ActionResult> {
   }
 
   const supabase = await getServerClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { ok: false, error: error.message };
 
   revalidatePath('/', 'layout');
-  redirect(next);
+
+  // If the form posted a specific `next` target (e.g. /admin/orders from
+  // the admin sign-in form), honour it. Otherwise route admins to the
+  // admin panel and everyone else to /account.
+  const formProvidedNext = formData.get('next');
+  if (formProvidedNext) redirect(next);
+
+  if (data.user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', data.user.id)
+      .single();
+    if (profile?.is_admin) redirect(siteConfig.routes.admin.orders);
+  }
+  redirect(siteConfig.routes.account);
 }
 
 /** Sign out — used by the account dashboard. */

@@ -1,7 +1,7 @@
 'use client';
 
-import { useMemo, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { useCart, type CartLine } from '@/lib/cart/store';
 import type { VariantsBlob, AddonsBlob } from '@/lib/supabase/types';
@@ -27,7 +27,11 @@ interface Item {
  */
 export default function CustomiseForm({ item }: { item: Item }) {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editingLineId = searchParams.get('edit');
   const addToCart = useCart((s) => s.add);
+  const removeFromCart = useCart((s) => s.remove);
+  const cartLines = useCart((s) => s.lines);
   const cartCount = useCart((s) => s.count());
 
   // Defaults: first option per required group
@@ -41,6 +45,34 @@ export default function CustomiseForm({ item }: { item: Item }) {
   const [addonSelections, setAddonSelections] = useState<Set<number>>(new Set());
   const [notes, setNotes] = useState('');
   const [qty, setQty] = useState(1);
+
+  // If arrived via "Edit options" on the cart, pre-fill from that line.
+  // Done in useEffect so we only run after mount (zustand-persist hydrates
+  // from localStorage on the client only).
+  const [prefilledFromLineId, setPrefilledFromLineId] = useState<string | null>(null);
+  useEffect(() => {
+    if (!editingLineId || prefilledFromLineId === editingLineId) return;
+    const line = cartLines.find((l) => l.id === editingLineId);
+    if (!line || line.menuItemId !== item.id) return;
+
+    const variants: Record<string, number> = {};
+    for (const [groupName, choice] of Object.entries(line.variantsChosen)) {
+      const g = item.variants.groups.find((x) => x.name === groupName);
+      if (!g) continue;
+      const idx = g.options.findIndex((o) => o.label === choice.label);
+      if (idx >= 0) variants[groupName] = idx;
+    }
+    const addons = new Set<number>();
+    for (const chosen of line.addonsChosen) {
+      const idx = item.addons.items.findIndex((a) => a.label === chosen.label);
+      if (idx >= 0) addons.add(idx);
+    }
+    setVariantSelections(variants);
+    setAddonSelections(addons);
+    setNotes(line.specialInstructions ?? '');
+    setQty(line.quantity);
+    setPrefilledFromLineId(editingLineId);
+  }, [editingLineId, prefilledFromLineId, cartLines, item.id, item.variants.groups, item.addons.items]);
 
   const unitPrice = useMemo(() => {
     let total = item.basePriceGbp;
@@ -87,6 +119,12 @@ export default function CustomiseForm({ item }: { item: Item }) {
       deltaGbp: item.addons.items[i].price_delta_gbp,
     }));
 
+    // Editing an existing cart line → drop the old one and add the new
+    // version so variants/addons/notes/qty are all replaced cleanly.
+    if (editingLineId) {
+      removeFromCart(editingLineId);
+    }
+
     addToCart({
       menuItemId: item.id,
       slug: item.slug,
@@ -99,6 +137,12 @@ export default function CustomiseForm({ item }: { item: Item }) {
       specialInstructions: notes.trim() || undefined,
       imageSrc: item.image,
     });
+
+    if (editingLineId) {
+      toast.success(`${item.name} updated.`);
+      router.push(siteConfig.routes.cart);
+      return;
+    }
 
     toast.success(`${qty} × ${item.name} added to your basket`, {
       action: { label: 'View basket', onClick: () => router.push(siteConfig.routes.cart) },
@@ -258,7 +302,7 @@ export default function CustomiseForm({ item }: { item: Item }) {
           disabled={!item.isAvailable}
           className="inline-flex flex-1 items-center justify-between gap-3 rounded-[2px] border-0 bg-walnut px-6 py-[13px] font-serif text-[14px] font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] transition-colors hover:bg-bronze-deep disabled:opacity-50 disabled:hover:bg-walnut"
         >
-          <span>Add to order</span>
+          <span>{editingLineId ? 'Update basket' : 'Add to order'}</span>
           <span className="font-serif text-[16px] font-semibold tracking-[0.02em] [font-variant:normal]">
             {formatGBP(lineTotal, { showZero: true })}
           </span>

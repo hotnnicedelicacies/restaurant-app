@@ -12,6 +12,13 @@ export function getStripe(): Stripe {
   if (!key) {
     throw new Error('STRIPE_SECRET_KEY is not set. Cannot create Stripe client.');
   }
+  if (key.startsWith('pk_')) {
+    // Loud diagnostic — Stripe's own message ("cannot be made with a
+    // publishable API key") only surfaces inside the failing API call.
+    throw new Error(
+      'STRIPE_SECRET_KEY is set to a publishable key (pk_…). It must be the secret key (sk_…). Update the env var in Vercel.'
+    );
+  }
   _stripe = new Stripe(key, {
     apiVersion: '2026-04-22.dahlia',
     typescript: true,
