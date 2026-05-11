@@ -36,8 +36,35 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   const path = request.nextUrl.pathname;
 
-  // Already signed-in users shouldn't see sign-in / sign-up
-  if (user && (path === '/sign-in' || path === '/sign-up')) {
+  // Resolve admin status once so we can enforce the customer / admin split.
+  let isAdmin = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single();
+    isAdmin = Boolean(profile?.is_admin);
+  }
+
+  // Admin accounts have no customer-facing surface. If an admin lands on
+  // /account, /cart, /checkout, /sign-in or /sign-up, bounce them into the
+  // admin panel — admin and customer are mutually-exclusive product modes.
+  const customerOnlyPath =
+    path.startsWith('/account') ||
+    path.startsWith('/cart') ||
+    path.startsWith('/checkout') ||
+    path === '/sign-in' ||
+    path === '/sign-up';
+  if (isAdmin && customerOnlyPath) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/admin/orders';
+    url.search = '';
+    return NextResponse.redirect(url);
+  }
+
+  // Signed-in (non-admin) users shouldn't see the customer sign-in / sign-up
+  if (user && !isAdmin && (path === '/sign-in' || path === '/sign-up')) {
     const url = request.nextUrl.clone();
     url.pathname = '/account';
     return NextResponse.redirect(url);
@@ -58,12 +85,7 @@ export async function middleware(request: NextRequest) {
       url.pathname = '/admin/sign-in';
       return NextResponse.redirect(url);
     }
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('is_admin')
-      .eq('id', user.id)
-      .single();
-    if (!profile?.is_admin) {
+    if (!isAdmin) {
       const url = request.nextUrl.clone();
       url.pathname = '/admin/sign-in';
       url.searchParams.set('error', 'not_admin');

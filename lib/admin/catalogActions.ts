@@ -263,6 +263,27 @@ export async function toggleItemAvailability(id: string, available: boolean): Pr
   return { ok: true };
 }
 
+export async function toggleItemCodEligible(id: string, eligible: boolean): Promise<Result> {
+  await requireAdmin();
+  const supabase = getServiceClient();
+  const { error } = await supabase.from('menu_items').update({ is_cod_eligible: eligible }).eq('id', id);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath('/admin/menu');
+  revalidateTag(MENU_TAG, 'default');
+  return { ok: true };
+}
+
+export async function toggleItemFeatured(id: string, featured: boolean): Promise<Result> {
+  await requireAdmin();
+  const supabase = getServiceClient();
+  const { error } = await supabase.from('menu_items').update({ is_featured: featured }).eq('id', id);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath('/admin/menu');
+  revalidatePath('/');
+  revalidateTag(MENU_TAG, 'default');
+  return { ok: true };
+}
+
 // ─────────────────────────────────────────────────────────────────────
 // Settings
 // ─────────────────────────────────────────────────────────────────────

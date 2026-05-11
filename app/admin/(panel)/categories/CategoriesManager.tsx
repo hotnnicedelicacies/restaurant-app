@@ -3,7 +3,11 @@
 import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { archiveCategory, createCategory, updateCategory } from '@/lib/admin/catalogActions';
+import {
+  archiveCategory,
+  createCategory,
+  updateCategory,
+} from '@/lib/admin/catalogActions';
 
 interface Category {
   id: string;
@@ -12,20 +16,21 @@ interface Category {
   description: string | null;
   displayOrder: number;
   isVisible: boolean;
+  itemCount?: number;
 }
 
 export default function CategoriesManager({ categories }: { categories: Category[] }) {
   const router = useRouter();
   const [pending, start] = useTransition();
-  const [newName, setNewName] = useState('');
-  const [newDesc, setNewDesc] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
 
-  function handleCreate() {
-    if (!newName.trim()) return;
+  function handleCreate(name: string, description: string) {
+    if (!name.trim()) return;
     start(async () => {
       const res = await createCategory({
-        name: newName,
-        description: newDesc,
+        name,
+        description,
         displayOrder: categories.length + 1,
       });
       if (!res.ok) {
@@ -33,8 +38,7 @@ export default function CategoriesManager({ categories }: { categories: Category
         return;
       }
       toast.success('Category created.');
-      setNewName('');
-      setNewDesc('');
+      setShowCreate(false);
       router.refresh();
     });
   }
@@ -45,8 +49,11 @@ export default function CategoriesManager({ categories }: { categories: Category
   ) {
     start(async () => {
       const res = await updateCategory({ id, ...patch });
-      if (!res.ok) toast.error(res.error);
-      else router.refresh();
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
+      }
+      router.refresh();
     });
   }
 
@@ -54,152 +61,334 @@ export default function CategoriesManager({ categories }: { categories: Category
     if (!confirm('Archive this category? Items in it will be hidden from the menu.')) return;
     start(async () => {
       const res = await archiveCategory(id);
-      if (!res.ok) toast.error(res.error);
-      else {
-        toast.success('Category archived.');
-        router.refresh();
+      if (!res.ok) {
+        toast.error(res.error);
+        return;
       }
+      toast.success('Category archived.');
+      router.refresh();
     });
   }
 
   return (
-    <div className="grid items-start gap-6 md:grid-cols-[1fr_320px]">
-      <div className="overflow-hidden rounded-[2px] border border-rule bg-cream">
-        <table className="w-full border-collapse">
-          <thead className="bg-cream-soft">
-            <tr className="text-left font-mono text-[10px] uppercase tracking-[0.18em] text-bronze-deep">
-              <th className="px-4 py-3 font-normal">Order</th>
-              <th className="px-4 py-3 font-normal">Name</th>
-              <th className="px-4 py-3 font-normal">Description</th>
-              <th className="px-4 py-3 font-normal">Visible</th>
-              <th className="px-4 py-3 text-right font-normal">Actions</th>
+    <>
+      <div className="admin-page-head">
+        <div className="admin-page-head__text">
+          <div className="admin-page-head__eyebrow">
+            {categories.length} {categories.length === 1 ? 'category' : 'categories'}
+          </div>
+          <h1 className="admin-page-head__title">
+            Menu <em>categories</em>
+          </h1>
+        </div>
+        <div className="admin-page-head__actions">
+          <button
+            type="button"
+            onClick={() => setShowCreate(true)}
+            className="receipt-btn receipt-btn--primary"
+          >
+            + Add category
+          </button>
+        </div>
+      </div>
+
+      <div
+        style={{
+          padding: '16px 20px',
+          background: 'var(--color-cream)',
+          borderLeft: '3px solid var(--color-bronze)',
+          marginBottom: 24,
+          borderRadius: '0 2px 2px 0',
+        }}
+      >
+        <p className="t-body" style={{ margin: '0 0 4px' }}>
+          <b style={{ fontWeight: 500, fontVariant: 'small-caps', letterSpacing: '0.08em' }}>
+            How categories work.
+          </b>
+        </p>
+        <p className="t-body-muted" style={{ margin: 0 }}>
+          Categories group menu items on the customer menu page. Reorder is by display order. Items keep their category assignment when a category is renamed; archiving a category hides all its items from the customer site.
+        </p>
+      </div>
+
+      <div className="admin-table-wrap">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th style={{ width: 60 }}>Order</th>
+              <th>Name</th>
+              <th>Slug</th>
+              <th>Items</th>
+              <th>Description</th>
+              <th style={{ textAlign: 'center' }}>Visible</th>
+              <th></th>
             </tr>
           </thead>
-          <tbody className="font-serif text-[13.5px] text-walnut">
+          <tbody>
             {categories.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-8 text-center italic text-ink-muted">
-                  No categories yet. Add one on the right.
+                <td colSpan={7} style={{ textAlign: 'center', padding: '48px 16px' }}>
+                  <p className="t-body-muted">No categories yet — add one to get started.</p>
                 </td>
               </tr>
             ) : (
-              categories.map((c) => (
-                <CategoryRow key={c.id} category={c} onPatch={handlePatch} onArchive={handleArchive} pending={pending} />
-              ))
+              categories.map((c) =>
+                editingId === c.id ? (
+                  <CategoryEditRow
+                    key={c.id}
+                    category={c}
+                    pending={pending}
+                    onSave={(patch) => {
+                      handlePatch(c.id, patch);
+                      setEditingId(null);
+                    }}
+                    onCancel={() => setEditingId(null)}
+                  />
+                ) : (
+                  <CategoryRow
+                    key={c.id}
+                    category={c}
+                    pending={pending}
+                    onEdit={() => setEditingId(c.id)}
+                    onToggleVisible={(v) => handlePatch(c.id, { isVisible: v })}
+                    onArchive={() => handleArchive(c.id)}
+                  />
+                )
+              )
+            )}
+            {showCreate && (
+              <NewCategoryRow
+                pending={pending}
+                onSave={(name, description) => handleCreate(name, description)}
+                onCancel={() => setShowCreate(false)}
+              />
             )}
           </tbody>
         </table>
       </div>
-
-      <aside className="rounded-[2px] border border-rule bg-cream p-5">
-        <h2 className="mb-3 font-mono text-[10px] uppercase tracking-[0.24em] text-bronze-deep">Add category</h2>
-        <div className="flex flex-col gap-3">
-          <input
-            type="text"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            placeholder="e.g. Italian classics"
-            className="rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut placeholder:italic placeholder:text-ink-muted"
-          />
-          <textarea
-            rows={2}
-            value={newDesc}
-            onChange={(e) => setNewDesc(e.target.value)}
-            placeholder="Optional short description"
-            className="resize-none rounded-[2px] border border-rule bg-cream-soft px-3 py-2 font-serif text-[14px] text-walnut outline-none focus:border-walnut placeholder:italic placeholder:text-ink-muted"
-          />
-          <button
-            type="button"
-            onClick={handleCreate}
-            disabled={pending || !newName.trim()}
-            className="rounded-[2px] bg-walnut px-4 py-2.5 font-serif text-[12.5px] font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] hover:bg-bronze-deep disabled:opacity-50"
-          >
-            {pending ? 'Saving…' : 'Add category'}
-          </button>
-        </div>
-      </aside>
-    </div>
+    </>
   );
 }
 
 function CategoryRow({
   category,
-  onPatch,
-  onArchive,
   pending,
+  onEdit,
+  onToggleVisible,
+  onArchive,
 }: {
   category: Category;
-  onPatch: (id: string, patch: { name?: string; description?: string; displayOrder?: number; isVisible?: boolean }) => void;
-  onArchive: (id: string) => void;
   pending: boolean;
+  onEdit: () => void;
+  onToggleVisible: (v: boolean) => void;
+  onArchive: () => void;
+}) {
+  return (
+    <tr>
+      <td>
+        <span className="t-mono">{String(category.displayOrder).padStart(2, '0')}</span>
+      </td>
+      <td>
+        <b style={{ fontWeight: 500 }}>{category.name}</b>
+      </td>
+      <td>
+        <code style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--color-ink-muted)' }}>
+          {category.slug}
+        </code>
+      </td>
+      <td>{category.itemCount ?? 0} items</td>
+      <td className="admin-table__items">{category.description || '—'}</td>
+      <td style={{ textAlign: 'center' }}>
+        <label className="switch" style={{ cursor: pending ? 'wait' : 'pointer' }}>
+          <input
+            type="checkbox"
+            checked={category.isVisible}
+            disabled={pending}
+            onChange={(e) => onToggleVisible(e.target.checked)}
+          />
+          <span className="switch__track">
+            <span className="switch__thumb" />
+          </span>
+        </label>
+      </td>
+      <td className="admin-table__actions">
+        <button
+          type="button"
+          onClick={onEdit}
+          className="admin-table__action"
+          style={{ background: 'transparent', border: 0, cursor: 'pointer' }}
+        >
+          Edit
+        </button>
+        <button
+          type="button"
+          onClick={onArchive}
+          className="admin-table__action menu-admin-table__action--danger"
+          style={{ background: 'transparent', border: 0, cursor: 'pointer' }}
+          disabled={pending}
+        >
+          Archive
+        </button>
+      </td>
+    </tr>
+  );
+}
+
+function CategoryEditRow({
+  category,
+  pending,
+  onSave,
+  onCancel,
+}: {
+  category: Category;
+  pending: boolean;
+  onSave: (patch: { name: string; description: string; displayOrder: number }) => void;
+  onCancel: () => void;
 }) {
   const [name, setName] = useState(category.name);
   const [description, setDescription] = useState(category.description ?? '');
   const [order, setOrder] = useState(category.displayOrder);
 
-  const isDirty = name !== category.name || description !== (category.description ?? '') || order !== category.displayOrder;
-
   return (
-    <tr className="border-t border-rule align-top">
-      <td className="px-3 py-2">
+    <tr style={{ background: 'var(--color-cream-soft)' }}>
+      <td>
         <input
           type="number"
           value={order}
           onChange={(e) => setOrder(Number(e.target.value))}
-          className="w-14 rounded-[2px] border border-rule bg-cream-soft px-2 py-1 font-mono text-[12px] text-walnut outline-none focus:border-walnut"
+          style={{
+            width: 50,
+            padding: '6px 8px',
+            border: '1px solid var(--color-rule)',
+            borderRadius: 2,
+            background: 'var(--color-cream)',
+            fontFamily: 'var(--font-mono)',
+            fontSize: 12,
+            color: 'var(--color-walnut)',
+          }}
         />
       </td>
-      <td className="px-3 py-2">
+      <td>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="w-full rounded-[2px] border border-rule bg-cream-soft px-2 py-1 font-serif text-[13.5px] text-walnut outline-none focus:border-walnut"
+          autoFocus
+          style={EDIT_INPUT}
         />
-        <div className="mt-0.5 font-mono text-[10px] text-ink-muted">/{category.slug}</div>
       </td>
-      <td className="px-3 py-2">
+      <td>
+        <code style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--color-ink-muted)' }}>
+          {category.slug}
+        </code>
+      </td>
+      <td>—</td>
+      <td>
         <input
           type="text"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full rounded-[2px] border border-rule bg-cream-soft px-2 py-1 font-serif text-[13.5px] italic text-walnut outline-none focus:border-walnut placeholder:text-ink-muted"
           placeholder="Optional"
+          style={EDIT_INPUT}
         />
       </td>
-      <td className="px-3 py-2">
-        <label className="flex cursor-pointer items-center gap-2 font-serif text-[12.5px] italic text-ink-muted">
-          <input
-            type="checkbox"
-            checked={category.isVisible}
-            onChange={(e) => onPatch(category.id, { isVisible: e.target.checked })}
-            className="h-[16px] w-[16px] accent-walnut"
-          />
-          {category.isVisible ? 'Visible' : 'Hidden'}
-        </label>
-      </td>
-      <td className="px-3 py-2 text-right">
-        <div className="inline-flex gap-2">
-          {isDirty && (
-            <button
-              type="button"
-              onClick={() => onPatch(category.id, { name, description, displayOrder: order })}
-              disabled={pending}
-              className="rounded-[2px] bg-walnut px-3 py-1 font-serif text-[11px] font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] hover:bg-bronze-deep disabled:opacity-50"
-            >
-              Save
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={() => onArchive(category.id)}
-            disabled={pending}
-            className="rounded-[2px] border border-danger bg-transparent px-3 py-1 font-serif text-[11px] font-semibold uppercase tracking-[0.16em] text-danger [font-variant:small-caps] hover:bg-danger hover:text-cream disabled:opacity-50"
-          >
-            Archive
-          </button>
-        </div>
+      <td />
+      <td className="admin-table__actions">
+        <button
+          type="button"
+          onClick={() => onSave({ name, description, displayOrder: order })}
+          disabled={pending || !name.trim()}
+          className="receipt-btn receipt-btn--primary"
+          style={{ padding: '6px 10px', fontSize: 11, cursor: 'pointer' }}
+        >
+          Save
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="admin-table__action"
+          style={{ background: 'transparent', border: 0, cursor: 'pointer', marginLeft: 10 }}
+        >
+          Cancel
+        </button>
       </td>
     </tr>
   );
 }
+
+function NewCategoryRow({
+  pending,
+  onSave,
+  onCancel,
+}: {
+  pending: boolean;
+  onSave: (name: string, description: string) => void;
+  onCancel: () => void;
+}) {
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
+
+  return (
+    <tr style={{ background: 'var(--color-cream-soft)' }}>
+      <td>
+        <span className="t-mono">NEW</span>
+      </td>
+      <td>
+        <input
+          type="text"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="e.g. Italian classics"
+          autoFocus
+          style={EDIT_INPUT}
+        />
+      </td>
+      <td>
+        <code style={{ fontFamily: 'var(--font-mono)', fontSize: 12, color: 'var(--color-ink-muted)' }}>
+          auto
+        </code>
+      </td>
+      <td>—</td>
+      <td>
+        <input
+          type="text"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Optional short description"
+          style={EDIT_INPUT}
+        />
+      </td>
+      <td />
+      <td className="admin-table__actions">
+        <button
+          type="button"
+          onClick={() => onSave(name, description)}
+          disabled={pending || !name.trim()}
+          className="receipt-btn receipt-btn--primary"
+          style={{ padding: '6px 10px', fontSize: 11, cursor: 'pointer' }}
+        >
+          Create
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="admin-table__action"
+          style={{ background: 'transparent', border: 0, cursor: 'pointer', marginLeft: 10 }}
+        >
+          Cancel
+        </button>
+      </td>
+    </tr>
+  );
+}
+
+const EDIT_INPUT: React.CSSProperties = {
+  width: '100%',
+  padding: '6px 10px',
+  border: '1px solid var(--color-rule)',
+  borderRadius: 2,
+  background: 'var(--color-cream)',
+  fontFamily: 'var(--font-serif)',
+  fontSize: 14,
+  color: 'var(--color-walnut)',
+};

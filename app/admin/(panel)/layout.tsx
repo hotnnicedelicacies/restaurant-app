@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { redirect } from 'next/navigation';
-import { getServerClient } from '@/lib/supabase/server';
+import { getServerClient, getServiceClient } from '@/lib/supabase/server';
 import { siteConfig } from '@/constants/siteConfig';
+import AdminNavLink from './AdminNavLink';
 import AdminSignOut from './AdminSignOut';
 
 export const metadata: Metadata = {
@@ -14,7 +16,7 @@ const NAV = [
   { href: '/admin/orders', label: 'Orders' },
   { href: '/admin/menu', label: 'Menu' },
   { href: '/admin/categories', label: 'Categories' },
-  { href: '/admin/zones', label: 'Zones' },
+  { href: '/admin/zones', label: 'Delivery zones' },
   { href: '/admin/payments', label: 'Payments' },
   { href: '/admin/settings', label: 'Settings' },
 ];
@@ -24,54 +26,101 @@ export default async function AdminPanelLayout({ children }: { children: React.R
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/admin/sign-in');
 
+  // Profile data — display name + store-open status for the kitchen pill
+  const svc = getServiceClient();
+  const [{ data: profile }, { data: storeOpenRow }, { data: liveOrders }] = await Promise.all([
+    svc.from('profiles').select('display_name').eq('id', user.id).single(),
+    svc.from('settings').select('value').eq('key', 'store_open').maybeSingle(),
+    svc
+      .from('orders')
+      .select('status', { count: 'exact', head: false })
+      .in('status', ['received', 'preparing', 'on_its_way']),
+  ]);
+  const storeOpen = (storeOpenRow?.value as boolean | undefined) ?? true;
+  const displayName = profile?.display_name ?? user.email ?? 'Admin';
+
+  // Map { received: n, ... } so the nav can show a live order count
+  const liveCount = (liveOrders ?? []).length;
+
   return (
-    <div className="min-h-screen bg-cream-soft text-walnut">
-      <header className="sticky top-0 z-30 border-b border-rule bg-cream/95 backdrop-blur">
-        <div className="mx-auto flex max-w-[1280px] items-center justify-between gap-6 px-6 py-3.5">
-          <div className="flex items-center gap-6">
-            <Link href="/admin" className="flex flex-col leading-tight">
-              <span className="font-mono text-[9px] uppercase tracking-[0.24em] text-bronze-deep">Admin</span>
-              <span className="font-serif text-[18px] font-medium text-walnut">{siteConfig.shortName}</span>
+    <div className="admin-shell">
+      <header className="admin-header">
+        <div className="container">
+          <div className="admin-header__row">
+            <Link href="/admin" className="admin-header__brand">
+              <Image src="/logo.png" alt={siteConfig.name} width={36} height={36} />
+              <div className="admin-header__brand-text">
+                <span className="admin-header__brand-name">{siteConfig.shortName}</span>
+                <span className="admin-header__brand-badge">Kitchen control · Admin</span>
+              </div>
             </Link>
-            <nav className="hidden gap-1 md:flex">
-              {NAV.map((n) => (
-                <Link
-                  key={n.href}
-                  href={n.href}
-                  className="rounded-[2px] px-3 py-2 font-serif text-[13.5px] font-medium tracking-[0.06em] text-walnut transition-colors hover:bg-cream-soft hover:text-bronze-deep"
-                >
-                  {n.label}
-                </Link>
-              ))}
-            </nav>
-          </div>
-          <div className="flex items-center gap-4">
-            <span className="hidden font-serif text-[12.5px] italic text-ink-muted sm:inline">
-              {user.email}
-            </span>
-            <Link
-              href="/"
-              className="hidden font-serif text-[12px] uppercase tracking-[0.16em] text-walnut hover:text-bronze-deep sm:inline-block [font-variant:small-caps]"
-            >
-              View site →
-            </Link>
-            <AdminSignOut />
+
+            <div className="admin-header__center">
+              <span
+                className={`kitchen-status ${storeOpen ? '' : 'kitchen-status--closed'}`}
+                aria-label={storeOpen ? 'Kitchen open · accepting orders' : 'Kitchen closed'}
+              >
+                <span className="kitchen-status__dot" />
+                <span>
+                  {storeOpen ? 'Kitchen open · accepting orders' : 'Kitchen closed'}
+                </span>
+              </span>
+            </div>
+
+            <div className="admin-header__right">
+              <span className="admin-header__user">{displayName}</span>
+              <AdminSignOut />
+            </div>
           </div>
         </div>
-        <nav className="flex gap-1 overflow-x-auto border-t border-rule bg-cream-soft px-4 py-2 md:hidden">
-          {NAV.map((n) => (
-            <Link
-              key={n.href}
-              href={n.href}
-              className="whitespace-nowrap rounded-[2px] px-3 py-1.5 font-serif text-[13px] text-walnut hover:bg-cream"
-            >
-              {n.label}
-            </Link>
-          ))}
+
+        <nav className="admin-nav">
+          <div className="container">
+            <div className="admin-nav__inner">
+              {NAV.map((n) => (
+                <AdminNavLink
+                  key={n.href}
+                  href={n.href}
+                  count={n.href === '/admin/orders' && liveCount > 0 ? liveCount : undefined}
+                >
+                  {n.label}
+                </AdminNavLink>
+              ))}
+            </div>
+          </div>
         </nav>
       </header>
 
-      <main className="mx-auto max-w-[1280px] px-6 py-8">{children}</main>
+      <main className="admin-content">
+        <div className="container">{children}</div>
+      </main>
+
+      <footer
+        style={{
+          background: 'var(--color-walnut)',
+          color: 'rgba(241, 229, 205, 0.55)',
+          padding: '16px 0',
+          fontFamily: 'var(--font-serif)',
+          fontStyle: 'italic',
+          fontSize: 12,
+          textAlign: 'center',
+        }}
+      >
+        <div className="container">
+          {siteConfig.shortName} Admin · v1.0 · Signed in as{' '}
+          <b style={{ color: 'rgba(241, 229, 205, 0.85)', fontWeight: 500 }}>{displayName}</b> ·{' '}
+          <a
+            href="/"
+            style={{
+              color: 'rgba(241, 229, 205, 0.7)',
+              borderBottom: '1px solid rgba(241, 229, 205, 0.25)',
+              paddingBottom: 1,
+            }}
+          >
+            View customer site →
+          </a>
+        </div>
+      </footer>
     </div>
   );
 }

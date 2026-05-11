@@ -18,7 +18,8 @@ export default function AdminSignOut() {
         })
       }
       disabled={pending}
-      className="rounded-[2px] border border-walnut bg-transparent px-3 py-1.5 font-serif text-[11.5px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] transition-colors hover:bg-walnut hover:text-cream disabled:opacity-60"
+      className="admin-header__signout cursor-pointer"
+      style={{ background: 'transparent', border: 0, padding: 0, cursor: pending ? 'wait' : 'pointer' }}
     >
       {pending ? 'Signing out…' : 'Sign out'}
     </button>

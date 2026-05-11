@@ -1,29 +1,29 @@
 <svg viewBox="0 0 48 54" fill="none" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="bowl" x1="24" y1="28" x2="24" y2="54" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#b91c1c"/>
-      <stop offset="1" stop-color="#7f1d1d"/>
+      <stop stop-color="#3D2A20"/>
+      <stop offset="1" stop-color="#2D1F18"/>
     </linearGradient>
     <linearGradient id="rim" x1="6" y1="34" x2="42" y2="34" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#ea580c"/>
-      <stop offset="0.5" stop-color="#f97316"/>
-      <stop offset="1" stop-color="#ea580c"/>
+      <stop stop-color="#A56F40"/>
+      <stop offset="0.5" stop-color="#C8884F"/>
+      <stop offset="1" stop-color="#7E5530"/>
     </linearGradient>
   </defs>
 
   <!-- Steam wisps -->
-  <path d="M16 24 C16 20 18 18 16 14 C14 10 16 8 16 8" stroke="#f97316" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
-  <path d="M24 22 C24 17 26 15 24 10 C22 5 24 2 24 2" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" opacity="0.9"/>
-  <path d="M32 24 C32 20 34 18 32 14 C30 10 32 8 32 8" stroke="#f97316" stroke-width="2" stroke-linecap="round" opacity="0.75"/>
+  <path d="M16 24 C16 20 18 18 16 14 C14 10 16 8 16 8" stroke="#A56F40" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <path d="M24 22 C24 17 26 15 24 10 C22 5 24 2 24 2" stroke="#7E5530" stroke-width="2.5" stroke-linecap="round" opacity="0.85"/>
+  <path d="M32 24 C32 20 34 18 32 14 C30 10 32 8 32 8" stroke="#A56F40" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
 
   <!-- Bowl body -->
   <path d="M6 34 C6 46 12 52 24 52 C36 52 42 46 42 34 Z" fill="url(#bowl)"/>
 
   <!-- Rim -->
-  <ellipse cx="24" cy="34" rx="18" ry="5" fill="#dc2626"/>
-  <ellipse cx="24" cy="34" rx="14" ry="3.5" fill="url(#rim)" opacity="0.7"/>
-  <ellipse cx="24" cy="34" rx="9" ry="2.2" fill="#fde68a" opacity="0.45"/>
+  <ellipse cx="24" cy="34" rx="18" ry="5" fill="#A56F40"/>
+  <ellipse cx="24" cy="34" rx="14" ry="3.5" fill="url(#rim)"/>
+  <ellipse cx="24" cy="34" rx="9" ry="2.2" fill="#F1E5CD" opacity="0.55"/>
 
   <!-- Base foot -->
-  <rect x="18" y="51" width="12" height="2" rx="1" fill="#7f1d1d"/>
+  <rect x="18" y="51" width="12" height="2" rx="1" fill="#2D1F18"/>
 </svg>
