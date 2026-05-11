@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My account — Hot N Nice Delicacies</title>
+<link rel="icon" href="../../app/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+
+<div class="mockup-banner">
+  <b>MOCKUP · v1</b> · Account · Walnut &amp; Cream
+  <a href="./index.html">← All pages</a>
+</div>
+
+<!-- HEADER (signed-in state) -->
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="./home.html" class="site-header__logo"><img src="../../public/logo.png" alt="Hot N Nice Delicacies"></a>
+    <nav class="site-header__nav">
+      <a href="./home.html">Home</a>
+      <a href="./menu.html">Menu</a>
+      <a href="./about.html">About</a>
+      <a href="./account.html" class="is-active">My account</a>
+    </nav>
+    <a href="./menu.html" class="site-header__cta">Order now</a>
+    <button class="site-header__burger" aria-label="Open menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg></button>
+  </div>
+</header>
+
+<!-- PAGE HERO (personal greeting) -->
+<section class="page-hero" style="padding-bottom: clamp(36px, 5vw, 56px);">
+  <div class="container">
+    <div class="page-hero__eyebrow">Member since May 2026 · Middlesbrough</div>
+    <h1 class="page-hero__title">Welcome back, <em>Sarah.</em></h1>
+    <p class="page-hero__sub">Your orders, saved addresses, and profile — all in one place.</p>
+  </div>
+</section>
+
+<!-- ACCOUNT LAYOUT -->
+<section class="container">
+  <div class="account-layout">
+
+    <!-- LEFT: sidebar nav -->
+    <aside class="account-sidebar">
+      <p class="account-sidebar__title">My account</p>
+      <a href="#orders" class="account-sidebar__link is-active">Orders</a>
+      <a href="#addresses" class="account-sidebar__link">Saved addresses</a>
+      <a href="#profile" class="account-sidebar__link">Profile &amp; password</a>
+      <a href="./sign-in.html" class="account-sidebar__signout">Sign out</a>
+    </aside>
+
+    <!-- RIGHT: main -->
+    <main class="account-main">
+
+      <!-- ============== ORDERS ============== -->
+      <section id="orders" class="account-section">
+        <header class="account-section__head">
+          <h2 class="account-section__title">Your <em>orders</em></h2>
+          <span class="account-section__count">4 orders</span>
+        </header>
+
+        <div class="order-history">
+
+          <article class="order-row">
+            <img class="order-row__thumb" src="../../assets/meals/jollof-rice-with-protein-of-choice-and-plantain-1.png" alt="">
+            <div class="order-row__body">
+              <div class="order-row__top">
+                <span class="order-row__ref">№ HNN-3F7K-1142</span>
+                <span class="order-row__date">Today · Mon 11 May</span>
+                <span class="order-row__status is-progress">On its way</span>
+              </div>
+              <p class="order-row__items">Jollof Rice with Plantain · Plantain Lasagna · Suya Sticks × 2<br><em>3 items · delivering to 42 Linthorpe Road</em></p>
+            </div>
+            <div class="order-row__right">
+              <span class="order-row__price">£64.00</span>
+              <div class="order-row__actions">
+                <a href="./track-order.html?ref=HNN-3F7K-1142" class="order-row__action">Track →</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="order-row">
+            <img class="order-row__thumb" src="../../assets/meals/plantain-lasagna.jpeg" alt="">
+            <div class="order-row__body">
+              <div class="order-row__top">
+                <span class="order-row__ref">№ HNN-2B9M-0917</span>
+                <span class="order-row__date">Sat 4 May</span>
+                <span class="order-row__status is-delivered">Delivered</span>
+              </div>
+              <p class="order-row__items">Plantain Lasagna · Edikaikong · Puff Puff Platter<br><em>3 items · delivered Sat 12:34pm</em></p>
+            </div>
+            <div class="order-row__right">
+              <span class="order-row__price">£50.00</span>
+              <div class="order-row__actions">
+                <a href="./receipt.html" class="order-row__action">View receipt</a>
+                <a href="./cart.html" class="order-row__action">Reorder →</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="order-row">
+            <img class="order-row__thumb" src="../../assets/meals/suya.jpeg" alt="">
+            <div class="order-row__body">
+              <div class="order-row__top">
+                <span class="order-row__ref">№ HNN-7K1Q-0445</span>
+                <span class="order-row__date">Wed 24 Apr</span>
+                <span class="order-row__status is-delivered">Delivered</span>
+              </div>
+              <p class="order-row__items">Suya Sticks × 4 · Small Chops Platter<br><em>2 items · party order, family gathering</em></p>
+            </div>
+            <div class="order-row__right">
+              <span class="order-row__price">£45.00</span>
+              <div class="order-row__actions">
+                <a href="./receipt.html" class="order-row__action">View receipt</a>
+                <a href="./cart.html" class="order-row__action">Reorder →</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="order-row">
+            <img class="order-row__thumb" src="../../assets/meals/roasted-tilapia-fish.jpeg" alt="">
+            <div class="order-row__body">
+              <div class="order-row__top">
+                <span class="order-row__ref">№ HNN-9P2L-0203</span>
+                <span class="order-row__date">Fri 12 Apr</span>
+                <span class="order-row__status is-cancelled">Cancelled</span>
+              </div>
+              <p class="order-row__items">Roasted Tilapia Platter · Pounded Yam<br><em>Cancelled before kitchen started · refunded £32.00</em></p>
+            </div>
+            <div class="order-row__right">
+              <span class="order-row__price"><span style="text-decoration: line-through; color: var(--ink-muted); font-weight: 400; font-size: 15px;">£32.00</span></span>
+              <div class="order-row__actions">
+                <a href="./receipt.html" class="order-row__action">Refund receipt</a>
+              </div>
+            </div>
+          </article>
+
+        </div>
+      </section>
+
+      <!-- ============== ADDRESSES ============== -->
+      <section id="addresses" class="account-section">
+        <header class="account-section__head">
+          <h2 class="account-section__title">Saved <em>addresses</em></h2>
+          <span class="account-section__count">2 saved</span>
+        </header>
+
+        <div class="address-grid">
+
+          <article class="address-card is-default">
+            <span class="address-card__default-badge">Default</span>
+            <span class="address-card__label">Home</span>
+            <p class="address-card__name">Sarah Whitfield</p>
+            <p class="address-card__lines">42 Linthorpe Road, Flat 3B<br>Middlesbrough · TS1 3AB<br>+44 7700 900123</p>
+            <div class="address-card__actions">
+              <button class="address-card__action">Edit</button>
+              <button class="address-card__action address-card__action--danger">Remove</button>
+            </div>
+          </article>
+
+          <article class="address-card">
+            <span class="address-card__label">Work</span>
+            <p class="address-card__name">Sarah Whitfield · c/o Reception</p>
+            <p class="address-card__lines">North Tees Hospital<br>Stockton-on-Tees · TS19 8PE<br>+44 7700 900123</p>
+            <div class="address-card__actions">
+              <button class="address-card__action">Edit</button>
+              <button class="address-card__action">Set as default</button>
+              <button class="address-card__action address-card__action--danger">Remove</button>
+            </div>
+          </article>
+
+          <button class="address-card address-card--add" type="button">
+            + Add another address
+          </button>
+
+        </div>
+      </section>
+
+      <!-- ============== PROFILE ============== -->
+      <section id="profile" class="account-section">
+        <header class="account-section__head">
+          <h2 class="account-section__title">Profile &amp; <em>password</em></h2>
+        </header>
+
+        <!-- Profile form -->
+        <div class="form-section">
+          <header class="form-section__head">
+            <h2 class="form-section__title">Your <em>details</em></h2>
+            <span class="form-section__num">№ 01</span>
+          </header>
+          <form onsubmit="event.preventDefault(); alert('Mockup — profile would be saved.');">
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="form-field__label" for="pf-first">First name</label>
+                <input id="pf-first" class="form-field__input" type="text" value="Sarah">
+              </div>
+              <div class="form-field">
+                <label class="form-field__label" for="pf-last">Last name</label>
+                <input id="pf-last" class="form-field__input" type="text" value="Whitfield">
+              </div>
+              <div class="form-field">
+                <label class="form-field__label" for="pf-email">Email</label>
+                <input id="pf-email" class="form-field__input" type="email" value="sarah.whitfield@example.co.uk">
+              </div>
+              <div class="form-field">
+                <label class="form-field__label" for="pf-phone">Phone</label>
+                <input id="pf-phone" class="form-field__input" type="tel" value="+44 7700 900123">
+              </div>
+              <div class="form-field full" style="grid-column: 1 / -1;">
+                <label class="auth-form__checkbox" style="font-size: 14px;">
+                  <input type="checkbox" checked>
+                  <span>Email me when my orders change status (out for delivery, delivered, etc.)</span>
+                </label>
+              </div>
+            </div>
+            <button type="submit" class="auth-form__submit" style="margin-top: 20px; width: auto; min-width: 200px;">Save profile</button>
+          </form>
+        </div>
+
+        <!-- Password change -->
+        <div class="form-section" style="margin-top: 20px;">
+          <header class="form-section__head">
+            <h2 class="form-section__title">Change <em>password</em></h2>
+            <span class="form-section__num">№ 02</span>
+          </header>
+          <form onsubmit="event.preventDefault(); alert('Mockup — password would be updated.');">
+            <div class="form-field" style="margin-bottom: 14px;">
+              <label class="form-field__label" for="pw-current">Current password</label>
+              <div class="password-input">
+                <input id="pw-current" class="form-field__input" type="password" placeholder="••••••••" autocomplete="current-password">
+                <button type="button" class="password-toggle" aria-label="Show password" data-target="pw-current">Show</button>
+              </div>
+            </div>
+            <div class="form-field" style="margin-bottom: 14px;">
+              <label class="form-field__label" for="pw-new">New password <small>· at least 8 characters</small></label>
+              <div class="password-input">
+                <input id="pw-new" class="form-field__input" type="password" minlength="8" placeholder="••••••••" autocomplete="new-password">
+                <button type="button" class="password-toggle" aria-label="Show password" data-target="pw-new">Show</button>
+              </div>
+            </div>
+            <button type="submit" class="auth-form__submit" style="margin-top: 6px; width: auto; min-width: 200px;">Update password</button>
+          </form>
+        </div>
+
+        <!-- Danger zone -->
+        <div class="form-section" style="margin-top: 20px; border-color: rgba(139, 42, 26, 0.25);">
+          <header class="form-section__head" style="border-bottom-color: rgba(139, 42, 26, 0.2);">
+            <h2 class="form-section__title" style="color: #8B2A1A;">Close <em>account</em></h2>
+            <span class="form-section__num" style="color: #8B2A1A;">Permanent</span>
+          </header>
+          <p class="t-body-muted" style="margin-bottom: 18px;">If you close your account, your saved addresses and profile are removed. Past orders and invoices are retained for our legal records but anonymised.</p>
+          <button type="button" class="btn btn-ghost" style="border-color: rgba(139, 42, 26, 0.5); color: #8B2A1A;">Close my account</button>
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__grid">
+      <div class="site-footer__brand">
+        <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+        <p class="site-footer__tagline">A small home kitchen in Middlesbrough — Italian &amp; West African, delivered hot.</p>
+        <div class="site-footer__hygiene">
+          <span class="site-footer__hygiene-stars">★ ★ ★ ★ ★  Hygiene · FSA</span>
+          <a href="https://ratings.food.gov.uk/business/1913815/hot-n-nice-delicacies" target="_blank" rel="noopener noreferrer">Verify our rating →</a>
+        </div>
+      </div>
+      <div><h4 class="site-footer__col-title">Visit</h4><ul><li><a href="./home.html">Home</a></li><li><a href="./menu.html">Menu</a></li><li><a href="./about.html">About</a></li><li><a href="./contact.html">Contact</a></li></ul></div>
+      <div><h4 class="site-footer__col-title">Contact</h4><ul><li><a href="tel:+447776320068">+44 7776 320068</a></li><li><a href="https://wa.me/447776320068">WhatsApp</a></li><li><a href="mailto:hotnnicedelicacies@gmail.com">Email us</a></li></ul></div>
+      <div><h4 class="site-footer__col-title">Hours</h4><ul><li>Tuesday – Sunday</li><li>12pm – 8pm</li><li>Order by 10am for same-day</li></ul></div>
+    </div>
+    <div class="site-footer__copy"><span>© 2026 Hot N Nice Delicacies · Middlesbrough, UK</span><span><a href="./terms.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Terms</a> · <a href="./privacy.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Privacy</a> · <a href="./refund-policy.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Refunds</a> · <a href="./cookie-notice.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Cookies</a></span></div>
+  </div>
+</footer>
+
+<script>
+  // Highlight active sidebar link on scroll + password toggles
+  (function() {
+    const links = document.querySelectorAll('.account-sidebar__link');
+    const sections = Array.from(links).map(l => document.querySelector(l.getAttribute('href')));
+    function onScroll() {
+      const offset = 120;
+      let active = 0;
+      sections.forEach((s, i) => { if (s && s.getBoundingClientRect().top - offset < 0) active = i; });
+      links.forEach((l, i) => l.classList.toggle('is-active', i === active));
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+
+    document.querySelectorAll('.password-toggle').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = document.getElementById(btn.dataset.target);
+        const showing = input.type === 'text';
+        input.type = showing ? 'password' : 'text';
+        btn.textContent = showing ? 'Show' : 'Hide';
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

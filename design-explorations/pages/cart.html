@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Your Order — Hot N Nice Delicacies</title>
+<link rel="icon" href="../../app/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+
+<div class="mockup-banner">
+  <b>MOCKUP · v1</b> · Cart · Walnut &amp; Cream
+  <a href="./index.html">← All pages</a>
+</div>
+
+<!-- ================= HEADER ================= -->
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="./home.html" class="site-header__logo">
+      <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+    </a>
+    <nav class="site-header__nav">
+      <a href="./home.html">Home</a>
+      <a href="./menu.html">Menu</a>
+      <a href="./about.html">About</a>
+      <a href="./contact.html">Contact</a>
+    </nav>
+    <a href="./cart.html" class="site-header__cta">Cart · 3</a>
+    <button class="site-header__burger" aria-label="Open menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <div class="container breadcrumb__inner">
+    <a href="./home.html">Home</a>
+    <span class="breadcrumb__sep">·</span>
+    <a href="./menu.html">Menu</a>
+    <span class="breadcrumb__sep">·</span>
+    <span class="breadcrumb__current">Your Order</span>
+  </div>
+</nav>
+
+<!-- ================= CART LAYOUT ================= -->
+<section class="container">
+  <div class="checkout-layout">
+
+    <!-- LEFT: cart items -->
+    <main class="checkout-main">
+      <header style="margin-bottom: 28px;">
+        <div class="t-mono" style="margin-bottom: 8px;">Vol. 01 · Three items · Eleventh of May</div>
+        <h1 class="t-display-l">Your <em>order</em></h1>
+        <p class="t-body-l" style="margin-top: 8px;">Review the kitchen's notes, adjust as you like, then proceed to checkout.</p>
+      </header>
+
+      <!--
+        EMPTY-CART STATE (commented for mockup; rendered conditionally in production).
+        Replace .cart-rows below with this block when basket is empty.
+
+        <div class="empty-state">
+          <div class="empty-state__eyebrow">Your basket</div>
+          <h2 class="empty-state__title">Nothing in your <em>basket</em> yet.</h2>
+          <p class="empty-state__sub">Browse today's bill of fare — order by 10am for same-day delivery.</p>
+          <a href="./menu.html" class="btn btn-primary">See today's menu →</a>
+        </div>
+      -->
+
+      <div class="cart-rows">
+
+        <article class="cart-row">
+          <img class="cart-row__img" src="../../assets/meals/jollof-rice-with-protein-of-choice-and-plantain-1.png" alt="Jollof rice with chicken and plantain">
+          <div class="cart-row__body">
+            <div class="cart-row__head">
+              <h3 class="cart-row__name">Jollof Rice <em>with Plantain</em></h3>
+              <span class="cart-row__line-price">£24.00</span>
+            </div>
+            <p class="cart-row__variants">
+              <b>Protein:</b> Fish <span style="color: var(--bronze)">·</span>
+              <b>Size:</b> Large <span style="color: var(--bronze)">·</span>
+              <b>Add-ons:</b> Extra plantain, Boiled egg
+            </p>
+            <p class="cart-row__notes">"Less spicy please — and ring on arrival, the bell is broken."</p>
+            <div class="cart-row__actions">
+              <div class="cart-row__actions-left">
+                <div class="qty-stepper" role="group" aria-label="Quantity">
+                  <button type="button" aria-label="Decrease">−</button>
+                  <span class="qty-stepper__count">1</span>
+                  <button type="button" aria-label="Increase">+</button>
+                </div>
+                <a href="./item-detail.html?id=jollof" class="cart-row__edit">Edit options</a>
+              </div>
+              <button type="button" class="cart-row__remove">Remove</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="cart-row">
+          <img class="cart-row__img" src="../../assets/meals/plantain-lasagna.jpeg" alt="Plantain lasagna">
+          <div class="cart-row__body">
+            <div class="cart-row__head">
+              <h3 class="cart-row__name">Plantain Lasagna</h3>
+              <span class="cart-row__line-price">£25.00</span>
+            </div>
+            <p class="cart-row__variants">
+              <b>Size:</b> Regular
+            </p>
+            <div class="cart-row__actions">
+              <div class="cart-row__actions-left">
+                <div class="qty-stepper" role="group" aria-label="Quantity">
+                  <button type="button" aria-label="Decrease">−</button>
+                  <span class="qty-stepper__count">1</span>
+                  <button type="button" aria-label="Increase">+</button>
+                </div>
+                <a href="./item-detail.html?id=plantain-lasagna" class="cart-row__edit">Edit options</a>
+              </div>
+              <button type="button" class="cart-row__remove">Remove</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="cart-row">
+          <img class="cart-row__img" src="../../assets/meals/suya.jpeg" alt="Suya sticks">
+          <div class="cart-row__body">
+            <div class="cart-row__head">
+              <h3 class="cart-row__name">Suya Sticks</h3>
+              <span class="cart-row__line-price">£10.00</span>
+            </div>
+            <p class="cart-row__variants">Two sticks · spicy</p>
+            <div class="cart-row__actions">
+              <div class="cart-row__actions-left">
+                <div class="qty-stepper" role="group" aria-label="Quantity">
+                  <button type="button" aria-label="Decrease">−</button>
+                  <span class="qty-stepper__count">2</span>
+                  <button type="button" aria-label="Increase">+</button>
+                </div>
+                <a href="./item-detail.html?id=suya" class="cart-row__edit">Edit options</a>
+              </div>
+              <button type="button" class="cart-row__remove">Remove</button>
+            </div>
+          </div>
+        </article>
+
+      </div>
+
+      <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--rule); display: flex; gap: 16px; flex-wrap: wrap;">
+        <a href="./menu.html" class="btn btn-ghost">← Add more from the menu</a>
+      </div>
+    </main>
+
+    <!-- RIGHT: summary -->
+    <aside class="checkout-aside">
+      <div class="summary">
+        <div class="summary__head">
+          <h2 class="summary__title">Order <em>summary</em></h2>
+          <span class="summary__count">3 items</span>
+        </div>
+
+        <div class="summary__totals">
+          <div class="summary__row">
+            <span>Subtotal</span>
+            <span>£59.00</span>
+          </div>
+          <div class="summary__row summary__row--muted">
+            <span>Delivery <em>· Middlesbrough</em></span>
+            <span>£5.00</span>
+          </div>
+          <div class="summary__row summary__row--grand">
+            <span>Total</span>
+            <span>£64.00</span>
+          </div>
+        </div>
+
+        <!--
+          MIN-ORDER WARNING — shown when subtotal < delivery_zones[matched].min_order_gbp.
+          Hidden here because £59 subtotal exceeds the £10 Middlesbrough minimum.
+          ADMIN: delivery_zones[matched].min_order_gbp
+        -->
+        <div style="display: none; padding: 12px 14px; background: rgba(139, 42, 26, 0.08); border-left: 3px solid #8B2A1A; border-radius: 0 2px 2px 0; margin-bottom: 14px;">
+          <p class="t-body" style="margin: 0 0 4px; font-size: 14px; font-weight: 500;">Add <b style="color: #8B2A1A;">£3.50</b> more for delivery</p>
+          <p class="t-body-muted" style="margin: 0; font-size: 13px;">The minimum order for Middlesbrough is £10.00 — your basket is at £6.50.</p>
+        </div>
+
+        <a href="./checkout.html" class="summary__cta">Proceed to checkout</a>
+
+        <div class="summary__trust">
+          <b>Secure checkout</b>
+          Card payment via Stripe · 5★ FSA hygiene<br>
+          No frozen meals — cooked this morning
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__grid">
+      <div class="site-footer__brand">
+        <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+        <p class="site-footer__tagline">A small home kitchen in Middlesbrough — Italian &amp; West African, delivered hot.</p>
+        <div class="site-footer__hygiene">
+          <span class="site-footer__hygiene-stars">★ ★ ★ ★ ★  Hygiene · FSA</span>
+          <a href="https://ratings.food.gov.uk/business/1913815/hot-n-nice-delicacies" target="_blank" rel="noopener noreferrer">Verify our rating →</a>
+        </div>
+      </div>
+      <div>
+        <h4 class="site-footer__col-title">Visit</h4>
+        <ul>
+          <li><a href="./home.html">Home</a></li>
+          <li><a href="./menu.html">Menu</a></li>
+          <li><a href="./about.html">About</a></li>
+          <li><a href="./contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="site-footer__col-title">Contact</h4>
+        <ul>
+          <li><a href="tel:+447776320068">+44 7776 320068</a></li>
+          <li><a href="https://wa.me/447776320068">WhatsApp</a></li>
+          <li><a href="mailto:hotnnicedelicacies@gmail.com">Email us</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="site-footer__col-title">Hours</h4>
+        <ul>
+          <li>Tuesday – Sunday</li>
+          <li>12pm – 8pm</li>
+          <li>Order by 10am for same-day</li>
+        </ul>
+      </div>
+    </div>
+    <div class="site-footer__copy">
+      <span>© 2026 Hot N Nice Delicacies · Middlesbrough, UK</span>
+      <span><a href="./terms.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Terms</a> · <a href="./privacy.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Privacy</a> · <a href="./refund-policy.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Refunds</a> · <a href="./cookie-notice.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Cookies</a></span>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

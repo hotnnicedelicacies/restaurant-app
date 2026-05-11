@@ -43,12 +43,12 @@ export default async function SignInPage({
       <SignInForm next={sp.next} />
 
       <div className="relative my-7 text-center">
-        <span className="absolute inset-x-0 top-1/2 h-px bg-[--color-border]" />
-        <span className="relative inline-block bg-[--color-cream] px-3 font-mono text-[10px] uppercase tracking-[0.22em] text-[--color-ink-muted]">
+        <span className="absolute inset-x-0 top-1/2 h-px bg-rule" />
+        <span className="relative inline-block bg-cream px-3 font-mono text-[10px] uppercase tracking-[0.22em] text-ink-muted">
           New here
         </span>
       </div>
-      <p className="m-0 text-center font-serif text-[14px] italic text-[--color-ink-muted]">
+      <p className="m-0 text-center font-serif text-[14px] italic text-ink-muted">
         No account yet?{' '}
         <Link href={siteConfig.routes.signUp} className="link-underline">
           Create one →

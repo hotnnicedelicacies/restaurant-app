@@ -65,7 +65,7 @@ export default function AboutPage() {
                 />
                 <div
                   aria-hidden
-                  className="pointer-events-none absolute -bottom-4 -right-4 left-4 top-4 -z-10 rounded-[2px] border border-[--color-bronze] opacity-40"
+                  className="pointer-events-none absolute -bottom-4 -right-4 left-4 top-4 -z-10 rounded-[2px] border border-bronze opacity-40"
                 />
               </div>
               <div className="flex flex-col gap-4">
@@ -78,11 +78,11 @@ export default function AboutPage() {
                   home, the way we cook it at home. The recipes came with us from Lagos and learned new
                   tricks in Teesside.
                 </p>
-                <blockquote className="m-0 mt-3 border-l-2 border-[--color-bronze] pl-6 font-serif text-[clamp(20px,2.4vw,26px)] italic leading-[1.4] text-[--color-walnut]">
+                <blockquote className="m-0 mt-3 border-l-2 border-bronze pl-6 font-serif text-[clamp(20px,2.4vw,26px)] italic leading-[1.4] text-walnut">
                   "The shortcut is the thing we don't take. Frozen would be faster. Cheaper too. But it
                   wouldn't be honest, and it wouldn't taste like ours."
                 </blockquote>
-                <span className="pl-6 font-serif text-[13px] font-medium tracking-[0.14em] text-[--color-bronze-deep] [font-variant:small-caps]">
+                <span className="pl-6 font-serif text-[13px] font-medium tracking-[0.14em] text-bronze-deep [font-variant:small-caps]">
                   — Anike, head of the kitchen
                 </span>
               </div>
@@ -91,15 +91,15 @@ export default function AboutPage() {
         </section>
 
         {/* Long prose */}
-        <section className="bg-[--color-cream-soft] py-[clamp(56px,8vw,96px)]">
+        <section className="bg-cream-soft py-[clamp(56px,8vw,96px)]">
           <div className="container">
             <SectionHead
               eyebrow="How we got here"
               title={<>Cooked in <em>Lagos.</em> Plated in <em>Middlesbrough.</em></>}
               className="mb-10"
             />
-            <article className="mx-auto max-w-[680px] font-serif text-[18px] leading-[1.65] text-[--color-walnut] [&_em]:italic [&_p]:m-0 [&_p+p]:mt-4 [&_b]:font-medium">
-              <p className="[&::first-letter]:float-left [&::first-letter]:pr-2.5 [&::first-letter]:pt-1 [&::first-letter]:text-[3.6em] [&::first-letter]:font-medium [&::first-letter]:leading-[0.9] [&::first-letter]:text-[--color-bronze-deep]">
+            <article className="mx-auto max-w-[680px] font-serif text-[18px] leading-[1.65] text-walnut [&_em]:italic [&_p]:m-0 [&_p+p]:mt-4 [&_b]:font-medium">
+              <p className="[&::first-letter]:float-left [&::first-letter]:pr-2.5 [&::first-letter]:pt-1 [&::first-letter]:text-[3.6em] [&::first-letter]:font-medium [&::first-letter]:leading-[0.9] [&::first-letter]:text-bronze-deep">
                 We started cooking for the neighbours in 2019. One pot of jollof on a Sunday afternoon,
                 ferried across the street in a tupperware. Then two pots. Then five. Then a friend
                 asked, half-jokingly, whether we could do delivery.
@@ -139,13 +139,13 @@ export default function AboutPage() {
             <div className="mx-auto grid max-w-[1100px] grid-cols-1 gap-10 md:grid-cols-3 md:gap-12">
               {PILLARS.map((p, i) => (
                 <article key={i}>
-                  <div className="mb-3 font-serif text-[48px] italic font-normal leading-none text-[--color-bronze]">
+                  <div className="mb-3 font-serif text-[48px] italic font-normal leading-none text-bronze">
                     {romanLower(i + 1)}.
                   </div>
-                  <h3 className="m-0 mb-2 font-serif text-[22px] font-medium text-[--color-walnut] [&_em]:font-normal [&_em]:italic">
+                  <h3 className="m-0 mb-2 font-serif text-[22px] font-medium text-walnut [&_em]:font-normal [&_em]:italic">
                     {p.title}
                   </h3>
-                  <p className="m-0 font-serif text-[15.5px] italic leading-[1.55] text-[--color-ink-muted]">
+                  <p className="m-0 font-serif text-[15.5px] italic leading-[1.55] text-ink-muted">
                     {p.body}
                   </p>
                 </article>

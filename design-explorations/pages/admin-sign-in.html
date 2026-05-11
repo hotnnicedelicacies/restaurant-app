@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin sign in — Hot N Nice Delicacies</title>
+<link rel="icon" href="../../app/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body style="background: var(--walnut);">
+
+<div class="mockup-banner">
+  <b>MOCKUP · v1</b> · Admin sign in · Walnut &amp; Cream
+  <a href="./index.html">← All pages</a>
+</div>
+
+<section class="auth-page" style="background: var(--walnut); min-height: calc(100vh - 32px); align-items: center;">
+  <div class="auth-card" style="background: var(--cream); position: relative;">
+
+    <div style="position: absolute; top: 18px; left: 18px; font-family: var(--font-mono); font-size: 9px; letter-spacing: 0.24em; text-transform: uppercase; color: var(--bronze-deep);">Admin</div>
+
+    <div class="auth-card__brand">
+      <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+    </div>
+    <div class="auth-card__eyebrow">Kitchen control</div>
+    <h1 class="auth-card__title">Sign in to <em>the kitchen</em></h1>
+    <p class="auth-card__sub">Manage today's orders, the menu, and everything else from one place.</p>
+
+    <form class="auth-form" action="./admin-orders.html">
+      <div class="form-field">
+        <label class="form-field__label" for="ad-email">Admin email</label>
+        <input id="ad-email" class="form-field__input" type="email" placeholder="anike@hotnnicedelicacies.com" required autocomplete="email">
+      </div>
+
+      <div class="form-field">
+        <label class="form-field__label" for="ad-password">Password</label>
+        <div class="password-input">
+          <input id="ad-password" class="form-field__input" type="password" placeholder="••••••••" required autocomplete="current-password">
+          <button type="button" class="password-toggle" aria-label="Show password" data-target="ad-password">Show</button>
+        </div>
+      </div>
+
+      <div class="auth-form__between">
+        <label class="auth-form__checkbox" style="font-size: 13.5px;">
+          <input type="checkbox" checked>
+          <span>Stay signed in on this device</span>
+        </label>
+        <a href="#">Reset password</a>
+      </div>
+
+      <button type="submit" class="auth-form__submit">Enter the kitchen</button>
+    </form>
+
+    <p class="t-body-muted" style="text-align: center; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--rule);">
+      Customer site? <a href="./home.html" class="link-underline">Go to hotnnicedelicacies.com</a>
+    </p>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll('.password-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById(btn.dataset.target);
+      const showing = input.type === 'text';
+      input.type = showing ? 'password' : 'text';
+      btn.textContent = showing ? 'Show' : 'Hide';
+    });
+  });
+</script>
+
+</body>
+</html>

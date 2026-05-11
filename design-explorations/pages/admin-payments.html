@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Payments — Admin · Hot N Nice</title>
+<link rel="icon" href="../../app/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body class="admin-shell">
+
+<div class="mockup-banner">
+  <b>MOCKUP · v1</b> · Admin · Payments &amp; COD reconciliation
+  <a href="./index.html">← All pages</a>
+</div>
+
+<header class="admin-header">
+  <div class="container">
+    <div class="admin-header__row">
+      <div class="admin-header__brand">
+        <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+        <div class="admin-header__brand-text">
+          <span class="admin-header__brand-name">Hot N Nice</span>
+          <span class="admin-header__brand-badge">Kitchen control · Admin</span>
+        </div>
+      </div>
+      <div class="admin-header__center">
+        <button type="button" class="kitchen-status"><span class="kitchen-status__dot"></span><span>Kitchen open · accepting orders</span></button>
+      </div>
+      <div class="admin-header__right">
+        <span class="admin-header__user">Anike Whitfield</span>
+        <a href="./admin-sign-in.html" class="admin-header__signout">Sign out</a>
+      </div>
+    </div>
+  </div>
+  <nav class="admin-nav">
+    <div class="container">
+      <div class="admin-nav__inner">
+        <a href="./admin-orders.html" class="admin-nav__link">Orders <span class="admin-nav__count">3</span></a>
+        <a href="./admin-menu.html" class="admin-nav__link">Menu</a>
+        <a href="./admin-zones.html" class="admin-nav__link">Delivery zones</a>
+        <a href="./admin-payments.html" class="admin-nav__link is-active">Payments <span class="admin-nav__count">2</span></a>
+        <a href="./admin-settings.html" class="admin-nav__link">Settings</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main class="admin-content">
+  <div class="container">
+
+    <div class="admin-page-head">
+      <div class="admin-page-head__text">
+        <div class="admin-page-head__eyebrow">Payments &amp; reconciliation</div>
+        <h1 class="admin-page-head__title">The <em>books</em></h1>
+      </div>
+      <div class="admin-page-head__actions">
+        <button type="button" class="receipt-btn">Export CSV</button>
+        <a href="https://dashboard.stripe.com" target="_blank" class="receipt-btn receipt-btn--primary">Open Stripe ↗</a>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="admin-stats">
+      <div class="admin-stat">
+        <div class="admin-stat__label">Today · Gross</div>
+        <div class="admin-stat__value">£304.00</div>
+        <div class="admin-stat__delta admin-stat__delta--up">+18% vs. last Mon</div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat__label">Today · Card</div>
+        <div class="admin-stat__value">£243.00</div>
+        <div class="admin-stat__delta">5 payments · Stripe</div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat__label">Today · COD</div>
+        <div class="admin-stat__value">£61.00</div>
+        <div class="admin-stat__delta">2 orders · 0 collected</div>
+      </div>
+      <div class="admin-stat">
+        <div class="admin-stat__label">Uncollected COD</div>
+        <div class="admin-stat__value" style="color: #8B2A1A;">£87.00</div>
+        <div class="admin-stat__delta admin-stat__delta--down">4 orders awaiting cash</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs" role="tablist">
+      <button class="tab" data-tab="stripe">Stripe payments <span class="tab__count">5</span></button>
+      <button class="tab is-active" data-tab="cod">COD reconciliation <span class="tab__count">4</span></button>
+      <button class="tab" data-tab="refunds">Refunds <span class="tab__count">1</span></button>
+    </div>
+
+    <!-- ============ STRIPE PAYMENTS PANEL ============ -->
+    <section class="tab-panel" data-panel="stripe">
+      <div class="admin-toolbar">
+        <div class="admin-toolbar__search">
+          <svg class="admin-toolbar__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3" stroke-linecap="round"/></svg>
+          <input type="search" placeholder="Search by Stripe ID, order №, or customer…">
+        </div>
+        <select class="admin-filter" style="cursor: pointer;">
+          <option>Today</option><option>This week</option><option>This month</option><option>Custom…</option>
+        </select>
+        <button class="admin-filter is-active">All</button>
+        <button class="admin-filter">Succeeded</button>
+        <button class="admin-filter">Refunded</button>
+        <button class="admin-filter">Disputed</button>
+      </div>
+
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr><th>Stripe ID / Time</th><th>Order</th><th>Customer</th><th>Card</th><th>Amount</th><th>Status</th><th></th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>
+                <div class="admin-table__ref">pi_3PqL4K…7K9z</div>
+                <div class="admin-table__time">12:08pm</div>
+              </td>
+              <td><a href="./admin-order-detail.html" class="admin-table__action" style="margin: 0; font-style: normal;">HNN-9R2X-1208</a></td>
+              <td><div class="admin-table__customer"><b>Emily Hartshorn</b></div></td>
+              <td>Visa · 8881</td>
+              <td class="admin-table__total">£40.00</td>
+              <td><span class="pill pill--collected">Succeeded</span></td>
+              <td class="admin-table__actions"><a href="#" class="admin-table__action">View ↗</a></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="admin-table__ref">pi_3PqL3F…1142</div>
+                <div class="admin-table__time">10:47am</div>
+              </td>
+              <td><a href="./admin-order-detail.html" class="admin-table__action" style="margin: 0; font-style: normal;">HNN-3F7K-1142</a></td>
+              <td><div class="admin-table__customer"><b>Sarah Whitfield</b></div></td>
+              <td>Visa · 4242</td>
+              <td class="admin-table__total">£64.00</td>
+              <td><span class="pill pill--collected">Succeeded</span></td>
+              <td class="admin-table__actions"><a href="#" class="admin-table__action">View ↗</a></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="admin-table__ref">pi_3PqL2…1015</div>
+                <div class="admin-table__time">10:15am</div>
+              </td>
+              <td><a href="./admin-order-detail.html" class="admin-table__action" style="margin: 0; font-style: normal;">HNN-4K8N-1015</a></td>
+              <td><div class="admin-table__customer"><b>Rebecca Lin</b></div></td>
+              <td>Mastercard · 0214</td>
+              <td class="admin-table__total">£43.00</td>
+              <td><span class="pill pill--collected">Succeeded</span></td>
+              <td class="admin-table__actions"><a href="#" class="admin-table__action">View ↗</a></td>
+            </tr>
+            <tr>
+              <td>
+                <div class="admin-table__ref">pi_3PqL1…0902</div>
+                <div class="admin-table__time">9:02am</div>
+              </td>
+              <td><a href="./admin-order-detail.html" class="admin-table__action" style="margin: 0; font-style: normal;">HNN-2P9L-0902</a></td>
+              <td><div class="admin-table__customer"><b>James Hawthorn</b></div></td>
+              <td>Apple Pay · 6741</td>
+              <td class="admin-table__total">£40.00</td>
+              <td><span class="pill pill--collected">Succeeded</span></td>
+              <td class="admin-table__actions"><a href="#" class="admin-table__action">View ↗</a></td>
+            </tr>
+            <tr style="opacity: 0.7;">
+              <td>
+                <div class="admin-table__ref">pi_3PqL0…0758</div>
+                <div class="admin-table__time">7:58am</div>
+              </td>
+              <td><a href="./admin-order-detail.html" class="admin-table__action" style="margin: 0; font-style: normal;">HNN-1J5T-0758</a></td>
+              <td><div class="admin-table__customer"><b>Olivia Brookes</b></div></td>
+              <td>Visa · 1057</td>
+              <td class="admin-table__total"><span style="text-decoration: line-through;">£25.00</span></td>
+              <td><span class="pill pill--refunded">Refunded</span></td>
+              <td class="admin-table__actions"><a href="#" class="admin-table__action">View ↗</a></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============ COD RECONCILIATION PANEL (default — comes from "Reconcile now") ============ -->
+    <section id="cod" class="tab-panel is-active" data-panel="cod">
+
+      <div style="padding: 16px 20px; background: var(--cream); border-left: 3px solid var(--bronze); margin-bottom: 16px; border-radius: 0 2px 2px 0;">
+        <p class="t-body" style="margin: 0 0 4px;"><b style="font-weight: 500; font-variant: small-caps; letter-spacing: 0.08em;">Cash on delivery reconciliation.</b></p>
+        <p class="t-body-muted" style="margin: 0;">After a COD order is delivered, the driver brings the cash back to the kitchen. Confirm here that you've received it — once marked, the order is closed for accounting. Every action is logged with your name and timestamp.</p>
+      </div>
+
+      <!-- Bulk action bar (visible when checkboxes are ticked) -->
+      <div class="cod-bulk-bar" id="cod-bulk">
+        <p class="cod-bulk-bar__text"><b id="cod-bulk-count">0</b> selected · <b id="cod-bulk-amount">£0.00</b> total</p>
+        <div class="cod-bulk-bar__actions">
+          <button type="button" class="cod-bulk-bar__btn--ghost cod-bulk-bar__btn" id="cod-bulk-clear">Clear</button>
+          <button type="button" class="cod-bulk-bar__btn" id="cod-bulk-mark">Mark selected as collected →</button>
+        </div>
+      </div>
+
+      <div class="admin-toolbar">
+        <div class="admin-toolbar__search">
+          <svg class="admin-toolbar__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3" stroke-linecap="round"/></svg>
+          <input type="search" placeholder="Search by order №, customer name, or address…">
+        </div>
+        <button class="admin-filter is-active">Uncollected <span class="admin-filter__count">4</span></button>
+        <button class="admin-filter">Collected <span class="admin-filter__count">23</span></button>
+        <button class="admin-filter">All <span class="admin-filter__count">27</span></button>
+      </div>
+
+      <table class="cod-table">
+        <thead>
+          <tr>
+            <th class="cod-table__check"><input type="checkbox" id="cod-check-all"></th>
+            <th>Order</th>
+            <th>Customer</th>
+            <th>Delivered</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="cod-table__check"><input type="checkbox" class="cod-row-check" data-amount="35.00"></td>
+            <td>
+              <div class="admin-table__ref">HNN-7M2B-1031</div>
+              <div class="admin-table__time">Today · 10:31am</div>
+            </td>
+            <td>
+              <div class="admin-table__customer">
+                <b>David Okonkwo</b>
+                <em>TS18 2BL · +44 7700 900789</em>
+              </div>
+            </td>
+            <td class="admin-table__time">Today · 12:42pm</td>
+            <td class="admin-table__total">£35.00</td>
+            <td><span class="pill pill--uncollected">Awaiting cash</span></td>
+            <td class="admin-table__actions"><button type="button" class="admin-table__action" data-confirm="cod-collect" data-amount="35.00" data-ref="HNN-7M2B-1031">Mark collected →</button></td>
+          </tr>
+          <tr>
+            <td class="cod-table__check"><input type="checkbox" class="cod-row-check" data-amount="26.00"></td>
+            <td>
+              <div class="admin-table__ref">HNN-8H4V-0847</div>
+              <div class="admin-table__time">Today · 8:47am</div>
+            </td>
+            <td>
+              <div class="admin-table__customer">
+                <b>Tamara Ofili</b>
+                <em>TS5 4LP · +44 7700 900567</em>
+              </div>
+            </td>
+            <td class="admin-table__time">Today · 11:24am</td>
+            <td class="admin-table__total">£26.00</td>
+            <td><span class="pill pill--uncollected">Awaiting cash</span></td>
+            <td class="admin-table__actions"><button type="button" class="admin-table__action" data-confirm="cod-collect" data-amount="26.00" data-ref="HNN-8H4V-0847">Mark collected →</button></td>
+          </tr>
+          <tr style="opacity: 0.85;">
+            <td class="cod-table__check"><input type="checkbox" class="cod-row-check" data-amount="14.00"></td>
+            <td>
+              <div class="admin-table__ref">HNN-5N1Q-1607</div>
+              <div class="admin-table__time">Yesterday · 4:07pm</div>
+            </td>
+            <td>
+              <div class="admin-table__customer">
+                <b>Lewis Ade</b>
+                <em>TS6 9AA · +44 7700 900112</em>
+              </div>
+            </td>
+            <td class="admin-table__time">Yesterday · 5:18pm</td>
+            <td class="admin-table__total">£14.00</td>
+            <td><span class="pill pill--uncollected">Awaiting cash</span></td>
+            <td class="admin-table__actions"><button type="button" class="admin-table__action" data-confirm="cod-collect" data-amount="14.00" data-ref="HNN-5N1Q-1607">Mark collected →</button></td>
+          </tr>
+          <tr style="opacity: 0.85;">
+            <td class="cod-table__check"><input type="checkbox" class="cod-row-check" data-amount="12.00"></td>
+            <td>
+              <div class="admin-table__ref">HNN-3D8P-1245</div>
+              <div class="admin-table__time">Yesterday · 12:45pm</div>
+            </td>
+            <td>
+              <div class="admin-table__customer">
+                <b>Margaret Lloyd</b>
+                <em>TS3 8PJ · +44 7700 900345</em>
+              </div>
+            </td>
+            <td class="admin-table__time">Yesterday · 1:51pm</td>
+            <td class="admin-table__total">£12.00</td>
+            <td><span class="pill pill--uncollected">Awaiting cash</span></td>
+            <td class="admin-table__actions"><button type="button" class="admin-table__action" data-confirm="cod-collect" data-amount="12.00" data-ref="HNN-3D8P-1245">Mark collected →</button></td>
+          </tr>
+
+          <!-- Already-collected example (for visual reference) -->
+          <tr style="background: var(--cream-soft); opacity: 0.7;">
+            <td class="cod-table__check"><input type="checkbox" disabled></td>
+            <td>
+              <div class="admin-table__ref">HNN-9X4F-1018</div>
+              <div class="admin-table__time">Mon last week · 10:18am</div>
+            </td>
+            <td>
+              <div class="admin-table__customer">
+                <b>Hannah Quaye</b>
+                <em>TS10 4HS</em>
+              </div>
+            </td>
+            <td class="admin-table__time">Mon · 1:02pm</td>
+            <td class="admin-table__total">£28.00</td>
+            <td><span class="pill pill--collected">Collected · Anike, 4 May 6:12pm</span></td>
+            <td class="admin-table__actions"><span class="t-body-muted" style="font-size: 12px;">Closed</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ============ REFUNDS PANEL ============ -->
+    <section class="tab-panel" data-panel="refunds">
+      <div class="admin-toolbar">
+        <div class="admin-toolbar__search">
+          <svg class="admin-toolbar__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3" stroke-linecap="round"/></svg>
+          <input type="search" placeholder="Search refunds…">
+        </div>
+        <select class="admin-filter"><option>This month</option><option>Last 90 days</option><option>All</option></select>
+      </div>
+
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr><th>Date</th><th>Order</th><th>Customer</th><th>Refunded</th><th>Reason</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="admin-table__time">Today · 8:14am</td>
+              <td><a href="./admin-order-detail.html" class="admin-table__action" style="margin: 0; font-style: normal;">HNN-1J5T-0758</a></td>
+              <td><b>Olivia Brookes</b></td>
+              <td class="admin-table__total">£25.00 · full</td>
+              <td class="admin-table__items">Customer cancelled before kitchen started.</td>
+              <td><span class="pill pill--refunded">Refunded</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<footer style="background: var(--walnut); color: rgba(241, 229, 205, 0.55); padding: 16px 0; font-family: var(--font-serif); font-style: italic; font-size: 12px; text-align: center;">
+  <div class="container">Hot N Nice Admin · v1.0 · Signed in as Anike Whitfield · <a href="./home.html" style="color: rgba(241, 229, 205, 0.7); border-bottom: 1px solid rgba(241, 229, 205, 0.25); padding-bottom: 1px;">View customer site →</a></div>
+</footer>
+
+<!-- ================= CONFIRMATION MODAL ================= -->
+<div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true">
+  <div class="modal-card">
+    <div class="modal-eyebrow" id="modal-eyebrow">COD reconciliation</div>
+    <h2 class="modal-title" id="modal-title">Mark cash as <em>collected?</em></h2>
+    <div class="modal-body" id="modal-body">Confirms cash receipt. Logged with your name and timestamp. No undo.</div>
+    <div class="modal-detail" id="modal-detail"><dl id="modal-detail-list"></dl></div>
+    <div class="modal-actions">
+      <button type="button" class="modal-btn" data-modal-close>Cancel</button>
+      <button type="button" class="modal-btn modal-btn--success" id="modal-confirm">Yes, collected</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Tab switching — honours #cod hash on load
+  (function() {
+    const tabs = document.querySelectorAll('.tab');
+    const panels = document.querySelectorAll('.tab-panel');
+    function show(name) {
+      tabs.forEach(t => t.classList.toggle('is-active', t.dataset.tab === name));
+      panels.forEach(p => p.classList.toggle('is-active', p.dataset.panel === name));
+    }
+    tabs.forEach(t => t.addEventListener('click', () => {
+      show(t.dataset.tab);
+      history.replaceState(null, '', '#' + t.dataset.tab);
+    }));
+    // Honour hash on load
+    const hash = location.hash.replace('#', '');
+    if (hash && document.querySelector('.tab-panel[data-panel="' + hash + '"]')) show(hash);
+  })();
+
+  // COD bulk select
+  (function() {
+    const checks = document.querySelectorAll('.cod-row-check');
+    const checkAll = document.getElementById('cod-check-all');
+    const bulk = document.getElementById('cod-bulk');
+    const bulkCount = document.getElementById('cod-bulk-count');
+    const bulkAmount = document.getElementById('cod-bulk-amount');
+    const bulkClear = document.getElementById('cod-bulk-clear');
+    const bulkMark = document.getElementById('cod-bulk-mark');
+
+    function update() {
+      const selected = Array.from(checks).filter(c => c.checked);
+      const total = selected.reduce((s, c) => s + parseFloat(c.dataset.amount || 0), 0);
+      bulkCount.textContent = selected.length;
+      bulkAmount.textContent = '£' + total.toFixed(2);
+      bulk.classList.toggle('is-visible', selected.length > 0);
+      checkAll.checked = selected.length === checks.length && checks.length > 0;
+    }
+    checks.forEach(c => c.addEventListener('change', update));
+    checkAll.addEventListener('change', () => { checks.forEach(c => c.checked = checkAll.checked); update(); });
+    bulkClear.addEventListener('click', () => { checks.forEach(c => c.checked = false); checkAll.checked = false; update(); });
+    bulkMark.addEventListener('click', () => {
+      const count = Array.from(checks).filter(c => c.checked).length;
+      const total = Array.from(checks).filter(c => c.checked).reduce((s, c) => s + parseFloat(c.dataset.amount || 0), 0);
+      openBulkModal(count, total);
+    });
+  })();
+
+  // Confirmation modal (single-order + bulk)
+  const overlay = document.getElementById('modal-overlay');
+  function openSingleModal(ref, amount) {
+    document.getElementById('modal-eyebrow').textContent = 'COD reconciliation';
+    document.getElementById('modal-title').innerHTML = 'Mark cash as <em>collected?</em>';
+    document.getElementById('modal-body').innerHTML = 'Confirms the driver received <b>£' + parseFloat(amount).toFixed(2) + ' in cash</b> for this order. Logged with your name and timestamp. There\'s no undo.';
+    document.getElementById('modal-detail-list').innerHTML =
+      '<dt>Order</dt><dd>' + ref + '</dd>' +
+      '<dt>Amount</dt><dd>£' + parseFloat(amount).toFixed(2) + '</dd>' +
+      '<dt>Marked by</dt><dd>Anike Whitfield</dd>' +
+      '<dt>When</dt><dd>Now</dd>';
+    overlay.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  }
+  function openBulkModal(count, total) {
+    document.getElementById('modal-eyebrow').textContent = 'COD reconciliation · Bulk';
+    document.getElementById('modal-title').innerHTML = 'Mark <em>' + count + ' orders</em> as collected?';
+    document.getElementById('modal-body').innerHTML = 'Confirms cash receipt for <b>' + count + ' orders</b> totalling <b>£' + total.toFixed(2) + '</b>. Each is logged separately with your name and the current timestamp.';
+    document.getElementById('modal-detail-list').innerHTML =
+      '<dt>Orders</dt><dd>' + count + '</dd>' +
+      '<dt>Total cash</dt><dd>£' + total.toFixed(2) + '</dd>' +
+      '<dt>Marked by</dt><dd>Anike Whitfield</dd>' +
+      '<dt>When</dt><dd>Now</dd>';
+    overlay.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() { overlay.classList.remove('is-open'); document.body.style.overflow = ''; }
+  document.querySelectorAll('[data-confirm="cod-collect"]').forEach(b => {
+    b.addEventListener('click', () => openSingleModal(b.dataset.ref, b.dataset.amount));
+  });
+  document.querySelectorAll('[data-modal-close]').forEach(b => b.addEventListener('click', closeModal));
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeModal(); });
+  document.getElementById('modal-confirm').addEventListener('click', closeModal);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+</script>
+
+</body>
+</html>

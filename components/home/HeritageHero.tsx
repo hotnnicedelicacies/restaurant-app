@@ -35,7 +35,7 @@ export default function HeritageHero({
   className,
 }: Props) {
   return (
-    <section className={cn('relative h-[clamp(560px,78vh,780px)] overflow-hidden text-[--color-cream]', className)}>
+    <section className={cn('relative h-[clamp(560px,78vh,780px)] overflow-hidden text-cream', className)}>
       <Image
         src={image}
         alt={imageAlt}
@@ -57,7 +57,7 @@ export default function HeritageHero({
         <div className="flex flex-col justify-between gap-1.5 sm:flex-row sm:items-start sm:gap-6">
           {eyebrow && (
             <span
-              className="font-serif text-[13px] font-medium tracking-[0.22em] text-[--color-cream] [font-variant:small-caps]"
+              className="font-serif text-[13px] font-medium tracking-[0.22em] text-cream [font-variant:small-caps]"
               style={{ textShadow: '0 1px 4px rgba(45, 31, 24, 0.45)' }}
             >
               {eyebrow}
@@ -65,7 +65,7 @@ export default function HeritageHero({
           )}
           {meta && (
             <span
-              className="font-mono text-[10px] uppercase tracking-[0.2em] text-[--color-cream] sm:text-right"
+              className="font-mono text-[10px] uppercase tracking-[0.2em] text-cream sm:text-right"
               style={{ textShadow: '0 1px 4px rgba(45, 31, 24, 0.45)' }}
             >
               {meta}
@@ -74,7 +74,7 @@ export default function HeritageHero({
         </div>
 
         <div className="max-w-[720px]">
-          <h1 className="m-0 mb-4 font-serif text-[clamp(40px,7vw,76px)] font-medium leading-[1.02] tracking-[-0.01em] text-[--color-cream] [&_em]:font-normal [&_em]:italic [&_em]:text-[--color-bronze]">
+          <h1 className="m-0 mb-4 font-serif text-[clamp(40px,7vw,76px)] font-medium leading-[1.02] tracking-[-0.01em] text-cream [&_em]:font-normal [&_em]:italic [&_em]:text-bronze">
             {headline}
           </h1>
           {deck && (
@@ -87,7 +87,7 @@ export default function HeritageHero({
               {primaryCta.label}
             </HeritageButton>
             {secondaryCta && (
-              <a href={secondaryCta.href} className="link-underline italic text-[--color-cream]">
+              <a href={secondaryCta.href} className="link-underline italic text-cream">
                 {secondaryCta.label}
               </a>
             )}

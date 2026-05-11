@@ -16,6 +16,7 @@ export type Database = {
         Row: { key: string; value: unknown; updated_at: string };
         Insert: { key: string; value: unknown };
         Update: { value?: unknown };
+        Relationships: [];
       };
       menu_categories: {
         Row: {
@@ -31,6 +32,7 @@ export type Database = {
         };
         Insert: Omit<Database['public']['Tables']['menu_categories']['Row'], 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Database['public']['Tables']['menu_categories']['Insert']>;
+        Relationships: [];
       };
       menu_items: {
         Row: {
@@ -59,6 +61,7 @@ export type Database = {
         };
         Insert: Omit<Database['public']['Tables']['menu_items']['Row'], 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Database['public']['Tables']['menu_items']['Insert']>;
+        Relationships: [];
       };
       delivery_zones: {
         Row: {
@@ -79,6 +82,7 @@ export type Database = {
         };
         Insert: Omit<Database['public']['Tables']['delivery_zones']['Row'], 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Database['public']['Tables']['delivery_zones']['Insert']>;
+        Relationships: [];
       };
       profiles: {
         Row: {
@@ -94,6 +98,7 @@ export type Database = {
         Insert: Pick<Database['public']['Tables']['profiles']['Row'], 'id'> &
           Partial<Omit<Database['public']['Tables']['profiles']['Row'], 'id' | 'created_at' | 'updated_at'>>;
         Update: Partial<Database['public']['Tables']['profiles']['Insert']>;
+        Relationships: [];
       };
       addresses: {
         Row: {
@@ -112,6 +117,7 @@ export type Database = {
         };
         Insert: Omit<Database['public']['Tables']['addresses']['Row'], 'id' | 'created_at' | 'updated_at'>;
         Update: Partial<Database['public']['Tables']['addresses']['Insert']>;
+        Relationships: [];
       };
       orders: {
         Row: {
@@ -150,10 +156,41 @@ export type Database = {
           created_at: string;
           updated_at: string;
         };
-        Insert: Omit<Database['public']['Tables']['orders']['Row'], 'id' | 'ref' | 'created_at' | 'updated_at'> & {
+        Insert: {
           ref?: string;
+          profile_id?: string | null;
+          customer_first_name: string;
+          customer_last_name: string;
+          customer_email: string;
+          customer_phone: string;
+          delivery_line1: string;
+          delivery_line2?: string | null;
+          delivery_city: string;
+          delivery_postcode: string;
+          delivery_zone_id?: string | null;
+          delivery_fee_gbp: number;
+          delivery_date: string;
+          delivery_window_start: string;
+          delivery_window_end: string;
+          delivery_notes?: string | null;
+          subtotal_gbp: number;
+          total_gbp: number;
+          payment_method: 'card' | 'cod';
+          payment_status?: 'pending' | 'paid' | 'refunded' | 'partially_refunded' | 'failed';
+          stripe_payment_intent_id?: string | null;
+          card_brand?: string | null;
+          card_last4?: string | null;
+          cod_status?: 'uncollected' | 'collected' | null;
+          cod_collected_at?: string | null;
+          cod_collected_by?: string | null;
+          refund_amount_gbp?: number | null;
+          refund_reason?: string | null;
+          status?: 'received' | 'preparing' | 'on_its_way' | 'delivered' | 'cancelled';
+          cancelled_at?: string | null;
+          cancelled_reason?: string | null;
         };
         Update: Partial<Database['public']['Tables']['orders']['Insert']>;
+        Relationships: [];
       };
       order_items: {
         Row: {
@@ -164,8 +201,8 @@ export type Database = {
           unit_price_gbp: number;
           quantity: number;
           line_total_gbp: number;
-          variants_chosen: Record<string, string>;
-          addons_chosen: Array<{ label: string; price: number }>;
+          variants_chosen: Record<string, { label: string; deltaGbp: number }>;
+          addons_chosen: Array<{ label: string; deltaGbp: number }>;
           special_instructions: string | null;
           image_path: string | null;
           display_order: number;
@@ -173,6 +210,7 @@ export type Database = {
         };
         Insert: Omit<Database['public']['Tables']['order_items']['Row'], 'id' | 'created_at'>;
         Update: Partial<Database['public']['Tables']['order_items']['Insert']>;
+        Relationships: [];
       };
       kitchen_notes: {
         Row: {
@@ -188,8 +226,13 @@ export type Database = {
         };
         Insert: Omit<Database['public']['Tables']['kitchen_notes']['Row'], 'id' | 'created_at'>;
         Update: Partial<Database['public']['Tables']['kitchen_notes']['Insert']>;
+        Relationships: [];
       };
     };
+    Views: { [_ in never]: never };
+    Functions: { [_ in never]: never };
+    Enums: { [_ in never]: never };
+    CompositeTypes: { [_ in never]: never };
   };
 };
 

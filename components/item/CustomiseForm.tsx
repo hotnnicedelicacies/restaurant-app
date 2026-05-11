@@ -120,9 +120,9 @@ export default function CustomiseForm({ item }: { item: Item }) {
       {/* Variant groups */}
       {item.variants.groups.map((group) => (
         <fieldset key={group.name} className="m-0 flex flex-col gap-2.5 border-0 p-0">
-          <legend className="mb-1 flex items-baseline gap-2.5 font-serif text-[14px] font-medium tracking-[0.14em] text-[--color-walnut] [font-variant:small-caps]">
+          <legend className="mb-1 flex items-baseline gap-2.5 font-serif text-[14px] font-medium tracking-[0.14em] text-walnut [font-variant:small-caps]">
             {group.name}
-            <small className="font-serif text-[12.5px] italic tracking-normal text-[--color-ink-muted] [font-variant:normal]">
+            <small className="font-serif text-[12.5px] italic tracking-normal text-ink-muted [font-variant:normal]">
               · {group.is_required ? 'required, choose one' : 'optional'}
             </small>
           </legend>
@@ -140,14 +140,14 @@ export default function CustomiseForm({ item }: { item: Item }) {
                     className="pointer-events-none absolute opacity-0"
                   />
                   <span
-                    className={`flex items-center justify-between gap-3 rounded-[2px] border bg-[--color-cream] px-3.5 py-3 font-serif text-[15px] text-[--color-walnut] transition-colors ${
+                    className={`flex items-center justify-between gap-3 rounded-[2px] border bg-cream px-3.5 py-3 font-serif text-[15px] text-walnut transition-colors ${
                       selected
-                        ? 'border-[--color-walnut] bg-[--color-cream-soft] shadow-[inset_0_0_0_1px_var(--color-walnut)]'
-                        : 'border-[--color-border] hover:border-[--color-walnut]'
+                        ? 'border-walnut bg-cream-soft shadow-[inset_0_0_0_1px_var(--color-walnut)]'
+                        : 'border-rule hover:border-walnut'
                     }`}
                   >
                     <span>{opt.label}</span>
-                    <small className="font-serif text-[13px] italic text-[--color-ink-muted]">
+                    <small className="font-serif text-[13px] italic text-ink-muted">
                       {opt.price_delta_gbp === 0 ? 'included' : formatPriceDelta(opt.price_delta_gbp)}
                     </small>
                   </span>
@@ -161,19 +161,19 @@ export default function CustomiseForm({ item }: { item: Item }) {
       {/* Addons */}
       {item.addons.items.length > 0 && (
         <fieldset className="m-0 flex flex-col gap-2.5 border-0 p-0">
-          <legend className="mb-1 flex items-baseline gap-2.5 font-serif text-[14px] font-medium tracking-[0.14em] text-[--color-walnut] [font-variant:small-caps]">
+          <legend className="mb-1 flex items-baseline gap-2.5 font-serif text-[14px] font-medium tracking-[0.14em] text-walnut [font-variant:small-caps]">
             Add-ons
-            <small className="font-serif text-[12.5px] italic tracking-normal text-[--color-ink-muted] [font-variant:normal]">
+            <small className="font-serif text-[12.5px] italic tracking-normal text-ink-muted [font-variant:normal]">
               · optional
             </small>
           </legend>
-          <div className="flex flex-col border-t border-[--color-border]">
+          <div className="flex flex-col border-t border-rule">
             {item.addons.items.map((addon, i) => {
               const checked = addonSelections.has(i);
               return (
                 <label
                   key={addon.label}
-                  className="flex cursor-pointer items-center justify-between gap-3 border-b border-[--color-border] py-3"
+                  className="flex cursor-pointer items-center justify-between gap-3 border-b border-rule py-3"
                 >
                   <span className="flex items-center gap-3">
                     <input
@@ -187,21 +187,21 @@ export default function CustomiseForm({ item }: { item: Item }) {
                           return next;
                         })
                       }
-                      className="h-[18px] w-[18px] accent-[--color-walnut]"
+                      className="h-[18px] w-[18px] accent-walnut"
                     />
                     <span>
-                      <span className="font-serif text-[15px] text-[--color-walnut]">{addon.label}</span>
+                      <span className="font-serif text-[15px] text-walnut">{addon.label}</span>
                       {addon.description && (
                         <>
                           <br />
-                          <span className="font-serif text-[13px] italic text-[--color-ink-muted]">
+                          <span className="font-serif text-[13px] italic text-ink-muted">
                             {addon.description}
                           </span>
                         </>
                       )}
                     </span>
                   </span>
-                  <span className="whitespace-nowrap font-serif text-[14px] font-medium text-[--color-bronze-deep]">
+                  <span className="whitespace-nowrap font-serif text-[14px] font-medium text-bronze-deep">
                     {formatPriceDelta(addon.price_delta_gbp) || formatGBP(0, { showZero: true })}
                   </span>
                 </label>
@@ -213,9 +213,9 @@ export default function CustomiseForm({ item }: { item: Item }) {
 
       {/* Special instructions */}
       <div className="flex flex-col gap-2.5">
-        <label className="font-serif text-[14px] font-medium tracking-[0.14em] text-[--color-walnut] [font-variant:small-caps]">
+        <label className="font-serif text-[14px] font-medium tracking-[0.14em] text-walnut [font-variant:small-caps]">
           Special instructions
-          <small className="ml-1.5 font-serif text-[12.5px] italic tracking-normal text-[--color-ink-muted] [font-variant:normal]">
+          <small className="ml-1.5 font-serif text-[12.5px] italic tracking-normal text-ink-muted [font-variant:normal]">
             · optional
           </small>
         </label>
@@ -225,30 +225,30 @@ export default function CustomiseForm({ item }: { item: Item }) {
           placeholder="Less spicy, no onions, allergies we should know about…"
           maxLength={500}
           rows={3}
-          className="w-full rounded-[2px] border border-[--color-border] bg-transparent px-3.5 py-3 font-serif text-[15px] italic leading-[1.55] text-[--color-walnut] outline-none transition-colors focus:border-[--color-walnut] placeholder:italic placeholder:text-[--color-ink-muted]"
+          className="w-full rounded-[2px] border border-rule bg-transparent px-3.5 py-3 font-serif text-[15px] italic leading-[1.55] text-walnut outline-none transition-colors focus:border-walnut placeholder:italic placeholder:text-ink-muted"
         />
       </div>
 
       {/* Qty stepper + Add to order */}
-      <div className="flex flex-wrap items-center gap-4 border-t border-[--color-border] pt-6">
-        <div className="inline-flex items-center rounded-[2px] border border-[--color-border]" role="group" aria-label="Quantity">
+      <div className="flex flex-wrap items-center gap-4 border-t border-rule pt-6">
+        <div className="inline-flex items-center rounded-[2px] border border-rule" role="group" aria-label="Quantity">
           <button
             type="button"
             onClick={() => setQty((q) => Math.max(1, q - 1))}
             disabled={qty <= 1}
             aria-label="Decrease quantity"
-            className="h-[44px] w-[44px] cursor-pointer font-serif text-[20px] text-[--color-walnut] transition-colors hover:bg-[--color-cream-soft] disabled:cursor-not-allowed disabled:text-[--color-ink-muted]"
+            className="h-[44px] w-[44px] cursor-pointer font-serif text-[20px] text-walnut transition-colors hover:bg-cream-soft disabled:cursor-not-allowed disabled:text-ink-muted"
           >
             −
           </button>
-          <span aria-live="polite" className="w-[44px] text-center font-serif text-[16px] font-medium text-[--color-walnut]">
+          <span aria-live="polite" className="w-[44px] text-center font-serif text-[16px] font-medium text-walnut">
             {qty}
           </span>
           <button
             type="button"
             onClick={() => setQty((q) => q + 1)}
             aria-label="Increase quantity"
-            className="h-[44px] w-[44px] cursor-pointer font-serif text-[20px] text-[--color-walnut] transition-colors hover:bg-[--color-cream-soft]"
+            className="h-[44px] w-[44px] cursor-pointer font-serif text-[20px] text-walnut transition-colors hover:bg-cream-soft"
           >
             +
           </button>
@@ -256,7 +256,7 @@ export default function CustomiseForm({ item }: { item: Item }) {
         <button
           type="submit"
           disabled={!item.isAvailable}
-          className="inline-flex flex-1 items-center justify-between gap-3 rounded-[2px] border-0 bg-[--color-walnut] px-6 py-[13px] font-serif text-[14px] font-semibold uppercase tracking-[0.16em] text-[--color-cream] [font-variant:small-caps] transition-colors hover:bg-[--color-bronze-deep] disabled:opacity-50 disabled:hover:bg-[--color-walnut]"
+          className="inline-flex flex-1 items-center justify-between gap-3 rounded-[2px] border-0 bg-walnut px-6 py-[13px] font-serif text-[14px] font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] transition-colors hover:bg-bronze-deep disabled:opacity-50 disabled:hover:bg-walnut"
         >
           <span>Add to order</span>
           <span className="font-serif text-[16px] font-semibold tracking-[0.02em] [font-variant:normal]">
@@ -265,7 +265,7 @@ export default function CustomiseForm({ item }: { item: Item }) {
         </button>
       </div>
 
-      <p className="m-0 mt-1 text-center font-serif text-[13.5px] italic text-[--color-ink-muted]">
+      <p className="m-0 mt-1 text-center font-serif text-[13.5px] italic text-ink-muted">
         {cartCount > 0
           ? `${cartCount} item${cartCount === 1 ? '' : 's'} already in your basket — checkout from the cart when you're ready.`
           : 'Add to your order to keep browsing — checkout from the cart when you\'re ready.'}

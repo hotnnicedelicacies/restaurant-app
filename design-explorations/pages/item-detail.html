@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jollof Rice with Plantain — Hot N Nice Delicacies</title>
+<link rel="icon" href="../../app/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+
+<div class="mockup-banner">
+  <b>MOCKUP · v1</b> · Item Detail · Walnut &amp; Cream
+  <a href="./index.html">← All pages</a>
+</div>
+
+<!-- ================= HEADER ================= -->
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="./home.html" class="site-header__logo">
+      <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+    </a>
+    <nav class="site-header__nav">
+      <a href="./home.html">Home</a>
+      <a href="./menu.html" class="is-active">Menu</a>
+      <a href="./about.html">About</a>
+      <a href="./contact.html">Contact</a>
+    </nav>
+    <a href="./cart.html" class="site-header__cta">Cart · 0</a>
+    <button class="site-header__burger" aria-label="Open menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ================= BREADCRUMB ================= -->
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <div class="container breadcrumb__inner">
+    <a href="./home.html">Home</a>
+    <span class="breadcrumb__sep">·</span>
+    <a href="./menu.html">Menu</a>
+    <span class="breadcrumb__sep">·</span>
+    <a href="./menu.html#rice">Rice</a>
+    <span class="breadcrumb__sep">·</span>
+    <span class="breadcrumb__current">Jollof Rice with Plantain</span>
+  </div>
+</nav>
+
+<!-- ================= ITEM DETAIL ================= -->
+<section class="item-detail">
+  <div class="container">
+    <div class="item-detail__grid">
+
+      <!-- LEFT: media -->
+      <div class="item-detail__media">
+        <img id="hero-img" src="../../assets/meals/jollof-rice-with-protein-of-choice-and-plantain.jpeg" alt="Jollof rice with chicken and plantain">
+        <div class="item-detail__thumbs">
+          <img class="item-detail__thumb is-active" src="../../assets/meals/jollof-rice-with-protein-of-choice-and-plantain.jpeg" alt="Plated" data-src="../../assets/meals/jollof-rice-with-protein-of-choice-and-plantain.jpeg">
+          <img class="item-detail__thumb" src="../../assets/meals/jollof-rice-with-protein-of-choice-and-plantain-1.png" alt="Top-down" data-src="../../assets/meals/jollof-rice-with-protein-of-choice-and-plantain-1.png">
+          <img class="item-detail__thumb" src="../../assets/hero-food.jpg" alt="Spread" data-src="../../assets/hero-food.jpg">
+        </div>
+      </div>
+
+      <!-- RIGHT: info + customise -->
+      <div class="item-detail__info">
+        <span class="item-detail__num">№ 01 · Rice · House signature</span>
+        <h1 class="item-detail__name">Jollof Rice <em>with Plantain</em></h1>
+        <p class="item-detail__desc">
+          Our jollof, made the way we make it at home — fragrant tomato-pepper base, par-boiled long-grain rice steamed slowly so the flavour reaches every grain. Plated with your choice of protein and a generous side of caramelised ripe plantain.
+        </p>
+
+        <div class="item-detail__tags">
+          <span class="item-detail__tag">Protein choice</span>
+          <span class="item-detail__tag">Gluten-free</span>
+          <span class="item-detail__tag">Spicy</span>
+          <span class="item-detail__tag">Available today</span>
+        </div>
+
+        <div class="item-detail__price-row">
+          <span class="item-detail__price" id="price-base">£10</span>
+          <span class="item-detail__price-note">Base price · before add-ons</span>
+        </div>
+
+        <!-- CUSTOMISE FORM -->
+        <form class="customise" onsubmit="event.preventDefault();">
+
+          <fieldset class="customise__group">
+            <legend class="customise__legend">Protein <small>· required, choose one</small></legend>
+            <div class="customise__options">
+              <label class="customise__option">
+                <input type="radio" name="protein" value="chicken" data-delta="0" checked>
+                <span class="customise__option-label">Chicken <small>included</small></span>
+              </label>
+              <label class="customise__option">
+                <input type="radio" name="protein" value="beef" data-delta="0">
+                <span class="customise__option-label">Beef <small>included</small></span>
+              </label>
+              <label class="customise__option">
+                <input type="radio" name="protein" value="fish" data-delta="2">
+                <span class="customise__option-label">Fish <small>+£2</small></span>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="customise__group">
+            <legend class="customise__legend">Size <small>· choose one</small></legend>
+            <div class="customise__options">
+              <label class="customise__option">
+                <input type="radio" name="size" value="regular" data-delta="0" checked>
+                <span class="customise__option-label">Regular <small>£0</small></span>
+              </label>
+              <label class="customise__option">
+                <input type="radio" name="size" value="large" data-delta="4">
+                <span class="customise__option-label">Large <small>+£4</small></span>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="customise__group">
+            <legend class="customise__legend">Add-ons <small>· optional</small></legend>
+            <div class="customise__addon-list">
+              <label class="customise__addon">
+                <span class="customise__addon-left">
+                  <input type="checkbox" data-delta="2">
+                  <span>
+                    <span class="customise__addon-name">Extra plantain</span><br>
+                    <span class="customise__addon-desc">Two extra slices, fried golden</span>
+                  </span>
+                </span>
+                <span class="customise__addon-price">+£2</span>
+              </label>
+              <label class="customise__addon">
+                <span class="customise__addon-left">
+                  <input type="checkbox" data-delta="3">
+                  <span>
+                    <span class="customise__addon-name">Side of moi moi</span><br>
+                    <span class="customise__addon-desc">House moi moi — soft, savoury bean pudding</span>
+                  </span>
+                </span>
+                <span class="customise__addon-price">+£3</span>
+              </label>
+              <label class="customise__addon">
+                <span class="customise__addon-left">
+                  <input type="checkbox" data-delta="1.5">
+                  <span>
+                    <span class="customise__addon-name">Boiled egg</span><br>
+                    <span class="customise__addon-desc">A whole boiled egg, halved</span>
+                  </span>
+                </span>
+                <span class="customise__addon-price">+£1.50</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div class="customise__group">
+            <label class="customise__legend" for="instructions">Special instructions <small>· optional</small></label>
+            <textarea id="instructions" class="customise__textarea" placeholder="Less spicy, no onions, allergies we should know about…"></textarea>
+          </div>
+
+          <div class="customise__bottom">
+            <div class="qty-stepper" role="group" aria-label="Quantity">
+              <button type="button" id="qty-minus" aria-label="Decrease quantity" disabled>−</button>
+              <span class="qty-stepper__count" id="qty-count">1</span>
+              <button type="button" id="qty-plus" aria-label="Increase quantity">+</button>
+            </div>
+            <button type="submit" class="customise__add-btn">
+              <span>Add to order</span>
+              <span class="customise__add-total" id="total">£10.00</span>
+            </button>
+          </div>
+
+          <p class="t-body-muted" style="margin-top:8px; text-align:center;">
+            Add to your order to keep browsing — checkout from the cart when you're ready.
+          </p>
+
+        </form>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ================= RELATED ITEMS ================= -->
+<section class="section section--soft">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__eyebrow">Pair it with</div>
+      <h2 class="section-head__title">You might also <em>like</em></h2>
+      <span class="ornament"></span>
+    </div>
+
+    <div class="related-grid">
+      <article class="related-card">
+        <a href="./item-detail.html?id=plantain-lasagna"><img src="../../assets/meals/plantain-lasagna.jpeg" alt="Plantain lasagna"></a>
+        <h3 class="related-card__name">Plantain Lasagna</h3>
+        <div class="related-card__row">
+          <span class="related-card__price">£25</span>
+          <a href="./item-detail.html?id=plantain-lasagna" class="related-card__add">Add to order →</a>
+        </div>
+      </article>
+
+      <article class="related-card">
+        <a href="./item-detail.html?id=suya"><img src="../../assets/meals/suya.jpeg" alt="Suya sticks"></a>
+        <h3 class="related-card__name">Suya Sticks</h3>
+        <div class="related-card__row">
+          <span class="related-card__price">£5</span>
+          <a href="./item-detail.html?id=suya" class="related-card__add">Add to order →</a>
+        </div>
+      </article>
+
+      <article class="related-card">
+        <a href="./item-detail.html?id=moi-moi"><img src="../../assets/meals/moi-moi-1.png" alt="Moi moi"></a>
+        <h3 class="related-card__name">Moi Moi</h3>
+        <div class="related-card__row">
+          <span class="related-card__price">£3</span>
+          <a href="./item-detail.html?id=moi-moi" class="related-card__add">Add to order →</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__grid">
+      <div class="site-footer__brand">
+        <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+        <p class="site-footer__tagline">A small home kitchen in Middlesbrough — Italian &amp; West African, delivered hot.</p>
+        <div class="site-footer__hygiene">
+          <span class="site-footer__hygiene-stars">★ ★ ★ ★ ★  Hygiene · FSA</span>
+          <a href="https://ratings.food.gov.uk/business/1913815/hot-n-nice-delicacies" target="_blank" rel="noopener noreferrer">Verify our rating →</a>
+        </div>
+      </div>
+      <div>
+        <h4 class="site-footer__col-title">Visit</h4>
+        <ul>
+          <li><a href="./home.html">Home</a></li>
+          <li><a href="./menu.html">Menu</a></li>
+          <li><a href="./about.html">About</a></li>
+          <li><a href="./contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="site-footer__col-title">Contact</h4>
+        <ul>
+          <li><a href="tel:+447776320068">+44 7776 320068</a></li>
+          <li><a href="https://wa.me/447776320068">WhatsApp</a></li>
+          <li><a href="mailto:hotnnicedelicacies@gmail.com">Email us</a></li>
+          <li><a href="https://instagram.com/hotnnicedelicacies" target="_blank" rel="noopener noreferrer">Instagram</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="site-footer__col-title">Hours</h4>
+        <ul>
+          <li>Tuesday – Sunday</li>
+          <li>12pm – 8pm</li>
+          <li>Order by 10am for same-day</li>
+        </ul>
+      </div>
+    </div>
+    <div class="site-footer__copy">
+      <span>© 2026 Hot N Nice Delicacies · Middlesbrough, UK</span>
+      <span><a href="./terms.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Terms</a> · <a href="./privacy.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Privacy</a> · <a href="./refund-policy.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Refunds</a> · <a href="./cookie-notice.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Cookies</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // --- Interactive: image gallery, qty stepper, live total ---
+  (function() {
+    const BASE = 10;
+    const heroImg = document.getElementById('hero-img');
+    const thumbs = document.querySelectorAll('.item-detail__thumb');
+    const qtyMinus = document.getElementById('qty-minus');
+    const qtyPlus = document.getElementById('qty-plus');
+    const qtyCount = document.getElementById('qty-count');
+    const totalEl = document.getElementById('total');
+    let qty = 1;
+
+    // Thumbnails
+    thumbs.forEach(t => t.addEventListener('click', () => {
+      thumbs.forEach(o => o.classList.remove('is-active'));
+      t.classList.add('is-active');
+      heroImg.src = t.dataset.src;
+    }));
+
+    // Quantity
+    function updateQtyUI() {
+      qtyCount.textContent = qty;
+      qtyMinus.disabled = qty <= 1;
+      updateTotal();
+    }
+    qtyMinus.addEventListener('click', () => { if (qty > 1) { qty--; updateQtyUI(); } });
+    qtyPlus.addEventListener('click', () => { qty++; updateQtyUI(); });
+
+    // Live total
+    function calcUnit() {
+      let total = BASE;
+      const radios = document.querySelectorAll('input[type="radio"]:checked');
+      radios.forEach(r => total += parseFloat(r.dataset.delta || 0));
+      const addons = document.querySelectorAll('input[type="checkbox"]:checked');
+      addons.forEach(a => total += parseFloat(a.dataset.delta || 0));
+      return total;
+    }
+    function updateTotal() {
+      const total = calcUnit() * qty;
+      totalEl.textContent = '£' + total.toFixed(2);
+    }
+    document.querySelectorAll('input[type="radio"], input[type="checkbox"]').forEach(i => i.addEventListener('change', updateTotal));
+    updateQtyUI();
+  })();
+</script>
+
+</body>
+</html>

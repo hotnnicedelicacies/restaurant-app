@@ -6,13 +6,13 @@ type Size = 'md' | 'lg';
 
 const VARIANTS: Record<Variant, string> = {
   primary:
-    'bg-[--color-bronze] text-[--color-walnut] hover:bg-[--color-bronze-deep] hover:text-[--color-cream]',
+    'bg-bronze text-walnut hover:bg-bronze-deep hover:text-cream',
   ghost:
-    'bg-transparent text-[--color-walnut] border border-[--color-walnut] hover:bg-[--color-walnut] hover:text-[--color-cream]',
+    'bg-transparent text-walnut border border-walnut hover:bg-walnut hover:text-cream',
   onDark:
-    'bg-[--color-bronze] text-[--color-walnut] hover:bg-[--color-cream] hover:text-[--color-walnut]',
+    'bg-bronze text-walnut hover:bg-cream hover:text-walnut',
   ghostOnDark:
-    'bg-transparent text-[--color-cream] border border-[--color-cream] hover:bg-[--color-cream] hover:text-[--color-walnut]',
+    'bg-transparent text-cream border border-cream hover:bg-cream hover:text-walnut',
 };
 
 const SIZES: Record<Size, string> = {

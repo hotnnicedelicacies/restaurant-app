@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Checkout — Hot N Nice Delicacies</title>
+<link rel="icon" href="../../app/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+
+<div class="mockup-banner">
+  <b>MOCKUP · v1</b> · Checkout · Walnut &amp; Cream
+  <a href="./index.html">← All pages</a>
+</div>
+
+<!-- ================= HEADER (slim — no nav, just brand) ================= -->
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="./home.html" class="site-header__logo">
+      <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+    </a>
+    <span class="t-mono-on-dark" style="letter-spacing: 0.22em;">Secure checkout · Stripe</span>
+    <a href="./cart.html" style="color: var(--cream); font-family: var(--font-serif); font-style: italic; font-size: 14px; border-bottom: 1px solid var(--rule-light); padding-bottom: 2px;">← Back to cart</a>
+  </div>
+</header>
+
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <div class="container breadcrumb__inner">
+    <a href="./home.html">Home</a>
+    <span class="breadcrumb__sep">·</span>
+    <a href="./cart.html">Cart</a>
+    <span class="breadcrumb__sep">·</span>
+    <span class="breadcrumb__current">Checkout</span>
+  </div>
+</nav>
+
+<section class="container">
+  <div class="checkout-layout">
+
+    <!-- LEFT: form -->
+    <main class="checkout-main">
+
+      <header style="margin-bottom: 24px;">
+        <h1 class="t-display-l">Almost <em>there</em></h1>
+        <p class="t-body-l" style="margin-top: 8px;">Three quick steps and we'll have your order on the kitchen pass.</p>
+      </header>
+
+      <!-- Step indicator -->
+      <div class="steps" role="tablist">
+        <div class="step is-active"><span class="step__num">1</span><span>Your details</span></div>
+        <span class="step__sep"></span>
+        <div class="step"><span class="step__num">2</span><span>Delivery</span></div>
+        <span class="step__sep"></span>
+        <div class="step"><span class="step__num">3</span><span>Payment</span></div>
+      </div>
+
+      <form onsubmit="event.preventDefault(); window.location='./confirmation.html'">
+
+        <!-- ====== 1. CONTACT DETAILS ====== -->
+        <section class="form-section">
+          <header class="form-section__head">
+            <h2 class="form-section__title">Your <em>details</em></h2>
+            <span class="form-section__num">№ 01</span>
+          </header>
+
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="form-field__label" for="firstname">First name</label>
+              <input id="firstname" class="form-field__input" type="text" placeholder="e.g., Sarah" required>
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="lastname">Last name</label>
+              <input id="lastname" class="form-field__input" type="text" placeholder="e.g., Whitfield" required>
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="phone">Phone <small>· for delivery driver</small></label>
+              <input id="phone" class="form-field__input" type="tel" placeholder="+44 7700 900123" required>
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="email">Email <small>· confirmation + receipt</small></label>
+              <input id="email" class="form-field__input" type="email" placeholder="you@example.co.uk" required>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== 2. DELIVERY ====== -->
+        <section class="form-section">
+          <header class="form-section__head">
+            <h2 class="form-section__title">Where &amp; <em>when</em></h2>
+            <span class="form-section__num">№ 02</span>
+          </header>
+
+          <div class="form-grid form-grid--single">
+            <div class="form-field full">
+              <label class="form-field__label" for="address1">Street address</label>
+              <input id="address1" class="form-field__input" type="text" placeholder="42 Linthorpe Road" required>
+            </div>
+            <div class="form-field full">
+              <label class="form-field__label" for="address2">Flat / unit <small>· optional</small></label>
+              <input id="address2" class="form-field__input" type="text" placeholder="Flat 3B">
+            </div>
+          </div>
+
+          <div class="form-grid" style="margin-top: 16px;">
+            <div class="form-field">
+              <label class="form-field__label" for="city">City / town</label>
+              <input id="city" class="form-field__input" type="text" placeholder="Middlesbrough" value="Middlesbrough" required>
+            </div>
+
+            <div class="form-field">
+              <label class="form-field__label" for="postcode">Postcode <small>· checks delivery</small></label>
+              <div class="postcode-row">
+                <input id="postcode" class="form-field__input" type="text" placeholder="TS1 3AB" required style="text-transform: uppercase;">
+                <button type="button" class="postcode-check-btn" id="check-postcode">Check</button>
+              </div>
+            </div>
+
+            <div class="zone-result" id="zone-result-ok">
+              <p class="zone-result__title">We deliver to <b>Middlesbrough</b> · <b>£5.00</b></p>
+              <p class="zone-result__sub">Estimated 30–45 minutes from kitchen to door once you've placed your order.</p>
+            </div>
+            <!-- ADMIN: delivery_zones[].postcodes — postcodes not matching any active zone trigger this fallback -->
+            <div class="zone-result is-out" id="zone-result-out">
+              <p class="zone-result__title">Outside our usual delivery area</p>
+              <p class="zone-result__sub">We don't deliver to this postcode by default — but get in touch with your order details and we may be able to arrange it. <a id="whatsapp-out-link" href="https://wa.me/447776320068" target="_blank" rel="noopener noreferrer">Message us on WhatsApp with your order →</a></p>
+            </div>
+          </div>
+
+          <div class="form-grid" style="margin-top: 16px;">
+            <div class="form-field">
+              <!-- ADMIN: settings.business_hours.same_day_cutoff -->
+              <label class="form-field__label" for="delivery-date">Delivery day <small>· order by 10am for same-day</small></label>
+              <select id="delivery-date" class="form-field__input" required>
+                <option>Today · Monday 11 May (cutoff 10am)</option>
+                <option>Tomorrow · Tuesday 12 May</option>
+                <option>Wednesday 13 May</option>
+                <option>Thursday 14 May</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="delivery-window">Delivery window</label>
+              <select id="delivery-window" class="form-field__input" required>
+                <option>12:00 – 14:00</option>
+                <option>14:00 – 16:00</option>
+                <option>16:00 – 18:00</option>
+                <option>18:00 – 20:00</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-grid form-grid--single" style="margin-top: 16px;">
+            <div class="form-field full">
+              <label class="form-field__label" for="delivery-notes">Notes for the kitchen / driver <small>· optional</small></label>
+              <textarea id="delivery-notes" class="form-field__textarea" placeholder="Buzz at the gate, leave on the porch, ring on arrival…"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====== 3. PAYMENT ====== -->
+        <section class="form-section">
+          <header class="form-section__head">
+            <h2 class="form-section__title">How you'd like to <em>pay</em></h2>
+            <span class="form-section__num">№ 03</span>
+          </header>
+
+          <div class="payment-options">
+
+            <!-- Stripe -->
+            <label class="payment-option">
+              <input type="radio" name="payment" value="stripe" checked>
+              <span class="payment-option__card">
+                <span class="payment-option__radio"></span>
+                <span class="payment-option__body">
+                  <h3 class="payment-option__title">Pay by card</h3>
+                  <p class="payment-option__desc">Visa, Mastercard, Amex, Apple Pay, Google Pay — handled securely by Stripe.</p>
+                </span>
+                <span class="payment-option__icon">Stripe</span>
+              </span>
+
+              <!--
+                STRIPE ELEMENT WRAPPER — in production this <div> is replaced by Stripe's
+                hosted iframe (mounted via Stripe.js / Payment Element). We never collect
+                or transmit card data; the iframe is on stripe.com origin. PCI scope is
+                Stripe's, not ours.
+              -->
+              <div class="stripe-element-wrap" id="stripe-element">
+                <header class="stripe-element-wrap__header">
+                  <span class="stripe-element-wrap__label">Card details</span>
+                  <span class="stripe-element-wrap__badge">Secured by Stripe</span>
+                </header>
+
+                <div class="stripe-iframe-mock">
+                  <div class="stripe-row">
+                    <span class="stripe-row__label">Card number</span>
+                    <div class="stripe-row__input stripe-row__input--placeholder">1234 1234 1234 1234</div>
+                  </div>
+                  <div class="stripe-row__split">
+                    <div class="stripe-row">
+                      <span class="stripe-row__label">Expiry</span>
+                      <div class="stripe-row__input stripe-row__input--placeholder">MM / YY</div>
+                    </div>
+                    <div class="stripe-row">
+                      <span class="stripe-row__label">CVC</span>
+                      <div class="stripe-row__input stripe-row__input--placeholder">CVC</div>
+                    </div>
+                    <div class="stripe-row">
+                      <span class="stripe-row__label">Postcode</span>
+                      <div class="stripe-row__input stripe-row__input--placeholder">TS1 3AB</div>
+                    </div>
+                  </div>
+                </div>
+
+                <p class="stripe-element-wrap__footer">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  <span><b>Your card details never touch our servers.</b> They're entered directly into Stripe's hosted form (iframe on stripe.com) — we receive only a payment token.</span>
+                </p>
+              </div>
+            </label>
+
+            <!--
+              COD admin-control rules:
+              ADMIN: settings.flags.cod_enabled_globally — master toggle, hides this option entirely if false
+              ADMIN: at least one menu_item.is_cod_eligible = true must be in basket
+              ADMIN: delivery_zones[matched].allows_cod = true for the customer's postcode zone
+              If any rule fails, this option is omitted (or shown disabled, see commented variant below)
+            -->
+            <label class="payment-option">
+              <input type="radio" name="payment" value="cod">
+              <span class="payment-option__card">
+                <span class="payment-option__radio"></span>
+                <span class="payment-option__body">
+                  <h3 class="payment-option__title">Cash on delivery</h3>
+                  <p class="payment-option__desc">Pay the driver in cash when your order arrives. Available because one or more items in your basket allow it, and your postcode is covered.</p>
+                </span>
+                <span class="payment-option__icon">Cash</span>
+              </span>
+            </label>
+
+            <!-- Disabled state — shown when admin disables COD globally OR no eligible items OR zone disallows COD
+            <label class="payment-option is-disabled">
+              <input type="radio" name="payment" value="cod" disabled>
+              <span class="payment-option__card">
+                <span class="payment-option__radio"></span>
+                <span class="payment-option__body">
+                  <h3 class="payment-option__title">Cash on delivery</h3>
+                  <p class="payment-option__desc">Not available for this basket — none of the items currently in your basket allow cash on delivery.</p>
+                </span>
+                <span class="payment-option__icon">Unavailable</span>
+              </span>
+            </label>
+            -->
+          </div>
+
+          <p class="t-body-muted" style="margin-top: 16px; text-align: center;">
+            By placing your order you agree to our <a href="./terms.html" class="link-underline">Terms</a>, <a href="./refund-policy.html" class="link-underline">Refund Policy</a> and <a href="./privacy.html" class="link-underline">Privacy Policy</a>.
+          </p>
+        </section>
+
+        <!--
+          FAILED-PAYMENT STATE (commented; shown in production after Stripe declines).
+          Inserted ABOVE the place-order button when payment_intent.status === 'requires_payment_method'.
+
+          <div style="margin-top: 8px; padding: 14px 18px; background: rgba(139, 42, 26, 0.08); border-left: 3px solid #8B2A1A; border-radius: 0 2px 2px 0;">
+            <p class="t-body" style="margin: 0 0 4px; font-weight: 500; color: #8B2A1A;">Card was declined</p>
+            <p class="t-body-muted" style="margin: 0; font-size: 13.5px;">
+              Your bank declined the payment — no money has been taken. Common reasons: wrong CVC, expired card, insufficient funds, or a 3-D Secure failure. Try a different card, or message us on <a href="https://wa.me/447776320068" class="link-underline">WhatsApp</a> and we'll arrange another way.
+            </p>
+          </div>
+        -->
+
+        <button type="submit" class="summary__cta" style="margin-top: 8px;">Place order · £64.00</button>
+      </form>
+
+    </main>
+
+    <!-- RIGHT: order summary -->
+    <aside class="checkout-aside">
+      <div class="summary">
+        <div class="summary__head">
+          <h2 class="summary__title">Your <em>order</em></h2>
+          <span class="summary__count">3 items</span>
+        </div>
+
+        <div class="summary__items">
+          <div class="summary__item">
+            <img src="../../assets/meals/jollof-rice-with-protein-of-choice-and-plantain-1.png" alt="">
+            <div class="summary__item-text">
+              <h3 class="summary__item-name">Jollof Rice with Plantain</h3>
+              <p class="summary__item-meta">Fish · Large · Extra plantain, Boiled egg</p>
+              <span class="summary__item-qty">× 1</span>
+            </div>
+            <span class="summary__item-price">£24.00</span>
+          </div>
+
+          <div class="summary__item">
+            <img src="../../assets/meals/plantain-lasagna.jpeg" alt="">
+            <div class="summary__item-text">
+              <h3 class="summary__item-name">Plantain Lasagna</h3>
+              <p class="summary__item-meta">Regular</p>
+              <span class="summary__item-qty">× 1</span>
+            </div>
+            <span class="summary__item-price">£25.00</span>
+          </div>
+
+          <div class="summary__item">
+            <img src="../../assets/meals/suya.jpeg" alt="">
+            <div class="summary__item-text">
+              <h3 class="summary__item-name">Suya Sticks</h3>
+              <p class="summary__item-meta">Two sticks · spicy</p>
+              <span class="summary__item-qty">× 2</span>
+            </div>
+            <span class="summary__item-price">£10.00</span>
+          </div>
+        </div>
+
+        <div class="summary__totals">
+          <div class="summary__row">
+            <span>Subtotal</span>
+            <span>£59.00</span>
+          </div>
+          <div class="summary__row summary__row--muted">
+            <span>Delivery <em>· TS1</em></span>
+            <span>£5.00</span>
+          </div>
+          <div class="summary__row summary__row--grand">
+            <span>Total</span>
+            <span>£64.00</span>
+          </div>
+        </div>
+
+        <div class="summary__trust">
+          <b>Cooked this morning</b>
+          Delivered hot to your door<br>
+          Secure card payment via Stripe
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</section>
+
+<!-- Slim footer for checkout (less distraction) -->
+<footer class="site-footer" style="padding-top: 32px;">
+  <div class="container">
+    <div class="site-footer__copy" style="border: 0; padding-top: 0;">
+      <span>© 2026 Hot N Nice Delicacies · Middlesbrough, UK</span>
+      <span>Secure checkout via Stripe · 5★ FSA hygiene</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ===== Postcode zone check + dynamic out-of-zone WhatsApp deep-link =====
+  (function() {
+    const btn = document.getElementById('check-postcode');
+    const postcode = document.getElementById('postcode');
+    const inZone = document.getElementById('zone-result-ok');
+    const outZone = document.getElementById('zone-result-out');
+    const whatsappLink = document.getElementById('whatsapp-out-link');
+
+    // In production: replace with delivery_zones lookup from settings table
+    const COVERED_PREFIXES = /^TS(1|2|3|4|5|6|10|17|18|19|20)\b/;
+    // ADMIN: settings.contact.whatsapp
+    const WHATSAPP_NUMBER = '447776320068';
+
+    // Static for mockup — in production, comes from cart state
+    const ORDER_LINES = [
+      'Jollof Rice with Plantain (Fish, Large, +Extra plantain, +Boiled egg) × 1 — £24.00',
+      'Plantain Lasagna (Regular) × 1 — £25.00',
+      'Suya Sticks × 2 — £10.00',
+    ];
+    const SUBTOTAL = '£59.00';
+
+    function buildWhatsappMessage() {
+      const firstName = (document.getElementById('firstname').value || '').trim();
+      const lastName  = (document.getElementById('lastname').value || '').trim();
+      const phone     = (document.getElementById('phone').value || '').trim();
+      const email     = (document.getElementById('email').value || '').trim();
+      const addr1     = (document.getElementById('address1').value || '').trim();
+      const addr2     = (document.getElementById('address2').value || '').trim();
+      const city      = (document.getElementById('city').value || '').trim();
+      const pc        = (postcode.value || '').trim().toUpperCase();
+      const fullName = [firstName, lastName].filter(Boolean).join(' ') || '[your name]';
+      const fullAddr = [addr1, addr2, city, pc].filter(Boolean).join(', ') || '[your address]';
+
+      const lines = [
+        "Hi Hot N Nice — I'd like to place an order but my postcode appears to be outside your usual delivery area.",
+        "",
+        "Could you let me know if you can arrange delivery? Details below:",
+        "",
+        "*Delivery to*",
+        `Name: ${fullName}`,
+        `Phone: ${phone || '[your phone]'}`,
+        `Email: ${email || '[your email]'}`,
+        `Address: ${fullAddr}`,
+        `Postcode: ${pc || '[your postcode]'}`,
+        "",
+        "*In my basket*",
+        ...ORDER_LINES.map(l => `• ${l}`),
+        "",
+        `Subtotal: ${SUBTOTAL} (delivery TBD)`,
+        "",
+        "Many thanks.",
+      ];
+      return lines.join('\n');
+    }
+
+    function updateWhatsappLink() {
+      const text = buildWhatsappMessage();
+      whatsappLink.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(text)}`;
+    }
+
+    function check() {
+      const v = postcode.value.trim().toUpperCase().replace(/\s+/g, ' ');
+      const inside = COVERED_PREFIXES.test(v);
+      inZone.classList.toggle('is-visible', inside && v.length >= 3);
+      outZone.classList.toggle('is-visible', !inside && v.length >= 3);
+      if (!inside) updateWhatsappLink();
+    }
+
+    btn.addEventListener('click', check);
+    postcode.addEventListener('input', () => {
+      inZone.classList.remove('is-visible');
+      outZone.classList.remove('is-visible');
+    });
+    postcode.addEventListener('blur', check);
+
+    // Refresh the WhatsApp URL whenever name/address fields change (so the deep-link always has current context)
+    ['firstname','lastname','phone','email','address1','address2','city'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('input', () => {
+        if (outZone.classList.contains('is-visible')) updateWhatsappLink();
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

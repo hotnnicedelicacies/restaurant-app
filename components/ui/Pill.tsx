@@ -1,17 +1,17 @@
 import { cn } from '@/lib/utils';
 
 const VARIANTS = {
-  default: 'bg-[--color-cream-soft] text-[--color-walnut] border-[--color-border]',
-  received: 'bg-[--color-cream] text-[--color-walnut] border-[--color-walnut]',
-  preparing: 'bg-[--color-bronze] text-[--color-walnut] border-[--color-bronze]',
-  out: 'bg-[--color-bronze-deep] text-[--color-cream] border-[--color-bronze-deep]',
-  delivered: 'bg-[--color-walnut] text-[--color-cream] border-[--color-walnut]',
-  cancelled: 'bg-[--color-cream] text-[#8B2A1A] border-[rgba(139,42,26,0.4)]',
-  refunded: 'bg-[--color-cream] text-[--color-ink-muted] border-[--color-border]',
-  cod: 'bg-[--color-cream] text-[--color-walnut] border-[--color-walnut]',
-  card: 'bg-[--color-cream-soft] text-[--color-ink-muted] border-[--color-border]',
-  collected: 'bg-[#1e7d3f] text-[--color-cream] border-[#1e7d3f]',
-  uncollected: 'bg-[--color-cream] text-[#8B2A1A] border-[rgba(139,42,26,0.4)]',
+  default: 'bg-cream-soft text-walnut border-rule',
+  received: 'bg-cream text-walnut border-walnut',
+  preparing: 'bg-bronze text-walnut border-bronze',
+  out: 'bg-bronze-deep text-cream border-bronze-deep',
+  delivered: 'bg-walnut text-cream border-walnut',
+  cancelled: 'bg-cream text-[#8B2A1A] border-[rgba(139,42,26,0.4)]',
+  refunded: 'bg-cream text-ink-muted border-rule',
+  cod: 'bg-cream text-walnut border-walnut',
+  card: 'bg-cream-soft text-ink-muted border-rule',
+  collected: 'bg-[#1e7d3f] text-cream border-[#1e7d3f]',
+  uncollected: 'bg-cream text-[#8B2A1A] border-[rgba(139,42,26,0.4)]',
 } as const;
 
 export type PillVariant = keyof typeof VARIANTS;

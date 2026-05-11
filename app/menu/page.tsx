@@ -99,7 +99,7 @@ export default async function MenuPage() {
 
         <section className="py-[clamp(40px,6vw,72px)]">
           <div className="container">
-            <p className="mb-4 mt-1 max-w-prose font-serif text-[14px] italic text-[--color-ink-muted]">
+            <p className="mb-4 mt-1 max-w-prose font-serif text-[14px] italic text-ink-muted">
               Tip · Tap any dish to customise it before adding to your order. Sold-out items appear greyed out and can't be added today.
             </p>
 
@@ -108,11 +108,11 @@ export default async function MenuPage() {
               if (items.length === 0) return null;
               return (
                 <article id={cat.slug} key={cat.slug} className="mb-[clamp(48px,6vw,72px)] scroll-mt-[140px] last:mb-0">
-                  <header className="mb-6 flex items-baseline justify-between gap-4 border-b border-[--color-walnut] pb-3.5">
-                    <h2 className="m-0 font-serif text-[clamp(24px,3vw,32px)] font-medium tracking-[-0.005em] text-[--color-walnut]">
+                  <header className="mb-6 flex items-baseline justify-between gap-4 border-b border-walnut pb-3.5">
+                    <h2 className="m-0 font-serif text-[clamp(24px,3vw,32px)] font-medium tracking-[-0.005em] text-walnut">
                       {cat.name}
                     </h2>
-                    <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[--color-bronze-deep]">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-bronze-deep">
                       {String(items.length).padStart(2, '0')} dishes
                     </span>
                   </header>
@@ -132,13 +132,13 @@ export default async function MenuPage() {
 
             {categories.length === 0 && (
               <div className="mx-auto max-w-[480px] py-[clamp(48px,8vw,96px)] text-center">
-                <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-[--color-bronze-deep]">
+                <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-bronze-deep">
                   Kitchen closed
                 </p>
-                <h2 className="m-0 mb-3 font-serif text-[clamp(26px,3.4vw,36px)] font-medium text-[--color-walnut]">
+                <h2 className="m-0 mb-3 font-serif text-[clamp(26px,3.4vw,36px)] font-medium text-walnut">
                   No menu items <em className="italic font-normal">just now</em>.
                 </h2>
-                <p className="m-0 font-serif text-[16px] italic leading-[1.5] text-[--color-ink-muted]">
+                <p className="m-0 font-serif text-[16px] italic leading-[1.5] text-ink-muted">
                   The kitchen is being set up. Check back shortly — or message us on{' '}
                   <a href={`https://wa.me/${siteConfig.contact.whatsapp}`} className="link-underline">
                     WhatsApp

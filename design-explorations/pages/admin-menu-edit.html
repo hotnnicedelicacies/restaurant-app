@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Edit · Jollof Rice with Plantain — Admin · Hot N Nice</title>
+<link rel="icon" href="../../app/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body class="admin-shell">
+
+<div class="mockup-banner">
+  <b>MOCKUP · v1</b> · Admin · Edit menu item (variants + addons editor)
+  <a href="./index.html">← All pages</a>
+</div>
+
+<header class="admin-header">
+  <div class="container">
+    <div class="admin-header__row">
+      <div class="admin-header__brand">
+        <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+        <div class="admin-header__brand-text">
+          <span class="admin-header__brand-name">Hot N Nice</span>
+          <span class="admin-header__brand-badge">Kitchen control · Admin</span>
+        </div>
+      </div>
+      <div class="admin-header__center">
+        <button type="button" class="kitchen-status"><span class="kitchen-status__dot"></span><span>Kitchen open · accepting orders</span></button>
+      </div>
+      <div class="admin-header__right">
+        <span class="admin-header__user">Anike Whitfield</span>
+        <a href="./admin-sign-in.html" class="admin-header__signout">Sign out</a>
+      </div>
+    </div>
+  </div>
+  <nav class="admin-nav">
+    <div class="container">
+      <div class="admin-nav__inner">
+        <a href="./admin-orders.html" class="admin-nav__link">Orders <span class="admin-nav__count">3</span></a>
+        <a href="./admin-menu.html" class="admin-nav__link is-active">Menu</a>
+        <a href="./admin-zones.html" class="admin-nav__link">Delivery zones</a>
+        <a href="./admin-payments.html" class="admin-nav__link">Payments <span class="admin-nav__count">2</span></a>
+        <a href="./admin-settings.html" class="admin-nav__link">Settings</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main class="admin-content">
+  <div class="container">
+
+    <a href="./admin-menu.html" class="admin-detail__back">← Back to menu</a>
+
+    <div class="admin-page-head">
+      <div class="admin-page-head__text">
+        <div class="admin-page-head__eyebrow">№ 01 · Rice · House signature</div>
+        <h1 class="admin-page-head__title">Edit · Jollof Rice <em>with Plantain</em></h1>
+        <p class="t-body-muted" style="margin-top: 4px;">
+          <span class="pill pill--collected" style="vertical-align: 2px;">Available today</span>
+          <span class="pill pill--card" style="vertical-align: 2px;">Featured on home</span>
+          · last edited Anike · 4 May 2026
+        </p>
+      </div>
+      <div class="admin-page-head__actions">
+        <a href="./item-detail.html?id=jollof" target="_blank" class="receipt-btn">View on customer site ↗</a>
+      </div>
+    </div>
+
+    <form id="edit-form" onsubmit="event.preventDefault();" style="max-width: 880px;">
+
+      <!-- ============ 1. BASICS ============ -->
+      <section class="form-section">
+        <header class="form-section__head">
+          <h2 class="form-section__title">Item <em>basics</em></h2>
+          <span class="form-section__num">№ 01</span>
+        </header>
+
+        <div class="form-grid">
+          <div class="form-field full" style="grid-column: 1 / -1;">
+            <label class="form-field__label" for="ed-name">Item name</label>
+            <input id="ed-name" class="form-field__input" type="text" value="Jollof Rice with Plantain">
+          </div>
+          <div class="form-field">
+            <label class="form-field__label" for="ed-category">Category</label>
+            <select id="ed-category" class="form-field__input">
+              <option>Rice</option><option>Pasta</option><option>Grill</option><option>Soup</option><option>Swallow</option><option>Sides</option><option>Snacks &amp; Party</option><option>Breakfast</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-field__label" for="ed-price">Base price <small>· before variants &amp; add-ons</small></label>
+            <div style="position: relative;">
+              <span style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-family: var(--font-serif); color: var(--ink-muted); pointer-events: none;">£</span>
+              <input id="ed-price" class="form-field__input" type="number" min="0" step="0.50" value="10.00" style="padding-left: 24px;">
+            </div>
+          </div>
+          <div class="form-field full" style="grid-column: 1 / -1;">
+            <label class="form-field__label" for="ed-desc">Short description <small>· shown on menu rows &amp; the Today's Bill of Fare</small></label>
+            <textarea id="ed-desc" class="form-field__textarea" style="min-height: 60px;">Fragrant tomato-based jollof with your choice of chicken, beef or fish, alongside caramelised fried plantain.</textarea>
+          </div>
+          <div class="form-field full" style="grid-column: 1 / -1;">
+            <label class="form-field__label" for="ed-long">Long description <small>· shown on the item detail page · optional</small></label>
+            <textarea id="ed-long" class="form-field__textarea" style="min-height: 100px;">Our jollof, made the way we make it at home — fragrant tomato-pepper base, par-boiled long-grain rice steamed slowly so the flavour reaches every grain. Plated with your choice of protein and a generous side of caramelised ripe plantain.</textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 2. PHOTOS (1 primary + up to 3 gallery) ============ -->
+      <section class="form-section">
+        <header class="form-section__head">
+          <h2 class="form-section__title">Photos</h2>
+          <span class="form-section__num">№ 02</span>
+        </header>
+        <p class="t-body-muted" style="margin: 0 0 14px;">
+          The <b style="color: var(--walnut); font-style: normal; font-weight: 500;">primary photo</b> appears on menu rows and as the hero on the item detail page. Up to <b style="color: var(--walnut); font-style: normal; font-weight: 500;">three gallery photos</b> are shown as thumbnails alongside the primary on the item detail page. Square crops, min 800×800, preferred 1200×1200.
+        </p>
+
+        <div class="image-gallery">
+          <!-- Primary -->
+          <div class="image-gallery__slot image-gallery__slot--primary">
+            <span class="image-gallery__badge">Primary</span>
+            <img src="../../assets/meals/jollof-rice-with-protein-of-choice-and-plantain-1.png" alt="">
+            <button type="button" class="image-gallery__remove" aria-label="Remove">×</button>
+          </div>
+          <!-- Gallery 1 -->
+          <div class="image-gallery__slot">
+            <img src="../../assets/meals/jollof-rice-with-protein-of-choice-and-plantain.jpeg" alt="">
+            <button type="button" class="image-gallery__remove" aria-label="Remove">×</button>
+            <button type="button" class="image-gallery__set-primary">Set as primary</button>
+          </div>
+          <!-- Gallery 2 -->
+          <div class="image-gallery__slot">
+            <img src="../../assets/hero-food.jpg" alt="">
+            <button type="button" class="image-gallery__remove" aria-label="Remove">×</button>
+            <button type="button" class="image-gallery__set-primary">Set as primary</button>
+          </div>
+          <!-- Add slot (max 4 total — 1 primary + 3 gallery) -->
+          <button type="button" class="image-gallery__slot image-gallery__slot--add">
+            + Add photo<br><em>1 of 3 remaining</em>
+          </button>
+        </div>
+
+        <p class="image-upload__note" style="margin-top: 14px;">Stored in Supabase Storage · primary uploaded 4 May 2026 · drag thumbnails to reorder gallery</p>
+      </section>
+
+      <!-- ============ 3. AVAILABILITY & STATUS ============ -->
+      <section class="form-section">
+        <header class="form-section__head">
+          <h2 class="form-section__title">Availability &amp; <em>visibility</em></h2>
+          <span class="form-section__num">№ 03</span>
+        </header>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <label class="switch-with-label" style="padding: 14px 16px; background: var(--cream-soft); border-radius: 2px; align-items: flex-start; flex-direction: row;">
+            <span class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></span>
+            <span class="switch-with-label__text">
+              <b style="font-weight: 500;">Available today</b><br>
+              <em>Show on customer menu. Toggle off when sold out.</em>
+            </span>
+          </label>
+          <label class="switch-with-label" style="padding: 14px 16px; background: var(--cream-soft); border-radius: 2px; align-items: flex-start; flex-direction: row;">
+            <span class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></span>
+            <span class="switch-with-label__text">
+              <b style="font-weight: 500;">Cash-on-Delivery eligible</b><br>
+              <em>Whether COD payment is allowed for this item.</em>
+            </span>
+          </label>
+          <label class="switch-with-label" style="padding: 14px 16px; background: var(--cream-soft); border-radius: 2px; align-items: flex-start; flex-direction: row;">
+            <span class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></span>
+            <span class="switch-with-label__text">
+              <b style="font-weight: 500;">Featured on homepage</b><br>
+              <em>Appears in "Today's Bill of Fare". Pick 4-6 items max.</em>
+            </span>
+          </label>
+          <label class="switch-with-label" style="padding: 14px 16px; background: var(--cream-soft); border-radius: 2px; align-items: flex-start; flex-direction: row;">
+            <span class="switch"><input type="checkbox"><span class="switch__track"><span class="switch__thumb"></span></span></span>
+            <span class="switch-with-label__text">
+              <b style="font-weight: 500;">Hide from customers</b><br>
+              <em>Soft-hide for items you're testing. Receipts still show.</em>
+            </span>
+          </label>
+        </div>
+      </section>
+
+      <!-- ============ 4. TAGS (chip inputs) ============ -->
+      <section class="form-section">
+        <header class="form-section__head">
+          <h2 class="form-section__title">Tags &amp; <em>badges</em></h2>
+          <span class="form-section__num">№ 04</span>
+        </header>
+
+        <div style="display: flex; flex-direction: column; gap: 18px;">
+          <div class="form-field">
+            <label class="form-field__label">Dietary tags <small>· shown to customers as chips on menu rows</small></label>
+            <div class="chip-input" data-chip-input>
+              <span class="chip">Gluten-free<button type="button" class="chip__remove" data-chip-remove>×</button></span>
+              <span class="chip">Spicy<button type="button" class="chip__remove" data-chip-remove>×</button></span>
+              <span class="chip">Protein choice<button type="button" class="chip__remove" data-chip-remove>×</button></span>
+              <input type="text" class="chip-input__input" placeholder="Type and press Enter…" data-chip-add="dietary">
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-field__label">Allergen tags <small>· for customer disclosure</small></label>
+            <div class="chip-input" data-chip-input>
+              <span class="chip">Contains crayfish<button type="button" class="chip__remove" data-chip-remove>×</button></span>
+              <input type="text" class="chip-input__input" placeholder="Add allergen and press Enter…" data-chip-add="allergen">
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label class="form-field__label">Editorial badges <small>· bronze labels on the menu row (Signature, House signature, Fusion, etc.)</small></label>
+            <div class="chip-input" data-chip-input>
+              <span class="chip chip--badge">Signature<button type="button" class="chip__remove" data-chip-remove>×</button></span>
+              <input type="text" class="chip-input__input" placeholder="Add a badge…" data-chip-add="badge" data-chip-type="badge">
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ 5. VARIANTS ============ -->
+      <section class="form-section">
+        <header class="form-section__head">
+          <h2 class="form-section__title">Variant <em>groups</em></h2>
+          <span class="form-section__num">№ 05</span>
+        </header>
+        <p class="t-body-muted" style="margin: 0 0 18px;">
+          Customers choose one option per group at checkout. Use groups for choices like protein, size, or spice level — anything that <em>must</em> be selected. Use <b style="color: var(--walnut); font-style: normal; font-variant: small-caps; letter-spacing: 0.06em;">Add-ons</b> below for optional extras.
+        </p>
+
+        <div id="variant-groups">
+
+          <!-- Group 1: Protein choice -->
+          <div class="editor-group">
+            <header class="editor-group__head">
+              <div class="editor-group__title-row">
+                <input type="text" class="editor-group__name" value="Protein choice">
+                <div class="editor-group__settings">
+                  <label><input type="checkbox" checked> Required</label>
+                  <label><input type="checkbox" checked> Choose one</label>
+                </div>
+              </div>
+              <button type="button" class="editor-group__remove" data-remove-group>Remove group</button>
+            </header>
+
+            <div class="option-rows">
+              <div class="option-row">
+                <span class="option-row__drag">⋮⋮</span>
+                <input type="text" class="option-row__input" value="Chicken">
+                <div class="option-row__money-wrap">
+                  <span class="option-row__money-prefix">+£</span>
+                  <input type="number" class="option-row__input option-row__input--money" min="0" step="0.50" value="0.00">
+                </div>
+                <button type="button" class="option-row__remove" data-remove-option>×</button>
+              </div>
+              <div class="option-row">
+                <span class="option-row__drag">⋮⋮</span>
+                <input type="text" class="option-row__input" value="Beef">
+                <div class="option-row__money-wrap">
+                  <span class="option-row__money-prefix">+£</span>
+                  <input type="number" class="option-row__input option-row__input--money" min="0" step="0.50" value="0.00">
+                </div>
+                <button type="button" class="option-row__remove" data-remove-option>×</button>
+              </div>
+              <div class="option-row">
+                <span class="option-row__drag">⋮⋮</span>
+                <input type="text" class="option-row__input" value="Fish">
+                <div class="option-row__money-wrap">
+                  <span class="option-row__money-prefix">+£</span>
+                  <input type="number" class="option-row__input option-row__input--money" min="0" step="0.50" value="2.00">
+                </div>
+                <button type="button" class="option-row__remove" data-remove-option>×</button>
+              </div>
+            </div>
+
+            <button type="button" class="editor-group__add-option" data-add-option>+ Add option</button>
+          </div>
+
+          <!-- Group 2: Size -->
+          <div class="editor-group">
+            <header class="editor-group__head">
+              <div class="editor-group__title-row">
+                <input type="text" class="editor-group__name" value="Size">
+                <div class="editor-group__settings">
+                  <label><input type="checkbox" checked> Required</label>
+                  <label><input type="checkbox" checked> Choose one</label>
+                </div>
+              </div>
+              <button type="button" class="editor-group__remove" data-remove-group>Remove group</button>
+            </header>
+
+            <div class="option-rows">
+              <div class="option-row">
+                <span class="option-row__drag">⋮⋮</span>
+                <input type="text" class="option-row__input" value="Regular">
+                <div class="option-row__money-wrap">
+                  <span class="option-row__money-prefix">+£</span>
+                  <input type="number" class="option-row__input option-row__input--money" min="0" step="0.50" value="0.00">
+                </div>
+                <button type="button" class="option-row__remove" data-remove-option>×</button>
+              </div>
+              <div class="option-row">
+                <span class="option-row__drag">⋮⋮</span>
+                <input type="text" class="option-row__input" value="Large">
+                <div class="option-row__money-wrap">
+                  <span class="option-row__money-prefix">+£</span>
+                  <input type="number" class="option-row__input option-row__input--money" min="0" step="0.50" value="4.00">
+                </div>
+                <button type="button" class="option-row__remove" data-remove-option>×</button>
+              </div>
+            </div>
+            <button type="button" class="editor-group__add-option" data-add-option>+ Add option</button>
+          </div>
+
+        </div>
+
+        <button type="button" class="add-group-btn" id="add-group-btn">+ Add a new variant group</button>
+      </section>
+
+      <!-- ============ 6. ADD-ONS ============ -->
+      <section class="form-section">
+        <header class="form-section__head">
+          <h2 class="form-section__title">Add-ons <em>(optional extras)</em></h2>
+          <span class="form-section__num">№ 06</span>
+        </header>
+        <p class="t-body-muted" style="margin: 0 0 18px;">
+          Optional extras the customer can tick to add on. Use for "extra plantain", "side of moi moi", "boiled egg" — anything they pay extra for but isn't required.
+        </p>
+
+        <div class="editor-group">
+          <div class="option-rows" id="addon-rows">
+            <div class="option-row option-row--with-desc">
+              <span class="option-row__drag">⋮⋮</span>
+              <input type="text" class="option-row__input" value="Extra plantain" placeholder="Name">
+              <input type="text" class="option-row__input" value="Two extra slices, fried golden" placeholder="Short description">
+              <div class="option-row__money-wrap">
+                <span class="option-row__money-prefix">+£</span>
+                <input type="number" class="option-row__input option-row__input--money" min="0" step="0.50" value="2.00">
+              </div>
+              <button type="button" class="option-row__remove" data-remove-option>×</button>
+            </div>
+            <div class="option-row option-row--with-desc">
+              <span class="option-row__drag">⋮⋮</span>
+              <input type="text" class="option-row__input" value="Side of moi moi" placeholder="Name">
+              <input type="text" class="option-row__input" value="House moi moi — soft, savoury bean pudding" placeholder="Short description">
+              <div class="option-row__money-wrap">
+                <span class="option-row__money-prefix">+£</span>
+                <input type="number" class="option-row__input option-row__input--money" min="0" step="0.50" value="3.00">
+              </div>
+              <button type="button" class="option-row__remove" data-remove-option>×</button>
+            </div>
+            <div class="option-row option-row--with-desc">
+              <span class="option-row__drag">⋮⋮</span>
+              <input type="text" class="option-row__input" value="Boiled egg" placeholder="Name">
+              <input type="text" class="option-row__input" value="A whole boiled egg, halved" placeholder="Short description">
+              <div class="option-row__money-wrap">
+                <span class="option-row__money-prefix">+£</span>
+                <input type="number" class="option-row__input option-row__input--money" min="0" step="0.50" value="1.50">
+              </div>
+              <button type="button" class="option-row__remove" data-remove-option>×</button>
+            </div>
+          </div>
+          <button type="button" class="editor-group__add-option" id="add-addon-btn">+ Add an add-on</button>
+        </div>
+      </section>
+
+      <!-- ============ 7. DANGER ============ -->
+      <div class="admin-danger">
+        <h3 class="admin-danger__title">Archive this item</h3>
+        <p class="admin-danger__body">
+          Archived items disappear from the customer site but stay in our records (so past receipts still show them correctly). Reversible.
+        </p>
+        <div class="admin-danger__actions">
+          <button type="button" class="admin-danger__btn">Archive item</button>
+        </div>
+      </div>
+
+    </form>
+
+    <!-- STICKY SAVE BAR -->
+    <div class="sticky-save-bar">
+      <div class="container sticky-save-bar__inner">
+        <span class="sticky-save-bar__left" id="save-status">
+          <span class="unsaved-dot"></span>You have unsaved changes
+        </span>
+        <div class="sticky-save-bar__right">
+          <a href="./admin-menu.html" class="receipt-btn">Discard</a>
+          <button type="button" class="receipt-btn receipt-btn--primary" id="save-btn">Save changes</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer style="background: var(--walnut); color: rgba(241, 229, 205, 0.55); padding: 16px 0; font-family: var(--font-serif); font-style: italic; font-size: 12px; text-align: center;">
+  <div class="container">Hot N Nice Admin · v1.0 · Signed in as Anike Whitfield · <a href="./home.html" style="color: rgba(241, 229, 205, 0.7); border-bottom: 1px solid rgba(241, 229, 205, 0.25); padding-bottom: 1px;">View customer site →</a></div>
+</footer>
+
+<script>
+  // ===== Chip input: Enter to add, × to remove =====
+  document.querySelectorAll('[data-chip-add]').forEach(input => {
+    input.addEventListener('keydown', (e) => {
+      if ((e.key === 'Enter' || e.key === ',') && input.value.trim()) {
+        e.preventDefault();
+        const chipClass = input.dataset.chipType === 'badge' ? 'chip chip--badge' : 'chip';
+        const chip = document.createElement('span');
+        chip.className = chipClass;
+        chip.innerHTML = input.value.trim() + '<button type="button" class="chip__remove" data-chip-remove>×</button>';
+        input.parentElement.insertBefore(chip, input);
+        input.value = '';
+        chip.querySelector('[data-chip-remove]').addEventListener('click', () => chip.remove());
+      }
+    });
+  });
+  document.querySelectorAll('[data-chip-remove]').forEach(btn => {
+    btn.addEventListener('click', () => btn.parentElement.remove());
+  });
+
+  // ===== Variant group: add option =====
+  function addOptionToGroup(group, withDesc) {
+    const rows = group.querySelector('.option-rows');
+    const row = document.createElement('div');
+    row.className = 'option-row' + (withDesc ? ' option-row--with-desc' : '');
+    row.innerHTML = withDesc
+      ? '<span class="option-row__drag">⋮⋮</span>' +
+        '<input type="text" class="option-row__input" placeholder="Name">' +
+        '<input type="text" class="option-row__input" placeholder="Short description">' +
+        '<div class="option-row__money-wrap"><span class="option-row__money-prefix">+£</span><input type="number" class="option-row__input option-row__input--money" min="0" step="0.50" value="0.00"></div>' +
+        '<button type="button" class="option-row__remove" data-remove-option>×</button>'
+      : '<span class="option-row__drag">⋮⋮</span>' +
+        '<input type="text" class="option-row__input" placeholder="Option name">' +
+        '<div class="option-row__money-wrap"><span class="option-row__money-prefix">+£</span><input type="number" class="option-row__input option-row__input--money" min="0" step="0.50" value="0.00"></div>' +
+        '<button type="button" class="option-row__remove" data-remove-option>×</button>';
+    rows.appendChild(row);
+    row.querySelector('[data-remove-option]').addEventListener('click', () => row.remove());
+    row.querySelector('input').focus();
+  }
+
+  document.querySelectorAll('#variant-groups [data-add-option]').forEach(btn => {
+    btn.addEventListener('click', () => addOptionToGroup(btn.closest('.editor-group'), false));
+  });
+  document.querySelectorAll('[data-remove-option]').forEach(btn => {
+    btn.addEventListener('click', () => btn.parentElement.remove());
+  });
+  document.querySelectorAll('[data-remove-group]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (confirm('Remove this variant group and all its options?')) btn.closest('.editor-group').remove();
+    });
+  });
+
+  // Add new variant group
+  document.getElementById('add-group-btn').addEventListener('click', () => {
+    const groupsContainer = document.getElementById('variant-groups');
+    const group = document.createElement('div');
+    group.className = 'editor-group';
+    group.innerHTML = `
+      <header class="editor-group__head">
+        <div class="editor-group__title-row">
+          <input type="text" class="editor-group__name" placeholder="Group name (e.g., Spice level)">
+          <div class="editor-group__settings">
+            <label><input type="checkbox" checked> Required</label>
+            <label><input type="checkbox" checked> Choose one</label>
+          </div>
+        </div>
+        <button type="button" class="editor-group__remove" data-remove-group>Remove group</button>
+      </header>
+      <div class="option-rows"></div>
+      <button type="button" class="editor-group__add-option" data-add-option>+ Add option</button>
+    `;
+    groupsContainer.appendChild(group);
+    group.querySelector('.editor-group__name').focus();
+    group.querySelector('[data-remove-group]').addEventListener('click', () => {
+      if (confirm('Remove this variant group and all its options?')) group.remove();
+    });
+    group.querySelector('[data-add-option]').addEventListener('click', () => addOptionToGroup(group, false));
+    // Add first option immediately so the group isn't empty
+    addOptionToGroup(group, false);
+  });
+
+  // Addon-list: add row
+  document.getElementById('add-addon-btn').addEventListener('click', () => {
+    const rows = document.getElementById('addon-rows');
+    const row = document.createElement('div');
+    row.className = 'option-row option-row--with-desc';
+    row.innerHTML =
+      '<span class="option-row__drag">⋮⋮</span>' +
+      '<input type="text" class="option-row__input" placeholder="Name">' +
+      '<input type="text" class="option-row__input" placeholder="Short description">' +
+      '<div class="option-row__money-wrap"><span class="option-row__money-prefix">+£</span><input type="number" class="option-row__input option-row__input--money" min="0" step="0.50" value="0.00"></div>' +
+      '<button type="button" class="option-row__remove" data-remove-option>×</button>';
+    rows.appendChild(row);
+    row.querySelector('[data-remove-option]').addEventListener('click', () => row.remove());
+    row.querySelector('input').focus();
+  });
+
+  // Save button feedback
+  document.getElementById('save-btn').addEventListener('click', () => {
+    const status = document.getElementById('save-status');
+    const btn = document.getElementById('save-btn');
+    btn.textContent = 'Saving…';
+    btn.disabled = true;
+    setTimeout(() => {
+      status.innerHTML = '<span style="color: #1e7d3f; font-style: normal; font-variant: small-caps; letter-spacing: 0.08em; font-weight: 500;">Saved</span> · just now';
+      btn.textContent = 'Save changes';
+      btn.disabled = false;
+    }, 600);
+  });
+</script>
+
+</body>
+</html>

@@ -20,7 +20,7 @@ export default function PasswordInput(props: Props) {
         {...rest}
         type={show ? 'text' : 'password'}
         className={cn(
-          'w-full rounded-[2px] border border-[--color-border] bg-transparent px-3.5 py-3 pr-16 font-serif text-[16px] text-[--color-walnut] outline-none transition-colors focus:border-[--color-walnut] placeholder:italic placeholder:text-[--color-ink-muted]',
+          'w-full rounded-[2px] border border-rule bg-transparent px-3.5 py-3 pr-16 font-serif text-[16px] text-walnut outline-none transition-colors focus:border-walnut placeholder:italic placeholder:text-ink-muted',
           className
         )}
       />
@@ -28,7 +28,7 @@ export default function PasswordInput(props: Props) {
         type="button"
         onClick={() => setShow((s) => !s)}
         aria-label={show ? 'Hide password' : 'Show password'}
-        className="absolute right-2.5 top-1/2 -translate-y-1/2 border-b border-[--color-bronze-deep] pb-px font-serif text-[13px] italic text-[--color-bronze-deep] transition-colors hover:border-[--color-walnut] hover:text-[--color-walnut]"
+        className="absolute right-2.5 top-1/2 -translate-y-1/2 border-b border-bronze-deep pb-px font-serif text-[13px] italic text-bronze-deep transition-colors hover:border-walnut hover:text-walnut"
       >
         {show ? 'Hide' : 'Show'}
       </button>

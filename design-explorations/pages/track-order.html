@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track your order — Hot N Nice Delicacies</title>
+<link rel="icon" href="../../app/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+
+<div class="mockup-banner">
+  <b>MOCKUP · v1</b> · Track Order · Walnut &amp; Cream
+  <a href="./index.html">← All pages</a>
+</div>
+
+<!--
+  This page is reached via a unique link (?ref=ORDER_NUMBER) in the order
+  confirmation email. No login required — the order ref is the access token.
+  Customers WITH accounts see this same view inside their account dashboard.
+-->
+
+<!-- ================= HEADER ================= -->
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="./home.html" class="site-header__logo">
+      <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+    </a>
+    <nav class="site-header__nav">
+      <a href="./home.html">Home</a>
+      <a href="./menu.html">Menu</a>
+      <a href="./about.html">About</a>
+      <a href="./contact.html">Contact</a>
+    </nav>
+    <a href="./menu.html" class="site-header__cta">Order again</a>
+    <button class="site-header__burger" aria-label="Open menu">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<!-- ================= PAGE HERO (slim) ================= -->
+<section class="page-hero" style="padding-top: clamp(48px, 6vw, 72px); padding-bottom: clamp(32px, 4vw, 56px);">
+  <div class="container">
+    <div class="page-hero__eyebrow">Order Tracking · Live status</div>
+    <h1 class="page-hero__title">Your order is <em>on the way.</em></h1>
+    <p class="page-hero__sub">Order № HNN-3F7K-1142 · Placed today at 10:47am</p>
+  </div>
+</section>
+
+<!-- ================= STATUS + DETAILS ================= -->
+<section class="container" style="padding-top: clamp(40px, 5vw, 56px); padding-bottom: clamp(48px, 6vw, 80px);">
+  <div class="checkout-layout">
+
+    <!-- LEFT: status + items -->
+    <main class="checkout-main">
+
+      <!-- Status section -->
+      <section class="form-section" style="background: var(--cream); border: 1px solid var(--rule);">
+        <header class="form-section__head">
+          <h2 class="form-section__title">Status · <em>On its way</em></h2>
+          <span class="form-section__num">Live</span>
+        </header>
+
+        <!-- Status timeline (Current state: On its way) -->
+        <div class="status-timeline" aria-label="Order progress">
+          <div class="status-step is-done">
+            <div class="status-step__dot">i</div>
+            <p class="status-step__label">Received</p>
+            <p class="status-step__time">10:47am</p>
+          </div>
+          <div class="status-step is-done">
+            <div class="status-step__dot">ii</div>
+            <p class="status-step__label">Preparing</p>
+            <p class="status-step__time">11:08am</p>
+          </div>
+          <div class="status-step is-current">
+            <div class="status-step__dot">iii</div>
+            <p class="status-step__label">On its way</p>
+            <p class="status-step__time">12:34pm</p>
+          </div>
+          <div class="status-step is-pending">
+            <div class="status-step__dot">iv</div>
+            <p class="status-step__label">Delivered</p>
+            <p class="status-step__time">Est. 12:50pm</p>
+          </div>
+        </div>
+
+        <!-- Latest status note -->
+        <div style="margin-top: 20px; padding: 16px; background: var(--cream-soft); border-left: 3px solid var(--bronze); border-radius: 2px;">
+          <p class="t-body-muted" style="margin: 0; color: var(--walnut); font-style: normal; font-weight: 500; font-size: 14px;">From the kitchen · 12:34pm</p>
+          <p class="t-body-l" style="margin-top: 4px;">"On the way to you now — should be at your door in 15 minutes. Look out for a knock; the driver has been told the bell is broken."</p>
+        </div>
+      </section>
+
+      <!-- Order detail -->
+      <section class="form-section">
+        <header class="form-section__head">
+          <h2 class="form-section__title">What you <em>ordered</em></h2>
+          <span class="form-section__num">3 items</span>
+        </header>
+
+        <div class="summary__items" style="margin: 0; border: 0; padding: 0;">
+          <div class="summary__item">
+            <img src="../../assets/meals/jollof-rice-with-protein-of-choice-and-plantain-1.png" alt="">
+            <div class="summary__item-text">
+              <h3 class="summary__item-name">Jollof Rice with Plantain</h3>
+              <p class="summary__item-meta">Fish · Large · Extra plantain, Boiled egg<br>"Less spicy please — ring on arrival, bell is broken."</p>
+              <span class="summary__item-qty">× 1</span>
+            </div>
+            <span class="summary__item-price">£24.00</span>
+          </div>
+          <div class="summary__item">
+            <img src="../../assets/meals/plantain-lasagna.jpeg" alt="">
+            <div class="summary__item-text">
+              <h3 class="summary__item-name">Plantain Lasagna</h3>
+              <p class="summary__item-meta">Regular</p>
+              <span class="summary__item-qty">× 1</span>
+            </div>
+            <span class="summary__item-price">£25.00</span>
+          </div>
+          <div class="summary__item">
+            <img src="../../assets/meals/suya.jpeg" alt="">
+            <div class="summary__item-text">
+              <h3 class="summary__item-name">Suya Sticks</h3>
+              <p class="summary__item-meta">Two sticks · spicy</p>
+              <span class="summary__item-qty">× 2</span>
+            </div>
+            <span class="summary__item-price">£10.00</span>
+          </div>
+        </div>
+
+        <div class="summary__totals" style="margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--rule);">
+          <div class="summary__row"><span>Subtotal</span><span>£59.00</span></div>
+          <div class="summary__row summary__row--muted"><span>Delivery · TS1</span><span>£5.00</span></div>
+          <div class="summary__row summary__row--grand"><span>Paid · Card ending 4242</span><span>£64.00</span></div>
+        </div>
+      </section>
+
+      <!-- Help / message us / cancel -->
+      <section class="form-section">
+        <h3 class="t-headline" style="margin: 0 0 8px; text-align: center;">Need to change something?</h3>
+
+        <!--
+          Customer cancel flow:
+          - Visible & active ONLY while status is "Received" (kitchen hasn't started cooking)
+          - Once status transitions to "Preparing" or beyond, the cancel button is disabled
+            and replaced with the WhatsApp escape hatch.
+          - This order is currently "On its way" → cancel is disabled, with an explanation.
+        -->
+        <p class="t-body-muted" style="margin: 0 0 18px; text-align: center;">
+          Your order is <b style="color: var(--walnut); font-style: normal; font-weight: 500; font-variant: small-caps; letter-spacing: 0.08em;">on its way</b>. Self-cancellation is only available before the kitchen starts cooking — message us for changes from here.
+        </p>
+
+        <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+          <a id="whatsapp-help" href="https://wa.me/447776320068" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Message us on WhatsApp →</a>
+          <a href="tel:+447776320068" class="btn btn-ghost">Call the kitchen</a>
+        </div>
+
+        <!-- Cancel button — shown but disabled to demonstrate the state -->
+        <div style="margin-top: 20px; padding-top: 18px; border-top: 1px dashed var(--rule); text-align: center;">
+          <button type="button" disabled style="font-family: var(--font-serif); font-style: italic; font-size: 13px; color: var(--ink-muted); border: 1px solid var(--rule); background: transparent; padding: 10px 18px; border-radius: 2px; cursor: not-allowed; opacity: 0.55;" title="Cancellation closed once cooking starts">
+            Cancel order · no longer available
+          </button>
+          <p class="t-body-muted" style="font-size: 12.5px; margin: 8px 0 0;">
+            While the kitchen hasn't started, customers see an active <em>Cancel my order</em> button here — instant full refund, no questions asked.
+          </p>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- RIGHT: delivery details + driver ETA -->
+    <aside class="checkout-aside">
+      <div class="summary">
+        <div class="summary__head">
+          <h2 class="summary__title">Delivering <em>to</em></h2>
+        </div>
+
+        <div style="margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid var(--rule);">
+          <p class="t-body" style="font-weight: 500;">Sarah Whitfield</p>
+          <p class="t-body-muted" style="margin-top: 4px;">42 Linthorpe Road, Flat 3B<br>Middlesbrough · TS1 3AB</p>
+          <p class="t-body-muted" style="margin-top: 8px;">+44 7700 900123</p>
+        </div>
+
+        <div class="summary__totals" style="margin-bottom: 16px;">
+          <div class="summary__row summary__row--muted"><span>Window</span><span>12:00 – 14:00</span></div>
+          <div class="summary__row"><span>ETA</span><span style="font-weight: 600; color: var(--bronze-deep);">12:50pm</span></div>
+        </div>
+
+        <div class="summary__trust">
+          <b>Status updates</b>
+          We'll email you when anything changes.<br>
+          Bookmark this page or use the link in your confirmation email.
+        </div>
+      </div>
+
+      <!-- Account opt-in (compact). Useful here because customers often realise they want
+           an account while checking on a current order. -->
+      <div class="summary" style="margin-top: 20px;">
+        <div class="summary__head" style="margin-bottom: 12px; padding-bottom: 12px;">
+          <h2 class="summary__title" style="font-size: 18px;">Save these <em>details</em></h2>
+        </div>
+        <p class="t-body-muted" style="margin: 0 0 14px;">Create an account so this address, your phone, and your favourite order are one tap next time.</p>
+        <a href="./sign-up.html" class="summary__cta">Create an account →</a>
+        <p class="t-body-muted" style="text-align: center; margin: 10px 0 0;">
+          Already have one? <a href="./sign-in.html" style="color: var(--bronze-deep); border-bottom: 1px solid var(--bronze-deep); padding-bottom: 1px;">Sign in</a>
+        </p>
+      </div>
+    </aside>
+
+  </div>
+</section>
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__grid">
+      <div class="site-footer__brand">
+        <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+        <p class="site-footer__tagline">A small home kitchen in Middlesbrough — Italian &amp; West African, delivered hot.</p>
+        <div class="site-footer__hygiene">
+          <span class="site-footer__hygiene-stars">★ ★ ★ ★ ★  Hygiene · FSA</span>
+          <a href="https://ratings.food.gov.uk/business/1913815/hot-n-nice-delicacies" target="_blank" rel="noopener noreferrer">Verify our rating →</a>
+        </div>
+      </div>
+      <div>
+        <h4 class="site-footer__col-title">Visit</h4>
+        <ul>
+          <li><a href="./home.html">Home</a></li>
+          <li><a href="./menu.html">Menu</a></li>
+          <li><a href="./about.html">About</a></li>
+          <li><a href="./contact.html">Contact</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="site-footer__col-title">Contact</h4>
+        <ul>
+          <li><a href="tel:+447776320068">+44 7776 320068</a></li>
+          <li><a href="https://wa.me/447776320068">WhatsApp</a></li>
+          <li><a href="mailto:hotnnicedelicacies@gmail.com">Email us</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="site-footer__col-title">Hours</h4>
+        <ul>
+          <li>Tuesday – Sunday</li>
+          <li>12pm – 8pm</li>
+          <li>Order by 10am for same-day</li>
+        </ul>
+      </div>
+    </div>
+    <div class="site-footer__copy">
+      <span>© 2026 Hot N Nice Delicacies · Middlesbrough, UK</span>
+      <span><a href="./terms.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Terms</a> · <a href="./privacy.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Privacy</a> · <a href="./refund-policy.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Refunds</a> · <a href="./cookie-notice.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Cookies</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Pre-fill WhatsApp help message with order ref so the kitchen has immediate context
+  (function() {
+    const link = document.getElementById('whatsapp-help');
+    const orderRef = 'HNN-3F7K-1142'; // In prod: from URL ?ref= or DB lookup
+    const message = `Hi Hot N Nice — I have a question about my order ${orderRef}.\n\n`;
+    link.href = `https://wa.me/447776320068?text=${encodeURIComponent(message)}`;
+  })();
+</script>
+
+</body>
+</html>

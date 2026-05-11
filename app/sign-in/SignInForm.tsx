@@ -27,7 +27,7 @@ export default function SignInForm({ next }: { next?: string }) {
       <input type="hidden" name="next" value={next ?? siteConfig.routes.account} />
 
       <div className="flex flex-col gap-1.5">
-        <label className="font-serif text-[13px] font-medium tracking-[0.14em] text-[--color-walnut] [font-variant:small-caps]">
+        <label className="font-serif text-[13px] font-medium tracking-[0.14em] text-walnut [font-variant:small-caps]">
           Email
         </label>
         <input
@@ -36,12 +36,12 @@ export default function SignInForm({ next }: { next?: string }) {
           required
           autoComplete="email"
           placeholder="you@example.co.uk"
-          className="w-full rounded-[2px] border border-[--color-border] bg-transparent px-3.5 py-3 font-serif text-[16px] text-[--color-walnut] outline-none transition-colors focus:border-[--color-walnut] placeholder:italic placeholder:text-[--color-ink-muted]"
+          className="w-full rounded-[2px] border border-rule bg-transparent px-3.5 py-3 font-serif text-[16px] text-walnut outline-none transition-colors focus:border-walnut placeholder:italic placeholder:text-ink-muted"
         />
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label className="font-serif text-[13px] font-medium tracking-[0.14em] text-[--color-walnut] [font-variant:small-caps]">
+        <label className="font-serif text-[13px] font-medium tracking-[0.14em] text-walnut [font-variant:small-caps]">
           Password
         </label>
         <PasswordInput name="password" required autoComplete="current-password" placeholder="••••••••" />
@@ -49,8 +49,8 @@ export default function SignInForm({ next }: { next?: string }) {
 
       <div className="flex flex-wrap items-center justify-between gap-3 font-serif text-[13.5px]">
         <label className="flex cursor-pointer items-center gap-2.5">
-          <input type="checkbox" name="remember" defaultChecked className="h-[18px] w-[18px] accent-[--color-walnut]" />
-          <span className="italic text-[--color-ink-muted]">Keep me signed in</span>
+          <input type="checkbox" name="remember" defaultChecked className="h-[18px] w-[18px] accent-walnut" />
+          <span className="italic text-ink-muted">Keep me signed in</span>
         </label>
         <Link href={siteConfig.routes.forgotPassword} className="link-underline italic">
           Forgot password?
@@ -60,7 +60,7 @@ export default function SignInForm({ next }: { next?: string }) {
       <button
         type="submit"
         disabled={submitting}
-        className="mt-1.5 w-full rounded-[2px] bg-[--color-walnut] px-5 py-[14px] font-serif text-[14px] font-semibold uppercase tracking-[0.16em] text-[--color-cream] [font-variant:small-caps] transition-colors hover:bg-[--color-bronze-deep] disabled:opacity-60"
+        className="mt-1.5 w-full rounded-[2px] bg-walnut px-5 py-[14px] font-serif text-[14px] font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] transition-colors hover:bg-bronze-deep disabled:opacity-60"
       >
         {submitting ? 'Signing in…' : 'Sign in'}
       </button>

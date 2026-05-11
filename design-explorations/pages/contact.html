@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — Hot N Nice Delicacies</title>
+<link rel="icon" href="../../app/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+
+<div class="mockup-banner">
+  <b>MOCKUP · v1</b> · Contact · Walnut &amp; Cream
+  <a href="./index.html">← All pages</a>
+</div>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="container site-header__inner">
+    <a href="./home.html" class="site-header__logo"><img src="../../public/logo.png" alt="Hot N Nice Delicacies"></a>
+    <nav class="site-header__nav">
+      <a href="./home.html">Home</a>
+      <a href="./menu.html">Menu</a>
+      <a href="./about.html">About</a>
+      <a href="./contact.html" class="is-active">Contact</a>
+    </nav>
+    <a href="./menu.html" class="site-header__cta">Order now</a>
+    <button class="site-header__burger" aria-label="Open menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16M4 12h16M4 17h16" stroke-linecap="round"/></svg></button>
+  </div>
+</header>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <div class="container">
+    <div class="page-hero__eyebrow">Say hello · Middlesbrough</div>
+    <h1 class="page-hero__title">Get in <em>touch.</em></h1>
+    <p class="page-hero__sub">The quickest way to reach us is WhatsApp — we answer between the kitchen passes.</p>
+  </div>
+</section>
+
+<!-- MAIN: channels + form -->
+<section class="section">
+  <div class="container">
+    <div class="contact-grid">
+
+      <!-- LEFT: channels + hours -->
+      <div>
+        <div class="t-mono" style="margin-bottom: 10px;">Find us</div>
+        <h2 class="t-display-m" style="margin-bottom: 8px;">Reach the <em>kitchen</em></h2>
+        <p class="t-body-l" style="margin-bottom: 20px;">If your question is about a live order, WhatsApp gets the fastest reply.</p>
+
+        <!-- ADMIN: settings.contact.* -->
+        <div class="contact-channels">
+          <div class="contact-channel">
+            <span class="contact-channel__label">WhatsApp</span>
+            <span class="contact-channel__value">+44 7776 320068<em>Fastest reply · live orders, custom requests</em></span>
+            <a href="https://wa.me/447776320068" class="contact-channel__cta">Open chat →</a>
+          </div>
+          <div class="contact-channel">
+            <span class="contact-channel__label">Phone</span>
+            <span class="contact-channel__value">+44 7776 320068<em>Available during kitchen hours</em></span>
+            <a href="tel:+447776320068" class="contact-channel__cta">Call →</a>
+          </div>
+          <div class="contact-channel">
+            <span class="contact-channel__label">Email</span>
+            <span class="contact-channel__value">hotnnicedelicacies@gmail.com<em>For invoices, larger orders, press</em></span>
+            <a href="mailto:hotnnicedelicacies@gmail.com" class="contact-channel__cta">Email us →</a>
+          </div>
+          <div class="contact-channel">
+            <span class="contact-channel__label">Instagram</span>
+            <span class="contact-channel__value">@hotnnicedelicacies<em>Today's kitchen, behind the scenes</em></span>
+            <a href="https://instagram.com/hotnnicedelicacies" target="_blank" rel="noopener noreferrer" class="contact-channel__cta">Follow →</a>
+          </div>
+        </div>
+
+        <!-- HOURS -->
+        <!-- ADMIN: settings.business_hours.* -->
+        <div class="hours-card">
+          <h3 class="hours-card__title">Kitchen hours</h3>
+          <ul class="hours-list">
+            <li class="is-closed"><b>Monday</b><span>Closed</span></li>
+            <li><b>Tuesday</b><span>12pm – 8pm</span></li>
+            <li><b>Wednesday</b><span>12pm – 8pm</span></li>
+            <li><b>Thursday</b><span>12pm – 8pm</span></li>
+            <li><b>Friday</b><span>12pm – 8pm</span></li>
+            <li><b>Saturday</b><span>12pm – 8pm</span></li>
+            <li><b>Sunday</b><span>12pm – 8pm</span></li>
+          </ul>
+          <p class="hours-card__note">Order by <b style="font-style: normal; font-variant: small-caps; letter-spacing: 0.08em; color: var(--walnut);">10am</b> for same-day delivery. Anything later goes onto the next day's list.</p>
+        </div>
+      </div>
+
+      <!-- RIGHT: contact form -->
+      <div>
+        <div class="form-section">
+          <header class="form-section__head">
+            <h2 class="form-section__title">Send us a <em>message</em></h2>
+            <span class="form-section__num">№ 01</span>
+          </header>
+
+          <form onsubmit="event.preventDefault(); alert('Mockup — message would be sent.');" style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="form-field__label" for="cf-name">Your name</label>
+                <input id="cf-name" class="form-field__input" type="text" placeholder="e.g., Sarah Whitfield" required>
+              </div>
+              <div class="form-field">
+                <label class="form-field__label" for="cf-phone">Phone <small>· optional</small></label>
+                <input id="cf-phone" class="form-field__input" type="tel" placeholder="+44 7700 900123">
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="cf-email">Email</label>
+              <input id="cf-email" class="form-field__input" type="email" placeholder="you@example.co.uk" required>
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="cf-topic">What's it about?</label>
+              <select id="cf-topic" class="form-field__input">
+                <option>A live order I've placed</option>
+                <option>Catering / larger order</option>
+                <option>Delivery outside Teesside</option>
+                <option>Dietary or allergen question</option>
+                <option>Feedback</option>
+                <option>Something else</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-field__label" for="cf-message">Your message</label>
+              <textarea id="cf-message" class="form-field__textarea" placeholder="Tell us what you need…" required style="min-height: 140px;"></textarea>
+            </div>
+            <button type="submit" class="auth-form__submit" style="margin-top: 4px;">Send message</button>
+            <p class="t-body-muted" style="text-align: center; margin: 0;">
+              For anything urgent about a live order, message us on <a href="https://wa.me/447776320068" class="link-underline">WhatsApp</a> instead — we'll see it faster.
+            </p>
+          </form>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- DELIVERY AREAS (compact reminder) -->
+<section class="section section--soft">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-head__eyebrow">Where we deliver</div>
+      <h2 class="section-head__title">Across <em>Teesside</em></h2>
+      <span class="ornament"></span>
+    </div>
+    <!-- ADMIN: delivery_zones[] -->
+    <div class="delivery-card">
+      <p class="delivery-card__areas">
+        Middlesbrough<span class="delivery-card__sep">·</span>Stockton-on-Tees<span class="delivery-card__sep">·</span>Redcar<span class="delivery-card__sep">·</span>Thornaby<span class="delivery-card__sep">·</span>Billingham
+      </p>
+      <p class="delivery-card__price">Delivery from £5 within Middlesbrough.</p>
+      <p class="delivery-card__note">Surrounding areas — final price depends on your postcode. <a href="https://wa.me/447776320068">Message us with your details and we'll quote.</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__grid">
+      <div class="site-footer__brand">
+        <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+        <p class="site-footer__tagline">A small home kitchen in Middlesbrough — Italian &amp; West African, delivered hot.</p>
+        <div class="site-footer__hygiene">
+          <span class="site-footer__hygiene-stars">★ ★ ★ ★ ★  Hygiene · FSA</span>
+          <a href="https://ratings.food.gov.uk/business/1913815/hot-n-nice-delicacies" target="_blank" rel="noopener noreferrer">Verify our rating →</a>
+        </div>
+      </div>
+      <div><h4 class="site-footer__col-title">Visit</h4><ul><li><a href="./home.html">Home</a></li><li><a href="./menu.html">Menu</a></li><li><a href="./about.html">About</a></li><li><a href="./contact.html">Contact</a></li></ul></div>
+      <div><h4 class="site-footer__col-title">Contact</h4><ul><li><a href="tel:+447776320068">+44 7776 320068</a></li><li><a href="https://wa.me/447776320068">WhatsApp</a></li><li><a href="mailto:hotnnicedelicacies@gmail.com">Email us</a></li></ul></div>
+      <div><h4 class="site-footer__col-title">Hours</h4><ul><li>Tuesday – Sunday</li><li>12pm – 8pm</li><li>Order by 10am for same-day</li></ul></div>
+    </div>
+    <div class="site-footer__copy"><span>© 2026 Hot N Nice Delicacies · Middlesbrough, UK</span><span><a href="./terms.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Terms</a> · <a href="./privacy.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Privacy</a> · <a href="./refund-policy.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Refunds</a> · <a href="./cookie-notice.html" style="color:inherit;border-bottom:1px solid rgba(241,229,205,0.2);padding-bottom:1px;">Cookies</a></span></div>
+  </div>
+</footer>
+
+</body>
+</html>

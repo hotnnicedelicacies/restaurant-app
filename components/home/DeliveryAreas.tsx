@@ -15,23 +15,23 @@ interface Props {
  */
 export default function DeliveryAreas({ unwrapped }: Props) {
   const card = (
-    <div className="mx-auto max-w-[720px] rounded-[2px] border border-[--color-border] bg-[--color-cream] p-8 text-center sm:p-10">
-      <p className="m-0 mb-6 font-serif text-[17px] italic leading-[1.5] text-[--color-ink-muted]">
+    <div className="mx-auto max-w-[720px] rounded-[2px] border border-rule bg-cream p-8 text-center sm:p-10">
+      <p className="m-0 mb-6 font-serif text-[17px] italic leading-[1.5] text-ink-muted">
         {siteConfig.delivery.areas.map((area, i) => (
           <span key={area}>
             {area}
             {i < siteConfig.delivery.areas.length - 1 && (
-              <span className="mx-2 text-[--color-bronze]">·</span>
+              <span className="mx-2 text-bronze">·</span>
             )}
           </span>
         ))}
       </p>
-      <p className="m-0 mb-1.5 font-serif text-[17px] font-medium text-[--color-walnut]">
+      <p className="m-0 mb-1.5 font-serif text-[17px] font-medium text-walnut">
         Delivery from {formatGBP(siteConfig.delivery.pricing.middlesbrough)} within Middlesbrough.
       </p>
-      <p className="m-0 font-serif text-[14px] italic text-[--color-ink-muted]">
+      <p className="m-0 font-serif text-[14px] italic text-ink-muted">
         Surrounding areas — final price depends on your postcode.{' '}
-        <Link href={siteConfig.routes.contact} className="border-b border-[--color-bronze-deep] pb-px italic text-[--color-bronze-deep]">
+        <Link href={siteConfig.routes.contact} className="border-b border-bronze-deep pb-px italic text-bronze-deep">
           Get in touch for a quote.
         </Link>
       </p>
@@ -41,7 +41,7 @@ export default function DeliveryAreas({ unwrapped }: Props) {
   if (unwrapped) return card;
 
   return (
-    <section className="bg-[--color-cream-soft] py-[clamp(56px,8vw,96px)]">
+    <section className="bg-cream-soft py-[clamp(56px,8vw,96px)]">
       <div className="container">
         <SectionHead
           eyebrow="Delivery"

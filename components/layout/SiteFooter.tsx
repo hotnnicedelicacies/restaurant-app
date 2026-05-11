@@ -9,7 +9,7 @@ import { siteConfig } from '@/constants/siteConfig';
  */
 export default function SiteFooter() {
   return (
-    <footer className="border-t border-[rgba(241,229,205,0.22)] bg-[--color-walnut] pt-14 pb-6 text-[--color-cream]">
+    <footer className="border-t border-[rgba(241,229,205,0.22)] bg-walnut pt-14 pb-6 text-cream">
       <div className="container">
         <div className="grid grid-cols-1 gap-10 border-b border-[rgba(241,229,205,0.22)] pb-10 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
           {/* Brand */}
@@ -25,14 +25,14 @@ export default function SiteFooter() {
               A small home kitchen in Middlesbrough — Italian &amp; West African, delivered hot.
             </p>
             <div className="flex flex-col gap-1.5 font-serif text-[13px]">
-              <span className="font-medium text-[--color-bronze] [font-variant:small-caps]">
+              <span className="font-medium text-bronze [font-variant:small-caps]">
                 ★ ★ ★ ★ ★ &nbsp;Hygiene · FSA
               </span>
               <a
                 href={siteConfig.foodHygiene.listingUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="self-start border-b border-[rgba(241,229,205,0.3)] pb-px text-[13px] italic text-[#F1E5CDBF] transition-colors hover:text-[--color-bronze]"
+                className="self-start border-b border-[rgba(241,229,205,0.3)] pb-px text-[13px] italic text-[#F1E5CDBF] transition-colors hover:text-bronze"
               >
                 Verify our rating →
               </a>
@@ -90,11 +90,11 @@ export default function SiteFooter() {
           </span>
           <span>
             <FooterLegalLink href={siteConfig.routes.legal.terms}>Terms</FooterLegalLink>
-            <span className="mx-2 text-[--color-bronze]">·</span>
+            <span className="mx-2 text-bronze">·</span>
             <FooterLegalLink href={siteConfig.routes.legal.privacy}>Privacy</FooterLegalLink>
-            <span className="mx-2 text-[--color-bronze]">·</span>
+            <span className="mx-2 text-bronze">·</span>
             <FooterLegalLink href={siteConfig.routes.legal.refund}>Refunds</FooterLegalLink>
-            <span className="mx-2 text-[--color-bronze]">·</span>
+            <span className="mx-2 text-bronze">·</span>
             <FooterLegalLink href={siteConfig.routes.legal.cookies}>Cookies</FooterLegalLink>
           </span>
         </div>
@@ -106,10 +106,10 @@ export default function SiteFooter() {
 function FooterColumn({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h4 className="m-0 mb-4 font-serif text-[14px] font-medium tracking-[0.16em] text-[--color-bronze] [font-variant:small-caps]">
+      <h4 className="m-0 mb-4 font-serif text-[14px] font-medium tracking-[0.16em] text-bronze [font-variant:small-caps]">
         {title}
       </h4>
-      <ul className="m-0 flex list-none flex-col gap-2.5 p-0 font-serif text-[15px] text-[#F1E5CDD2] [&_a]:transition-colors [&_a:hover]:text-[--color-bronze]">
+      <ul className="m-0 flex list-none flex-col gap-2.5 p-0 font-serif text-[15px] text-[#F1E5CDD2] [&_a]:transition-colors [&_a:hover]:text-bronze">
         {Array.isArray(children)
           ? children.map((child, i) => <li key={i}>{child}</li>)
           : <li>{children}</li>}
@@ -122,7 +122,7 @@ function FooterLegalLink({ href, children }: { href: string; children: React.Rea
   return (
     <Link
       href={href}
-      className="border-b border-[rgba(241,229,205,0.2)] pb-px text-[#F1E5CD8C] transition-colors hover:text-[--color-bronze]"
+      className="border-b border-[rgba(241,229,205,0.2)] pb-px text-[#F1E5CD8C] transition-colors hover:text-bronze"
     >
       {children}
     </Link>

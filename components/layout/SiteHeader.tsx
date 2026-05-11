@@ -37,7 +37,7 @@ export default function SiteHeader({
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[rgba(241,229,205,0.22)] bg-[--color-walnut] text-[--color-cream]">
+    <header className="sticky top-0 z-50 border-b border-[rgba(241,229,205,0.22)] bg-walnut text-cream">
       <div className="container flex h-[68px] items-center justify-between gap-6">
         <Link
           href={siteConfig.routes.home}
@@ -67,8 +67,8 @@ export default function SiteHeader({
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'font-serif text-[14px] font-medium tracking-[0.14em] text-[--color-cream] transition-colors hover:text-[--color-bronze] [font-variant:small-caps]',
-                  isActive && 'text-[--color-bronze]'
+                  'font-serif text-[14px] font-medium tracking-[0.14em] text-cream transition-colors hover:text-bronze [font-variant:small-caps]',
+                  isActive && 'text-bronze'
                 )}
               >
                 {item.label}
@@ -79,14 +79,14 @@ export default function SiteHeader({
 
         <Link
           href={cta.href}
-          className="hidden rounded-[2px] bg-[--color-bronze] px-[18px] py-[10px] font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-[--color-walnut] [font-variant:small-caps] transition-colors hover:bg-[--color-cream] hover:text-[--color-walnut] md:inline-block"
+          className="hidden rounded-[2px] bg-bronze px-[18px] py-[10px] font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] transition-colors hover:bg-cream hover:text-walnut md:inline-block"
         >
           {cta.label}
         </Link>
 
         {/* Mobile burger */}
         <button
-          className="inline-flex h-8 w-8 items-center justify-center text-[--color-cream] md:hidden"
+          className="inline-flex h-8 w-8 items-center justify-center text-cream md:hidden"
           onClick={() => setMobileOpen((v) => !v)}
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={mobileOpen}
@@ -104,7 +104,7 @@ export default function SiteHeader({
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-            className="overflow-hidden border-t border-[rgba(241,229,205,0.18)] bg-[--color-walnut] md:hidden"
+            className="overflow-hidden border-t border-[rgba(241,229,205,0.18)] bg-walnut md:hidden"
             aria-label="Primary mobile"
           >
             <div className="container flex flex-col gap-3 py-4">
@@ -117,8 +117,8 @@ export default function SiteHeader({
                     href={item.href}
                     onClick={() => setMobileOpen(false)}
                     className={cn(
-                      'py-2 font-serif text-[16px] font-medium tracking-[0.12em] text-[--color-cream] transition-colors hover:text-[--color-bronze] [font-variant:small-caps]',
-                      isActive && 'text-[--color-bronze]'
+                      'py-2 font-serif text-[16px] font-medium tracking-[0.12em] text-cream transition-colors hover:text-bronze [font-variant:small-caps]',
+                      isActive && 'text-bronze'
                     )}
                   >
                     {item.label}
@@ -128,7 +128,7 @@ export default function SiteHeader({
               <Link
                 href={cta.href}
                 onClick={() => setMobileOpen(false)}
-                className="mt-2 rounded-[2px] bg-[--color-bronze] px-5 py-3 text-center font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-[--color-walnut] [font-variant:small-caps]"
+                className="mt-2 rounded-[2px] bg-bronze px-5 py-3 text-center font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps]"
               >
                 {cta.label}
               </Link>

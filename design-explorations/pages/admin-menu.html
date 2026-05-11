@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Menu — Admin · Hot N Nice</title>
+<link rel="icon" href="../../app/icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body class="admin-shell">
+
+<div class="mockup-banner">
+  <b>MOCKUP · v1</b> · Admin · Menu (CRUD + quick toggles)
+  <a href="./index.html">← All pages</a>
+</div>
+
+<header class="admin-header">
+  <div class="container">
+    <div class="admin-header__row">
+      <div class="admin-header__brand">
+        <img src="../../public/logo.png" alt="Hot N Nice Delicacies">
+        <div class="admin-header__brand-text">
+          <span class="admin-header__brand-name">Hot N Nice</span>
+          <span class="admin-header__brand-badge">Kitchen control · Admin</span>
+        </div>
+      </div>
+      <div class="admin-header__center">
+        <button type="button" class="kitchen-status"><span class="kitchen-status__dot"></span><span>Kitchen open · accepting orders</span></button>
+      </div>
+      <div class="admin-header__right">
+        <span class="admin-header__user">Anike Whitfield</span>
+        <a href="./admin-sign-in.html" class="admin-header__signout">Sign out</a>
+      </div>
+    </div>
+  </div>
+  <nav class="admin-nav">
+    <div class="container">
+      <div class="admin-nav__inner">
+        <a href="./admin-orders.html" class="admin-nav__link">Orders <span class="admin-nav__count">3</span></a>
+        <a href="./admin-menu.html" class="admin-nav__link is-active">Menu</a>
+        <a href="./admin-zones.html" class="admin-nav__link">Delivery zones</a>
+        <a href="./admin-payments.html" class="admin-nav__link">Payments <span class="admin-nav__count">2</span></a>
+        <a href="./admin-settings.html" class="admin-nav__link">Settings</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main class="admin-content">
+  <div class="container">
+
+    <div class="admin-page-head">
+      <div class="admin-page-head__text">
+        <div class="admin-page-head__eyebrow">31 items · 8 categories</div>
+        <h1 class="admin-page-head__title">The <em>menu</em></h1>
+      </div>
+      <div class="admin-page-head__actions">
+        <a href="./admin-categories.html" class="receipt-btn">Manage categories</a>
+        <a href="./admin-menu-edit.html?new=1" class="receipt-btn receipt-btn--primary">+ Add menu item</a>
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="admin-toolbar">
+      <div class="admin-toolbar__search">
+        <svg class="admin-toolbar__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3" stroke-linecap="round"/></svg>
+        <input type="search" placeholder="Search by name, category, or tag…">
+      </div>
+      <button class="admin-filter is-active">All <span class="admin-filter__count">31</span></button>
+      <button class="admin-filter">Available today <span class="admin-filter__count">30</span></button>
+      <button class="admin-filter">Sold out <span class="admin-filter__count">1</span></button>
+      <button class="admin-filter">Featured on home <span class="admin-filter__count">6</span></button>
+      <button class="admin-filter">COD eligible <span class="admin-filter__count">28</span></button>
+    </div>
+
+    <!-- Column header (used across all category sections) -->
+    <p class="t-body-muted" style="margin: 24px 0 14px; font-size: 13.5px;">
+      Tip · Toggle availability, COD eligibility and homepage feature inline. For prices, photos, variants or descriptions, click <em>Edit</em>.
+    </p>
+
+    <!-- ====== CATEGORY: RICE ====== -->
+    <section class="menu-admin-section">
+      <header class="menu-admin-section__head">
+        <h2 class="menu-admin-section__title">Rice</h2>
+        <span class="menu-admin-section__count">04 items</span>
+      </header>
+      <table class="menu-admin-table">
+        <thead>
+          <tr>
+            <th style="width: 30px;"></th>
+            <th style="width: 60px;">Photo</th>
+            <th>Name</th>
+            <th class="is-right" style="width: 80px;">Price</th>
+            <th class="is-center" style="width: 110px;">Available</th>
+            <th class="is-center" style="width: 90px;">COD ok</th>
+            <th class="is-center" style="width: 100px;">Featured</th>
+            <th style="width: 130px;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="menu-admin-table__drag">⋮⋮</td>
+            <td><img class="menu-admin-table__thumb" src="../../assets/meals/jollof-rice-with-protein-of-choice-and-plantain-1.png" alt=""></td>
+            <td>
+              <div class="menu-admin-table__name-cell">
+                <span class="menu-admin-table__name">Jollof Rice <em>with Plantain</em></span>
+                <span class="menu-admin-table__meta"><b>Signature</b>Protein choice · Gluten-free</span>
+              </div>
+            </td>
+            <td class="is-right menu-admin-table__price">£10.00</td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="menu-admin-table__actions">
+              <a href="./admin-menu-edit.html" class="menu-admin-table__action">Edit</a>
+              <a href="#" class="menu-admin-table__action menu-admin-table__action--danger">Archive</a>
+            </td>
+          </tr>
+          <tr>
+            <td class="menu-admin-table__drag">⋮⋮</td>
+            <td><img class="menu-admin-table__thumb" src="../../assets/meals/ofada-rice-and-ayamase-sauce-1.png" alt=""></td>
+            <td>
+              <div class="menu-admin-table__name-cell">
+                <span class="menu-admin-table__name">Ofada Rice &amp; Ayamase Sauce</span>
+                <span class="menu-admin-table__meta">Spicy</span>
+              </div>
+            </td>
+            <td class="is-right menu-admin-table__price">£15.00</td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox"><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="menu-admin-table__actions"><a href="./admin-menu-edit.html" class="menu-admin-table__action">Edit</a><a href="#" class="menu-admin-table__action menu-admin-table__action--danger">Archive</a></td>
+          </tr>
+          <tr>
+            <td class="menu-admin-table__drag">⋮⋮</td>
+            <td><img class="menu-admin-table__thumb" src="../../assets/meals/fried-rice-1.png" alt=""></td>
+            <td>
+              <div class="menu-admin-table__name-cell">
+                <span class="menu-admin-table__name">Fried Rice</span>
+                <span class="menu-admin-table__meta">Contains seafood</span>
+              </div>
+            </td>
+            <td class="is-right menu-admin-table__price">£12.00</td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox"><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="menu-admin-table__actions"><a href="./admin-menu-edit.html" class="menu-admin-table__action">Edit</a><a href="#" class="menu-admin-table__action menu-admin-table__action--danger">Archive</a></td>
+          </tr>
+          <tr style="background: rgba(45, 31, 24, 0.04);">
+            <td class="menu-admin-table__drag">⋮⋮</td>
+            <td style="position: relative;">
+              <img class="menu-admin-table__thumb" src="../../assets/meals/white-rice-and-stew.jpeg" alt="" style="opacity: 0.5;">
+              <span style="position: absolute; inset: 14px; display: flex; align-items: center; justify-content: center; font-family: var(--font-mono); font-size: 8px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--cream); background: rgba(45,31,24,0.65); border-radius: 2px;">Out</span>
+            </td>
+            <td>
+              <div class="menu-admin-table__name-cell">
+                <span class="menu-admin-table__name">White Rice &amp; Stew</span>
+                <span class="menu-admin-table__meta" style="color: #8B2A1A;">Sold out today · customers see it greyed out</span>
+              </div>
+            </td>
+            <td class="is-right menu-admin-table__price">£12.00</td>
+            <td class="is-center"><label class="switch"><input type="checkbox"><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox"><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="menu-admin-table__actions"><a href="./admin-menu-edit.html" class="menu-admin-table__action">Edit</a><a href="#" class="menu-admin-table__action menu-admin-table__action--danger">Archive</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ====== PASTA ====== -->
+    <section class="menu-admin-section">
+      <header class="menu-admin-section__head">
+        <h2 class="menu-admin-section__title">Pasta</h2>
+        <span class="menu-admin-section__count">03 items</span>
+      </header>
+      <table class="menu-admin-table">
+        <thead>
+          <tr>
+            <th style="width: 30px;"></th><th style="width: 60px;">Photo</th><th>Name</th>
+            <th class="is-right" style="width: 80px;">Price</th>
+            <th class="is-center" style="width: 110px;">Available</th>
+            <th class="is-center" style="width: 90px;">COD ok</th>
+            <th class="is-center" style="width: 100px;">Featured</th>
+            <th style="width: 130px;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="menu-admin-table__drag">⋮⋮</td>
+            <td><img class="menu-admin-table__thumb" src="../../assets/meals/plantain-lasagna.jpeg" alt=""></td>
+            <td>
+              <div class="menu-admin-table__name-cell">
+                <span class="menu-admin-table__name">Plantain Lasagna</span>
+                <span class="menu-admin-table__meta"><b>House signature</b>Contains dairy</span>
+              </div>
+            </td>
+            <td class="is-right menu-admin-table__price">£25.00</td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="menu-admin-table__actions"><a href="./admin-menu-edit.html" class="menu-admin-table__action">Edit</a><a href="#" class="menu-admin-table__action menu-admin-table__action--danger">Archive</a></td>
+          </tr>
+          <tr>
+            <td class="menu-admin-table__drag">⋮⋮</td>
+            <td><img class="menu-admin-table__thumb" src="../../assets/meals/lasagna-1.png" alt=""></td>
+            <td>
+              <div class="menu-admin-table__name-cell">
+                <span class="menu-admin-table__name">Classic Lasagna</span>
+                <span class="menu-admin-table__meta">Contains dairy · Contains gluten</span>
+              </div>
+            </td>
+            <td class="is-right menu-admin-table__price">£20.00</td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox"><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="menu-admin-table__actions"><a href="./admin-menu-edit.html" class="menu-admin-table__action">Edit</a><a href="#" class="menu-admin-table__action menu-admin-table__action--danger">Archive</a></td>
+          </tr>
+          <tr>
+            <td class="menu-admin-table__drag">⋮⋮</td>
+            <td><img class="menu-admin-table__thumb" src="../../assets/meals/spaghetti-bolognaise.jpeg" alt=""></td>
+            <td>
+              <div class="menu-admin-table__name-cell">
+                <span class="menu-admin-table__name">Spaghetti Bolognaise</span>
+                <span class="menu-admin-table__meta">Contains gluten</span>
+              </div>
+            </td>
+            <td class="is-right menu-admin-table__price">£20.00</td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox"><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="menu-admin-table__actions"><a href="./admin-menu-edit.html" class="menu-admin-table__action">Edit</a><a href="#" class="menu-admin-table__action menu-admin-table__action--danger">Archive</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ====== GRILL (sample of 4 with one featured) ====== -->
+    <section class="menu-admin-section">
+      <header class="menu-admin-section__head">
+        <h2 class="menu-admin-section__title">Grill</h2>
+        <span class="menu-admin-section__count">04 items</span>
+      </header>
+      <table class="menu-admin-table">
+        <thead>
+          <tr>
+            <th style="width: 30px;"></th><th style="width: 60px;">Photo</th><th>Name</th>
+            <th class="is-right" style="width: 80px;">Price</th>
+            <th class="is-center" style="width: 110px;">Available</th>
+            <th class="is-center" style="width: 90px;">COD ok</th>
+            <th class="is-center" style="width: 100px;">Featured</th>
+            <th style="width: 130px;"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="menu-admin-table__drag">⋮⋮</td>
+            <td><img class="menu-admin-table__thumb" src="../../assets/meals/roasted-tilapia-fish.jpeg" alt=""></td>
+            <td><div class="menu-admin-table__name-cell"><span class="menu-admin-table__name">Roasted Tilapia Platter</span><span class="menu-admin-table__meta">Spicy · Pescatarian</span></div></td>
+            <td class="is-right menu-admin-table__price">£25.00</td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="menu-admin-table__actions"><a href="./admin-menu-edit.html" class="menu-admin-table__action">Edit</a><a href="#" class="menu-admin-table__action menu-admin-table__action--danger">Archive</a></td>
+          </tr>
+          <tr>
+            <td class="menu-admin-table__drag">⋮⋮</td>
+            <td><img class="menu-admin-table__thumb" src="../../assets/meals/roasted-yam-and-plantain-with-tilapia-fish.jpeg" alt=""></td>
+            <td><div class="menu-admin-table__name-cell"><span class="menu-admin-table__name">Roasted Yam &amp; Tilapia</span><span class="menu-admin-table__meta">Pescatarian</span></div></td>
+            <td class="is-right menu-admin-table__price">£30.00</td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox"><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="menu-admin-table__actions"><a href="./admin-menu-edit.html" class="menu-admin-table__action">Edit</a><a href="#" class="menu-admin-table__action menu-admin-table__action--danger">Archive</a></td>
+          </tr>
+          <tr>
+            <td class="menu-admin-table__drag">⋮⋮</td>
+            <td><img class="menu-admin-table__thumb" src="../../assets/meals/suya.jpeg" alt=""></td>
+            <td><div class="menu-admin-table__name-cell"><span class="menu-admin-table__name">Suya Sticks</span><span class="menu-admin-table__meta">Spicy · Shareable</span></div></td>
+            <td class="is-right menu-admin-table__price">£5.00</td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="menu-admin-table__actions"><a href="./admin-menu-edit.html" class="menu-admin-table__action">Edit</a><a href="#" class="menu-admin-table__action menu-admin-table__action--danger">Archive</a></td>
+          </tr>
+          <tr>
+            <td class="menu-admin-table__drag">⋮⋮</td>
+            <td><img class="menu-admin-table__thumb" src="../../assets/meals/suya-burger.jpeg" alt=""></td>
+            <td><div class="menu-admin-table__name-cell"><span class="menu-admin-table__name">Suya Burger</span><span class="menu-admin-table__meta"><b>Fusion</b>Spicy · Contains gluten</span></div></td>
+            <td class="is-right menu-admin-table__price">£15.00</td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox" checked><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="is-center"><label class="switch"><input type="checkbox"><span class="switch__track"><span class="switch__thumb"></span></span></label></td>
+            <td class="menu-admin-table__actions"><a href="./admin-menu-edit.html" class="menu-admin-table__action">Edit</a><a href="#" class="menu-admin-table__action menu-admin-table__action--danger">Archive</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- Other categories collapsed for brevity in the mockup -->
+    <section class="menu-admin-section">
+      <header class="menu-admin-section__head"><h2 class="menu-admin-section__title">Soup</h2><span class="menu-admin-section__count">08 items</span></header>
+      <div style="background: var(--cream); border: 1px solid var(--rule); border-top: 0; padding: 18px 20px; font-family: var(--font-serif); font-style: italic; color: var(--ink-muted); font-size: 14px;">
+        + 8 more rows (Edikaikong, Afang, Oha, Banga, Efo Riro, Okra, Ofe Akwu, Ogbono) — same row structure.
+        <a href="#" class="link-underline" style="margin-left: 8px;">Expand all categories</a>
+      </div>
+    </section>
+
+    <section class="menu-admin-section">
+      <header class="menu-admin-section__head"><h2 class="menu-admin-section__title">Swallow</h2><span class="menu-admin-section__count">03 items</span></header>
+      <div style="background: var(--cream); border: 1px solid var(--rule); border-top: 0; padding: 18px 20px; font-family: var(--font-serif); font-style: italic; color: var(--ink-muted); font-size: 14px;">+ 3 rows · Pounded Yam, Fufu, Garri</div>
+    </section>
+
+    <section class="menu-admin-section">
+      <header class="menu-admin-section__head"><h2 class="menu-admin-section__title">Sides</h2><span class="menu-admin-section__count">04 items</span></header>
+      <div style="background: var(--cream); border: 1px solid var(--rule); border-top: 0; padding: 18px 20px; font-family: var(--font-serif); font-style: italic; color: var(--ink-muted); font-size: 14px;">+ 4 rows · Abacha, Moi Moi, Tomato Stew, Okpa</div>
+    </section>
+
+    <section class="menu-admin-section">
+      <header class="menu-admin-section__head"><h2 class="menu-admin-section__title">Snacks &amp; Party</h2><span class="menu-admin-section__count">03 items</span></header>
+      <div style="background: var(--cream); border: 1px solid var(--rule); border-top: 0; padding: 18px 20px; font-family: var(--font-serif); font-style: italic; color: var(--ink-muted); font-size: 14px;">+ 3 rows · Small Chops, Puff Puff, Meat Pie</div>
+    </section>
+
+    <section class="menu-admin-section">
+      <header class="menu-admin-section__head"><h2 class="menu-admin-section__title">Breakfast</h2><span class="menu-admin-section__count">02 items</span></header>
+      <div style="background: var(--cream); border: 1px solid var(--rule); border-top: 0; padding: 18px 20px; font-family: var(--font-serif); font-style: italic; color: var(--ink-muted); font-size: 14px;">+ 2 rows · Akara &amp; Akamu, Oatmeal</div>
+    </section>
+
+    <!-- Bulk actions / archived items hint -->
+    <p class="t-body-muted" style="margin-top: 24px; text-align: center;">
+      <a href="#" class="link-underline">View archived items (4)</a> · Archived items don't appear on the customer site but are kept for receipts and analytics.
+    </p>
+
+  </div>
+</main>
+
+<footer style="background: var(--walnut); color: rgba(241, 229, 205, 0.55); padding: 16px 0; font-family: var(--font-serif); font-style: italic; font-size: 12px; text-align: center;">
+  <div class="container">Hot N Nice Admin · v1.0 · Signed in as Anike Whitfield · <a href="./home.html" style="color: rgba(241, 229, 205, 0.7); border-bottom: 1px solid rgba(241, 229, 205, 0.25); padding-bottom: 1px;">View customer site →</a></div>
+</footer>
+
+</body>
+</html>

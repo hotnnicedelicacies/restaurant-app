@@ -31,7 +31,7 @@ export default function KitchenStory({
   reverse,
 }: Props) {
   return (
-    <section className="bg-[--color-cream-soft] py-[clamp(56px,8vw,96px)]">
+    <section className="bg-cream-soft py-[clamp(56px,8vw,96px)]">
       <div className="container">
         <div
           className={`mx-auto grid max-w-[1100px] items-center gap-[clamp(40px,6vw,80px)] md:grid-cols-[1.1fr_1fr] ${reverse ? 'md:[&>div:first-child]:order-2' : ''}`}
@@ -46,19 +46,19 @@ export default function KitchenStory({
             />
             <div
               aria-hidden
-              className="pointer-events-none absolute -bottom-4 -right-4 left-4 top-4 -z-10 rounded-[2px] border border-[--color-bronze] opacity-40"
+              className="pointer-events-none absolute -bottom-4 -right-4 left-4 top-4 -z-10 rounded-[2px] border border-bronze opacity-40"
             />
           </div>
           <div className="flex flex-col gap-5">
             {eyebrow && (
-              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-[--color-bronze-deep]">
+              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-bronze-deep">
                 {eyebrow}
               </span>
             )}
-            <h2 className="m-0 font-serif text-[clamp(28px,4vw,42px)] font-medium leading-[1.05] tracking-[-0.005em] text-[--color-walnut] [&_em]:font-normal [&_em]:italic">
+            <h2 className="m-0 font-serif text-[clamp(28px,4vw,42px)] font-medium leading-[1.05] tracking-[-0.005em] text-walnut [&_em]:font-normal [&_em]:italic">
               {title}
             </h2>
-            <div className="font-serif text-[17px] leading-[1.6] text-[--color-ink-muted] [&_b]:font-medium [&_b]:text-[--color-walnut] [&_em]:italic [&_em]:text-[--color-walnut] [&_p]:m-0 [&_p+p]:mt-4">
+            <div className="font-serif text-[17px] leading-[1.6] text-ink-muted [&_b]:font-medium [&_b]:text-walnut [&_em]:italic [&_em]:text-walnut [&_p]:m-0 [&_p+p]:mt-4">
               {body}
             </div>
             {link && (

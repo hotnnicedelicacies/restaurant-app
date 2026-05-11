@@ -43,13 +43,13 @@ export default function HowItWorks({
         <div className="mx-auto grid max-w-[1100px] grid-cols-1 gap-10 md:grid-cols-3 md:gap-12">
           {steps.map((step, i) => (
             <article key={i} className="flex flex-col items-center gap-3 text-center">
-              <div className="font-serif text-[56px] italic font-normal leading-none text-[--color-bronze]">
+              <div className="font-serif text-[56px] italic font-normal leading-none text-bronze">
                 {romanLower(i + 1)}.
               </div>
-              <h3 className="m-0 font-serif text-[22px] font-medium text-[--color-walnut] [&_em]:font-normal [&_em]:italic">
+              <h3 className="m-0 font-serif text-[22px] font-medium text-walnut [&_em]:font-normal [&_em]:italic">
                 {step.title}
               </h3>
-              <p className="m-0 max-w-[24ch] font-serif text-[15px] italic leading-[1.55] text-[--color-ink-muted]">
+              <p className="m-0 max-w-[24ch] font-serif text-[15px] italic leading-[1.55] text-ink-muted">
                 {step.body}
               </p>
             </article>

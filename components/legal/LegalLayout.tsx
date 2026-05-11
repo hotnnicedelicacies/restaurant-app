@@ -17,12 +17,12 @@ export default function LegalLayout({ eyebrow, title, updatedLine, tags, childre
     <>
       <SiteHeader />
 
-      <section className="border-b border-[rgba(241,229,205,0.22)] bg-[--color-walnut] py-[clamp(56px,7vw,96px)] text-[--color-cream]">
+      <section className="border-b border-[rgba(241,229,205,0.22)] bg-walnut py-[clamp(56px,7vw,96px)] text-cream">
         <div className="container">
-          <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.24em] text-[--color-bronze]">
+          <div className="mb-3 font-mono text-[10px] uppercase tracking-[0.24em] text-bronze">
             {eyebrow}
           </div>
-          <h1 className="m-0 mb-3 font-serif text-[clamp(38px,5.5vw,60px)] font-medium leading-[1.02] tracking-[-0.005em] text-[--color-cream] [&_em]:font-normal [&_em]:italic [&_em]:text-[--color-bronze]">
+          <h1 className="m-0 mb-3 font-serif text-[clamp(38px,5.5vw,60px)] font-medium leading-[1.02] tracking-[-0.005em] text-cream [&_em]:font-normal [&_em]:italic [&_em]:text-bronze">
             {title}
           </h1>
           <p className="m-0 font-serif text-[14px] italic text-[#F1E5CDB8]">{updatedLine}</p>
@@ -38,7 +38,7 @@ export default function LegalLayout({ eyebrow, title, updatedLine, tags, childre
                 className={`rounded-[2px] border px-[9px] py-1 font-mono text-[9px] uppercase tracking-[0.2em] ${
                   tag.warning
                     ? 'border-[rgba(139,42,26,0.4)] text-[#8B2A1A]'
-                    : 'border-[--color-border] text-[--color-ink-muted]'
+                    : 'border-rule text-ink-muted'
                 }`}
               >
                 {tag.label}
