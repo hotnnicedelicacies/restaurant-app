@@ -1,0 +1,88 @@
+'use server';
+
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
+import { headers } from 'next/headers';
+import { getServerClient } from '@/lib/supabase/server';
+import { absoluteUrl } from '@/lib/utils';
+import { siteConfig } from '@/constants/siteConfig';
+
+type ActionResult = { ok: true } | { ok: false; error: string };
+
+/** Sign up via email + password. Auto-creates a profile row. */
+export async function signUpAction(formData: FormData): Promise<ActionResult> {
+  const name = String(formData.get('name') ?? '').trim();
+  const email = String(formData.get('email') ?? '').trim();
+  const password = String(formData.get('password') ?? '');
+  const next = String(formData.get('next') ?? siteConfig.routes.account);
+
+  if (!name || !email || password.length < 8) {
+    return { ok: false, error: 'Please fill in all fields. Password must be at least 8 characters.' };
+  }
+
+  const supabase = await getServerClient();
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: absoluteUrl(`/auth/callback?next=${encodeURIComponent(next)}`),
+      data: { display_name: name },
+    },
+  });
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath('/', 'layout');
+  redirect(next);
+}
+
+/** Sign in via email + password. */
+export async function signInAction(formData: FormData): Promise<ActionResult> {
+  const email = String(formData.get('email') ?? '').trim();
+  const password = String(formData.get('password') ?? '');
+  const next = String(formData.get('next') ?? siteConfig.routes.account);
+
+  if (!email || !password) {
+    return { ok: false, error: 'Please enter your email and password.' };
+  }
+
+  const supabase = await getServerClient();
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) return { ok: false, error: error.message };
+
+  revalidatePath('/', 'layout');
+  redirect(next);
+}
+
+/** Sign out — used by the account dashboard. */
+export async function signOutAction() {
+  const supabase = await getServerClient();
+  await supabase.auth.signOut();
+  revalidatePath('/', 'layout');
+  redirect(siteConfig.routes.home);
+}
+
+/** Request a password reset email. */
+export async function forgotPasswordAction(formData: FormData): Promise<ActionResult> {
+  const email = String(formData.get('email') ?? '').trim();
+  if (!email) return { ok: false, error: 'Please enter your email.' };
+
+  const supabase = await getServerClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: absoluteUrl('/auth/reset-password'),
+  });
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
+/** Apply a new password after clicking the reset link. */
+export async function resetPasswordAction(formData: FormData): Promise<ActionResult> {
+  const password = String(formData.get('password') ?? '');
+  if (password.length < 8) {
+    return { ok: false, error: 'Password must be at least 8 characters.' };
+  }
+
+  const supabase = await getServerClient();
+  const { error } = await supabase.auth.updateUser({ password });
+  if (error) return { ok: false, error: error.message };
+  redirect(siteConfig.routes.account);
+}
