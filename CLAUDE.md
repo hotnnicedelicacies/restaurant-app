@@ -130,6 +130,8 @@ Large chunks of `design-explorations/shared/styles.css` are copied into `app/glo
 ## Critical gotchas
 
 1. **Tailwind v4 + @theme tokens.** Use named utility classes (`bg-walnut`, `text-cream`) — `bg-[--color-walnut]` shorthand doesn't resolve. The full fix is at commit `f9e897a`.
+
+   **Element-selector base rules must live in `@layer base`.** Tailwind v4 resolves CSS cascade layer order *before* selector specificity, so a bare `img { height: auto }` written outside any `@layer` wins against `<img class="h-10">` even though the class has higher specificity — the bare rule lands in the "unlayered" sink which comes AFTER `@layer utilities`. The design's button / a / img resets in globals.css are wrapped in `@layer base {}` for exactly this reason; don't move them out.
 2. **Cart `menuItemId` is a UUID.** Old/legacy carts stored the slug. `createOrder` validates the UUID format and stores `null` if invalid; the persist version bump (v2) wipes legacy carts on next load. Don't reintroduce slug-as-id.
 3. **`STRIPE_SECRET_KEY` must be `sk_...`.** `getStripe()` throws loudly if it sees `pk_`. The most common deployment mistake.
 4. **`isSupabaseConfigured()` accepts both env-name conventions** (`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and the legacy `..._ANON_KEY`).
