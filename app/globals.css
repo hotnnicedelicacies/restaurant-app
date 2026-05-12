@@ -2604,18 +2604,38 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -0.00
     box-shadow: none;
     padding: 14mm 16mm;
   }
-  /* Tighten the vertical rhythm so a 3-item receipt comfortably fits. */
-  .receipt__title { font-size: 22px; margin-top: 14px; }
-  .receipt__title-sub { margin: 4px 0 16px; font-size: 13px; }
-  .receipt__parties { margin: 18px 0; gap: 24px; }
-  .receipt__table th, .receipt__table td { padding: 8px 0; font-size: 12.5px; }
-  .receipt__totals { margin: 14px 0; }
-  .receipt__total-row { padding: 4px 0; }
-  .receipt__total-row--grand { padding: 8px 0; font-size: 15px; }
-  .receipt__payment { margin: 18px 0; gap: 24px; }
-  .receipt__thanks { margin-top: 18px; padding-top: 14px; font-size: 14px; }
-  .receipt__footer { margin-top: 18px; padding-top: 12px; font-size: 11.5px; }
-  .receipt__paid-stamp { opacity: 0.5; }
+  /* Tighten the vertical rhythm so a long-itemised receipt fits one A4. */
+  .receipt__header { padding-bottom: 14px; margin-bottom: 14px; }
+  .receipt__brand img { height: 44px; }
+  .receipt__brand-meta { font-size: 11.5px; line-height: 1.45; }
+  .receipt__doc-type { font-size: 9px; }
+  .receipt__ref { font-size: 13px; }
+  .receipt__date { font-size: 11.5px; }
+  .receipt__title { font-size: 18px; margin: 8px 0 2px; line-height: 1.1; }
+  .receipt__title-sub { margin: 0 0 10px; font-size: 12px; }
+  .receipt__parties { margin: 12px 0; gap: 20px; padding: 12px 0; }
+  .receipt__party-label { font-size: 8.5px; margin-bottom: 4px; }
+  .receipt__party-name { font-size: 13.5px; margin: 0 0 2px; }
+  .receipt__party-lines { font-size: 12px; line-height: 1.45; }
+  .receipt__table th, .receipt__table td { padding: 7px 0; font-size: 12px; }
+  .receipt__item-name { font-size: 13px; }
+  .receipt__item-meta, .receipt__item-note { font-size: 11.5px; }
+  .receipt__totals { margin: 10px 0; }
+  .receipt__total-row { padding: 3px 0; font-size: 12.5px; }
+  .receipt__total-row--grand { padding: 6px 0; font-size: 14px; }
+  /* Payment block — pack method + status into one tight row pair. */
+  .receipt__payment {
+    margin: 12px 0 0;
+    padding-top: 12px;
+    gap: 20px;
+  }
+  .receipt__payment-label { font-size: 8.5px; margin-bottom: 3px; }
+  .receipt__payment-value { font-size: 12.5px; line-height: 1.35; }
+  .receipt__payment-value em { font-size: 11px; margin-top: 0; }
+  .receipt__thanks { margin-top: 12px; padding-top: 10px; font-size: 13px; }
+  .receipt__footer { margin-top: 12px; padding-top: 10px; font-size: 11px; }
+  .receipt__footer-hygiene { font-size: 10.5px; margin-bottom: 4px; }
+  .receipt__paid-stamp { opacity: 0.55; font-size: 18px; padding: 5px 14px; top: 14px; right: 14px; }
   /* Keep grouped sections from splitting across pages. */
   .receipt__parties,
   .receipt__payment,
