@@ -11,6 +11,10 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+// Never cache the receipt — payment_status can flip via webhook or admin
+// Stripe re-sync at any point and the receipt must show the latest truth.
+export const dynamic = 'force-dynamic';
+
 const STATUS_LABELS: Record<string, string> = {
   received: 'Received',
   preparing: 'Preparing',

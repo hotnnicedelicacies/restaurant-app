@@ -17,6 +17,10 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+// Always show the freshest status — webhooks / admin syncs flip status
+// continuously and stale renders confuse customers.
+export const dynamic = 'force-dynamic';
+
 const STATUS_LABELS: Record<string, { label: string; numeral: string }> = {
   received: { label: 'Received', numeral: 'i' },
   preparing: { label: 'Preparing', numeral: 'ii' },

@@ -1,8 +1,13 @@
 import Link from 'next/link';
 import { getServiceClient } from '@/lib/supabase/server';
 import { formatLongDate } from '@/lib/utils';
+import { maybeBackSyncStripe } from '@/lib/admin/orderActions';
 import AdminOrdersTable, { type OrderRow } from './AdminOrdersTable';
 import ExportCsvButton from './ExportCsvButton';
+
+export const dynamic = 'force-dynamic';
+
+const SYNC_LOOKBACK_MS = 60 * 60 * 1000; // auto-sync only orders < 1h old
 
 interface SearchParams {
   status?: string;
@@ -60,31 +65,49 @@ export default async function AdminOrdersPage({
   const supabase = getServiceClient();
   const from = rangeStart(range);
 
-  let q = supabase
-    .from('orders')
-    .select(
-      'id, ref, status, payment_method, payment_status, cod_status, customer_first_name, customer_last_name, customer_phone, delivery_postcode, total_gbp, created_at, stripe_payment_intent_id'
+  function buildOrdersQuery() {
+    let q = supabase
+      .from('orders')
+      .select(
+        'id, ref, status, payment_method, payment_status, cod_status, customer_first_name, customer_last_name, customer_phone, delivery_postcode, total_gbp, created_at, stripe_payment_intent_id'
+      )
+      .order('created_at', { ascending: false })
+      .limit(200);
+    if (from) q = q.gte('created_at', from);
+    if (activeStatus !== 'all') {
+      q = q.eq(
+        'status',
+        activeStatus as 'received' | 'preparing' | 'on_its_way' | 'delivered' | 'cancelled'
+      );
+    }
+    if (sp.payment === 'card' || sp.payment === 'cod') {
+      q = q.eq('payment_method', sp.payment);
+    }
+    if (sp.q) {
+      q = q.or(
+        `ref.ilike.%${sp.q}%,customer_first_name.ilike.%${sp.q}%,customer_last_name.ilike.%${sp.q}%,customer_phone.ilike.%${sp.q}%,delivery_postcode.ilike.%${sp.q}%`
+      );
+    }
+    return q;
+  }
+
+  let { data: orders, error } = await buildOrdersQuery();
+
+  // Best-effort back-sync any pending/failed card orders in the last hour.
+  // Parallel + 15s per-ref throttle in maybeBackSyncStripe keeps it cheap.
+  const stalePendingRefs = (orders ?? [])
+    .filter(
+      (o) =>
+        o.payment_method === 'card' &&
+        (o.payment_status === 'pending' || o.payment_status === 'failed') &&
+        Date.now() - new Date(o.created_at).getTime() < SYNC_LOOKBACK_MS
     )
-    .order('created_at', { ascending: false })
-    .limit(200);
-
-  if (from) q = q.gte('created_at', from);
-  if (activeStatus !== 'all') {
-    q = q.eq(
-      'status',
-      activeStatus as 'received' | 'preparing' | 'on_its_way' | 'delivered' | 'cancelled'
-    );
+    .map((o) => o.ref);
+  if (stalePendingRefs.length > 0) {
+    await Promise.all(stalePendingRefs.map((r) => maybeBackSyncStripe(r, 'orders-list')));
+    const refresh = await buildOrdersQuery();
+    if (refresh.data) orders = refresh.data;
   }
-  if (sp.payment === 'card' || sp.payment === 'cod') {
-    q = q.eq('payment_method', sp.payment);
-  }
-  if (sp.q) {
-    q = q.or(
-      `ref.ilike.%${sp.q}%,customer_first_name.ilike.%${sp.q}%,customer_last_name.ilike.%${sp.q}%,customer_phone.ilike.%${sp.q}%,delivery_postcode.ilike.%${sp.q}%`
-    );
-  }
-
-  const { data: orders, error } = await q;
 
   // Counts per status — scoped to the same date range as the table.
   let countsQuery = supabase.from('orders').select('status');

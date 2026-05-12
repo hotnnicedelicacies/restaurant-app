@@ -1955,6 +1955,9 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -0.00
 }
 
 /* ============================================================
+   FORM SECTION (admin + checkout cards)
+   ============================================================ */
+
 .form-section {
   background: var(--color-cream);
   border: 1px solid var(--color-rule);

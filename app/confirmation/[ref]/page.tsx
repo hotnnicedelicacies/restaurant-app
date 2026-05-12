@@ -14,6 +14,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+export const dynamic = 'force-dynamic';
+
 interface Props {
   params: Promise<{ ref: string }>;
   searchParams: Promise<{ payment_intent?: string; redirect_status?: string }>;

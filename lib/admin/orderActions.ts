@@ -281,8 +281,19 @@ export async function addKitchenNote(args: {
  * the PaymentIntent + latest charge from Stripe directly and reconciles
  * payment_status / card_brand / card_last4 / refund_amount on our order.
  */
-export async function syncStripePayment(ref: string): Promise<Result<{ paymentStatus: string }>> {
-  const admin = await requireAdmin();
+export async function syncStripePayment(
+  ref: string,
+  opts?: { actorName?: string; actorId?: string | null }
+): Promise<Result<{ paymentStatus: string; changed: boolean }>> {
+  let actorId: string | null = opts?.actorId ?? null;
+  let actorName: string = opts?.actorName ?? 'System';
+  if (!opts) {
+    // Manual invocation from admin UI — require admin.
+    const admin = await requireAdmin();
+    actorId = admin.id;
+    actorName = admin.displayName;
+  }
+
   const order = await getOrderByRef(ref);
   if (!order) return { ok: false, error: 'Order not found.' };
   if (order.paymentMethod !== 'card') return { ok: false, error: 'Only card orders can be synced.' };
@@ -329,29 +340,64 @@ export async function syncStripePayment(ref: string): Promise<Result<{ paymentSt
     nextPaymentStatus = 'pending';
   }
 
-  const { error } = await supabase
-    .from('orders')
-    .update({
-      payment_status: nextPaymentStatus,
-      card_brand: cardBrand,
-      card_last4: cardLast4,
-      refund_amount_gbp: refundedTotal > 0 ? refundedTotal : null,
-    })
-    .eq('id', order.id);
-  if (error) return { ok: false, error: error.message };
+  const changed = nextPaymentStatus !== order.paymentStatus;
 
-  await supabase.from('kitchen_notes').insert({
-    order_id: order.id,
-    author_id: admin.id,
-    author_name: admin.displayName,
-    status_at_time: order.status,
-    body: `Stripe re-sync · payment_status now '${nextPaymentStatus}' (stripe says '${stripeStatus}').`,
-    visible_to_customer: false,
-    emailed: false,
-  });
+  if (changed) {
+    const { error } = await supabase
+      .from('orders')
+      .update({
+        payment_status: nextPaymentStatus,
+        card_brand: cardBrand,
+        card_last4: cardLast4,
+        refund_amount_gbp: refundedTotal > 0 ? refundedTotal : null,
+      })
+      .eq('id', order.id);
+    if (error) return { ok: false, error: error.message };
 
-  revalidatePath(`/admin/orders/${ref}`);
-  revalidatePath('/admin/orders');
-  revalidatePath('/admin/payments');
-  return { ok: true, data: { paymentStatus: nextPaymentStatus } };
+    await supabase.from('kitchen_notes').insert({
+      order_id: order.id,
+      author_id: actorId,
+      author_name: actorName,
+      status_at_time: order.status,
+      body: `Stripe re-sync · payment_status now '${nextPaymentStatus}' (stripe says '${stripeStatus}').`,
+      visible_to_customer: false,
+      emailed: false,
+    });
+
+    // Bust the order ref everywhere it appears so customer-facing pages
+    // (receipt, track, confirmation) don't keep serving the stale status.
+    revalidatePath(`/admin/orders/${ref}`);
+    revalidatePath('/admin/orders');
+    revalidatePath('/admin/payments');
+    revalidatePath(`/receipt/${ref}`);
+    revalidatePath(`/track/${ref}`);
+    revalidatePath(`/confirmation/${ref}`);
+  }
+
+  return { ok: true, data: { paymentStatus: nextPaymentStatus, changed } };
+}
+
+/**
+ * Best-effort background sync invoked from server components (no auth
+ * required because we don't expose it as an action). Throttles per ref
+ * using an in-memory map so a fast double-load doesn't double-hit Stripe.
+ * Use from `/admin/orders/[ref]` page load when payment_status is pending
+ * or failed and the order is more than ~30s old.
+ */
+const _lastSyncAt = new Map<string, number>();
+const SYNC_COOLDOWN_MS = 15_000; // 15s between auto-syncs per ref
+
+export async function maybeBackSyncStripe(
+  ref: string,
+  reason: string
+): Promise<void> {
+  try {
+    const now = Date.now();
+    const last = _lastSyncAt.get(ref) ?? 0;
+    if (now - last < SYNC_COOLDOWN_MS) return;
+    _lastSyncAt.set(ref, now);
+    await syncStripePayment(ref, { actorName: `Auto-sync (${reason})`, actorId: null });
+  } catch {
+    // Swallow — never break page rendering because of a sync hiccup.
+  }
 }

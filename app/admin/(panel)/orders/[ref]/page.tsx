@@ -6,9 +6,14 @@ import { getServiceClient } from '@/lib/supabase/server';
 import { getStorageUrl } from '@/lib/supabase/storage';
 import { formatGBP, formatLongDate, formatTime } from '@/lib/utils';
 import { siteConfig } from '@/constants/siteConfig';
+import { maybeBackSyncStripe } from '@/lib/admin/orderActions';
 import OrderStatusControls from './OrderStatusControls';
 import KitchenNotesPanel from './KitchenNotesPanel';
 import OrderPaymentControls from './OrderPaymentControls';
+
+export const dynamic = 'force-dynamic';
+
+const SYNC_LOOKBACK_MS = 60 * 60 * 1000; // auto-sync only orders < 1h old
 
 const STATUS_LABELS: Record<string, string> = {
   received: 'Received',
@@ -28,8 +33,21 @@ const STATUS_PILL: Record<string, string> = {
 
 export default async function AdminOrderDetail({ params }: { params: Promise<{ ref: string }> }) {
   const { ref } = await params;
-  const order = await getOrderByRef(ref);
+  let order = await getOrderByRef(ref);
   if (!order) notFound();
+
+  // Auto-sync from Stripe when payment is pending/failed on a recent card
+  // order. Throttled to one call per 15s per ref (in lib/admin/orderActions).
+  if (
+    order.paymentMethod === 'card' &&
+    (order.paymentStatus === 'pending' || order.paymentStatus === 'failed') &&
+    Date.now() - new Date(order.createdAt).getTime() < SYNC_LOOKBACK_MS
+  ) {
+    await maybeBackSyncStripe(order.ref, 'order-detail');
+    // Re-fetch so the just-synced status renders this load instead of next.
+    const refreshed = await getOrderByRef(ref);
+    if (refreshed) order = refreshed;
+  }
 
   const supabase = getServiceClient();
   const { data: notes } = await supabase
