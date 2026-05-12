@@ -107,6 +107,13 @@ export default function SettingsForm({ initial }: { initial: SettingsBlob }) {
           <a href="#operations" className="settings-sidebar__link">
             Operations
           </a>
+          <a
+            href="/admin/settings/advanced"
+            className="settings-sidebar__link"
+            style={{ marginTop: 16, borderTop: '1px solid var(--color-rule)', paddingTop: 18, color: 'var(--color-bronze-deep)' }}
+          >
+            Advanced &amp; security →
+          </a>
         </aside>
 
         <div className="settings-main">

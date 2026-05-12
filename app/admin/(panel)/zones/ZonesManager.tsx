@@ -19,15 +19,30 @@ interface Zone {
   allowsCod: boolean;
   isActive: boolean;
   displayOrder: number;
+  monthlyOrders: number;
 }
 
-const EMPTY: Omit<Zone, 'id'> = {
+interface ZoneDraft {
+  id?: string;
+  name: string;
+  postcodes: string[];
+  baseFeeGbp: number;
+  minOrderGbp: number;
+  prepTimeMin: number;
+  prepTimeMax: number;
+  isQuoted: boolean;
+  allowsCod: boolean;
+  isActive: boolean;
+  displayOrder: number;
+}
+
+const EMPTY: ZoneDraft = {
   name: '',
   postcodes: [],
   baseFeeGbp: 5,
   minOrderGbp: 10,
-  prepTimeMin: 60,
-  prepTimeMax: 90,
+  prepTimeMin: 30,
+  prepTimeMax: 45,
   isQuoted: false,
   allowsCod: true,
   isActive: true,
@@ -37,23 +52,42 @@ const EMPTY: Omit<Zone, 'id'> = {
 export default function ZonesManager({ zones }: { zones: Zone[] }) {
   const router = useRouter();
   const [pending, start] = useTransition();
-  const [editing, setEditing] = useState<Zone | (Omit<Zone, 'id'> & { id?: string }) | null>(null);
+  const [draft, setDraft] = useState<ZoneDraft | null>(null);
   const [archiveTarget, setArchiveTarget] = useState<Zone | null>(null);
 
+  function openNew() {
+    setDraft({ ...EMPTY, displayOrder: zones.length + 1 });
+  }
+  function openEdit(z: Zone) {
+    setDraft({
+      id: z.id,
+      name: z.name,
+      postcodes: [...z.postcodes],
+      baseFeeGbp: z.baseFeeGbp,
+      minOrderGbp: z.minOrderGbp,
+      prepTimeMin: z.prepTimeMin,
+      prepTimeMax: z.prepTimeMax,
+      isQuoted: z.isQuoted,
+      allowsCod: z.allowsCod,
+      isActive: z.isActive,
+      displayOrder: z.displayOrder,
+    });
+  }
+
   function handleSave() {
-    if (!editing) return;
-    if (!editing.name.trim()) {
-      toast.error('Name required.');
+    if (!draft) return;
+    if (!draft.name.trim()) {
+      toast.error('Zone name is required.');
       return;
     }
     start(async () => {
-      const res = await upsertZone({ ...editing });
+      const res = await upsertZone({ ...draft });
       if (!res.ok) {
         toast.error(res.error);
         return;
       }
-      toast.success(editing.id ? 'Zone updated.' : 'Zone created.');
-      setEditing(null);
+      toast.success(draft.id ? 'Zone updated.' : 'Zone created.');
+      setDraft(null);
       router.refresh();
     });
   }
@@ -72,7 +106,7 @@ export default function ZonesManager({ zones }: { zones: Zone[] }) {
     });
   }
 
-  function toggleZoneField(zone: Zone, field: 'allowsCod' | 'isActive') {
+  function toggleField(zone: Zone, field: 'allowsCod' | 'isActive') {
     start(async () => {
       const res = await upsertZone({ ...zone, [field]: !zone[field] });
       if (!res.ok) {
@@ -90,12 +124,14 @@ export default function ZonesManager({ zones }: { zones: Zone[] }) {
       <div className="admin-page-head">
         <div className="admin-page-head__text">
           <div className="admin-page-head__eyebrow">{activeCount} active zones · Teesside</div>
-          <h1 className="admin-page-head__title">Delivery <em>zones</em></h1>
+          <h1 className="admin-page-head__title">
+            Delivery <em>zones</em>
+          </h1>
         </div>
         <div className="admin-page-head__actions">
           <button
             type="button"
-            onClick={() => setEditing({ ...EMPTY })}
+            onClick={openNew}
             className="receipt-btn receipt-btn--primary"
             style={{ cursor: 'pointer' }}
           >
@@ -119,7 +155,7 @@ export default function ZonesManager({ zones }: { zones: Zone[] }) {
           </b>
         </p>
         <p className="t-body-muted" style={{ margin: 0 }}>
-          Each zone covers a list of postcode prefixes. At checkout we match the customer's postcode against an active zone and apply its fee. Postcodes outside any active zone trigger the "outside our delivery area — message us on WhatsApp" fallback.
+          Each zone covers a list of postcode prefixes. At checkout we match the customer&apos;s postcode against an active zone and apply its fee. Postcodes outside any active zone trigger the &quot;outside our delivery area — message us on WhatsApp&quot; fallback.
         </p>
       </div>
 
@@ -150,7 +186,10 @@ export default function ZonesManager({ zones }: { zones: Zone[] }) {
                   <td>
                     <div className="admin-table__customer">
                       <b>{z.name}</b>
-                      {z.isQuoted && <em>Variable-quoted</em>}
+                      <em>
+                        {z.monthlyOrders} order{z.monthlyOrders === 1 ? '' : 's'} this month
+                        {z.isQuoted && ' · variable-quoted'}
+                      </em>
                     </div>
                   </td>
                   <td>
@@ -161,15 +200,14 @@ export default function ZonesManager({ zones }: { zones: Zone[] }) {
                         z.postcodes.map((pc) => (
                           <span
                             key={pc}
+                            className="chip"
                             style={{
                               padding: '3px 9px',
                               fontSize: 11,
                               background: 'var(--color-cream)',
-                              border: '1px solid var(--color-rule)',
                               borderRadius: 2,
                               fontFamily: 'var(--font-mono)',
                               letterSpacing: '0.04em',
-                              color: 'var(--color-walnut)',
                             }}
                           >
                             {pc}
@@ -199,7 +237,7 @@ export default function ZonesManager({ zones }: { zones: Zone[] }) {
                         type="checkbox"
                         checked={z.allowsCod}
                         disabled={pending}
-                        onChange={() => toggleZoneField(z, 'allowsCod')}
+                        onChange={() => toggleField(z, 'allowsCod')}
                       />
                       <span className="switch__track">
                         <span className="switch__thumb" />
@@ -212,7 +250,7 @@ export default function ZonesManager({ zones }: { zones: Zone[] }) {
                         type="checkbox"
                         checked={z.isActive}
                         disabled={pending}
-                        onChange={() => toggleZoneField(z, 'isActive')}
+                        onChange={() => toggleField(z, 'isActive')}
                       />
                       <span className="switch__track">
                         <span className="switch__thumb" />
@@ -222,7 +260,7 @@ export default function ZonesManager({ zones }: { zones: Zone[] }) {
                   <td className="admin-table__actions">
                     <button
                       type="button"
-                      onClick={() => setEditing(z)}
+                      onClick={() => openEdit(z)}
                       className="admin-table__action"
                       style={{ background: 'transparent', border: 0, cursor: 'pointer' }}
                     >
@@ -245,16 +283,39 @@ export default function ZonesManager({ zones }: { zones: Zone[] }) {
         </table>
       </div>
 
-      {editing && (
-        <ZoneEditModal
-          zone={editing}
-          pending={pending}
-          onChange={(patch) => setEditing({ ...editing, ...patch })}
-          onSave={handleSave}
-          onCancel={() => setEditing(null)}
-        />
-      )}
+      {/* Add / Edit zone modal */}
+      <ConfirmModal
+        open={draft !== null}
+        onCancel={() => setDraft(null)}
+        onConfirm={handleSave}
+        pending={pending}
+        eyebrow="Delivery zone"
+        title={
+          draft?.id ? (
+            <>
+              Edit · <em>{draft.name || 'zone'}</em>
+            </>
+          ) : (
+            <>
+              Add a new <em>zone</em>
+            </>
+          )
+        }
+        body={
+          <>Changes apply to new orders only — existing orders keep their original fee.</>
+        }
+        inputSlot={
+          draft && (
+            <ZoneForm
+              draft={draft}
+              onChange={(patch) => setDraft({ ...draft, ...patch })}
+            />
+          )
+        }
+        confirmLabel={pending ? 'Saving…' : draft?.id ? 'Save zone' : 'Create zone'}
+      />
 
+      {/* Archive modal */}
       <ConfirmModal
         open={archiveTarget !== null}
         onCancel={() => setArchiveTarget(null)}
@@ -262,11 +323,20 @@ export default function ZonesManager({ zones }: { zones: Zone[] }) {
         pending={pending}
         tone="danger"
         eyebrow="Archive delivery zone"
-        title={archiveTarget && <>Archive <em>{archiveTarget.name}?</em></>}
+        title={
+          archiveTarget && (
+            <>
+              Archive <em>{archiveTarget.name}?</em>
+            </>
+          )
+        }
         body={
-          <>
-            Customers in those postcode prefixes will see the "outside our delivery area" fallback at checkout. The zone is kept in the database and can be restored later.
-          </>
+          archiveTarget && (
+            <>
+              Customers in postcode{archiveTarget.postcodes.length === 1 ? '' : 's'}{' '}
+              <b>{archiveTarget.postcodes.join(', ') || '—'}</b> will see the &quot;outside our delivery area&quot; fallback at checkout. The zone is kept in the database and can be restored later.
+            </>
+          )
         }
         confirmLabel="Yes, archive"
       />
@@ -274,185 +344,244 @@ export default function ZonesManager({ zones }: { zones: Zone[] }) {
   );
 }
 
-function ZoneEditModal({
-  zone,
-  pending,
+function ZoneForm({
+  draft,
   onChange,
-  onSave,
-  onCancel,
 }: {
-  zone: Omit<Zone, 'id'> & { id?: string };
-  pending: boolean;
-  onChange: (patch: Partial<Zone>) => void;
-  onSave: () => void;
-  onCancel: () => void;
+  draft: ZoneDraft;
+  onChange: (patch: Partial<ZoneDraft>) => void;
 }) {
   return (
-    <div
-      role="dialog"
-      aria-modal="true"
-      style={{
-        position: 'fixed',
-        inset: 0,
-        background: 'rgba(45, 31, 24, 0.55)',
-        display: 'grid',
-        placeItems: 'center',
-        zIndex: 100,
-        padding: 16,
-      }}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onCancel();
-      }}
-    >
-      <div className="form-section" style={{ width: '100%', maxWidth: 560 }}>
-        <header className="form-section__head">
-          <h2 className="form-section__title">
-            {zone.id ? <>Edit <em>zone</em></> : <>New <em>zone</em></>}
-          </h2>
-          <span className="form-section__num">{zone.id ? 'Edit' : 'New'}</span>
-        </header>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, marginTop: 4 }}>
+      <div className="form-field">
+        <label className="form-field__label" htmlFor="zone-name">
+          Zone name
+        </label>
+        <input
+          id="zone-name"
+          className="form-field__input"
+          type="text"
+          value={draft.name}
+          onChange={(e) => onChange({ name: e.target.value })}
+          placeholder="e.g. Middlesbrough Central"
+          autoFocus
+        />
+      </div>
 
-        <div className="form-grid">
-          <label className="form-field full">
-            <span className="form-field__label">Zone name</span>
-            <input
-              type="text"
-              className="form-field__input"
-              value={zone.name}
-              onChange={(e) => onChange({ name: e.target.value })}
-              placeholder="e.g. Middlesbrough Central"
-            />
+      <div className="form-field">
+        <label className="form-field__label">
+          Postcode prefixes <small>· press Enter to add</small>
+        </label>
+        <PostcodeChipInput
+          values={draft.postcodes}
+          onChange={(postcodes) => onChange({ postcodes })}
+        />
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <div className="form-field">
+          <label className="form-field__label" htmlFor="zone-fee">
+            Delivery fee
           </label>
-          <label className="form-field full">
-            <span className="form-field__label">Postcode prefixes <small>· comma-separated</small></span>
+          <div style={{ position: 'relative' }}>
+            <span
+              style={{
+                position: 'absolute',
+                left: 12,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                fontFamily: 'var(--font-serif)',
+                color: 'var(--color-ink-muted)',
+                pointerEvents: 'none',
+              }}
+            >
+              £
+            </span>
             <input
-              type="text"
+              id="zone-fee"
               className="form-field__input"
-              value={zone.postcodes.join(', ')}
-              onChange={(e) =>
-                onChange({
-                  postcodes: e.target.value.split(',').map((s) => s.trim().toUpperCase()).filter(Boolean),
-                })
-              }
-              placeholder="TS1, TS2, TS3"
-              style={{ fontFamily: 'var(--font-mono)', fontStyle: 'normal' }}
-            />
-          </label>
-          <label className="form-field">
-            <span className="form-field__label">Base fee (£)</span>
-            <input
               type="number"
-              step="0.5"
               min="0"
-              className="form-field__input"
-              value={zone.baseFeeGbp}
+              step="0.50"
+              value={draft.baseFeeGbp}
               onChange={(e) => onChange({ baseFeeGbp: Number(e.target.value) })}
-              disabled={zone.isQuoted}
+              disabled={draft.isQuoted}
+              style={{ paddingLeft: 24 }}
             />
+          </div>
+        </div>
+        <div className="form-field">
+          <label className="form-field__label" htmlFor="zone-min">
+            Minimum order
           </label>
-          <label className="form-field">
-            <span className="form-field__label">Min order (£)</span>
+          <div style={{ position: 'relative' }}>
+            <span
+              style={{
+                position: 'absolute',
+                left: 12,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                fontFamily: 'var(--font-serif)',
+                color: 'var(--color-ink-muted)',
+                pointerEvents: 'none',
+              }}
+            >
+              £
+            </span>
             <input
+              id="zone-min"
+              className="form-field__input"
               type="number"
-              step="1"
               min="0"
-              className="form-field__input"
-              value={zone.minOrderGbp}
+              step="0.50"
+              value={draft.minOrderGbp}
               onChange={(e) => onChange({ minOrderGbp: Number(e.target.value) })}
+              style={{ paddingLeft: 24 }}
             />
-          </label>
-          <label className="form-field">
-            <span className="form-field__label">Prep min (mins)</span>
-            <input
-              type="number"
-              className="form-field__input"
-              value={zone.prepTimeMin}
-              onChange={(e) => onChange({ prepTimeMin: Number(e.target.value) })}
-            />
-          </label>
-          <label className="form-field">
-            <span className="form-field__label">Prep max (mins)</span>
-            <input
-              type="number"
-              className="form-field__input"
-              value={zone.prepTimeMax}
-              onChange={(e) => onChange({ prepTimeMax: Number(e.target.value) })}
-            />
-          </label>
-          <label className="form-field full">
-            <span className="form-field__label">Display order</span>
-            <input
-              type="number"
-              className="form-field__input"
-              value={zone.displayOrder}
-              onChange={(e) => onChange({ displayOrder: Number(e.target.value) })}
-            />
-          </label>
-        </div>
-
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginTop: 12 }}>
-          <FlagToggle label="Active (shown at checkout)" checked={zone.isActive} onChange={(v) => onChange({ isActive: v })} />
-          <FlagToggle label="Allows cash on delivery" checked={zone.allowsCod} onChange={(v) => onChange({ allowsCod: v })} />
-          <FlagToggle label="Variable-quoted (no auto fee)" checked={zone.isQuoted} onChange={(v) => onChange({ isQuoted: v })} />
-        </div>
-
-        <div style={{ display: 'flex', gap: 10, marginTop: 18, justifyContent: 'flex-end' }}>
-          <button
-            type="button"
-            onClick={onCancel}
-            disabled={pending}
-            className="receipt-btn"
-            style={{ cursor: pending ? 'wait' : 'pointer' }}
-          >
-            Cancel
-          </button>
-          <button
-            type="button"
-            onClick={onSave}
-            disabled={pending}
-            className="receipt-btn receipt-btn--primary"
-            style={{ cursor: pending ? 'wait' : 'pointer' }}
-          >
-            {pending ? 'Saving…' : zone.id ? 'Save zone' : 'Create zone'}
-          </button>
+          </div>
         </div>
       </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+        <div className="form-field">
+          <label className="form-field__label" htmlFor="zone-prep-min">
+            Prep time min <small>· minutes</small>
+          </label>
+          <input
+            id="zone-prep-min"
+            className="form-field__input"
+            type="number"
+            min="0"
+            step="5"
+            value={draft.prepTimeMin}
+            onChange={(e) => onChange({ prepTimeMin: Number(e.target.value) })}
+          />
+        </div>
+        <div className="form-field">
+          <label className="form-field__label" htmlFor="zone-prep-max">
+            Prep time max <small>· minutes</small>
+          </label>
+          <input
+            id="zone-prep-max"
+            className="form-field__input"
+            type="number"
+            min="0"
+            step="5"
+            value={draft.prepTimeMax}
+            onChange={(e) => onChange({ prepTimeMax: Number(e.target.value) })}
+          />
+        </div>
+      </div>
+
+      <CheckboxRow
+        checked={draft.allowsCod}
+        onChange={(v) => onChange({ allowsCod: v })}
+        label={<b style={{ color: 'var(--color-walnut)', fontStyle: 'normal', fontWeight: 500 }}>Allow Cash on Delivery</b>}
+        caption="in this zone — drivers will carry change."
+      />
+      <CheckboxRow
+        checked={draft.isActive}
+        onChange={(v) => onChange({ isActive: v })}
+        label={<b style={{ color: 'var(--color-walnut)', fontStyle: 'normal', fontWeight: 500 }}>Zone is active</b>}
+        caption="— customers in this postcode can place orders."
+      />
+      <CheckboxRow
+        checked={draft.isQuoted}
+        onChange={(v) => onChange({ isQuoted: v })}
+        label={<b style={{ color: 'var(--color-walnut)', fontStyle: 'normal', fontWeight: 500 }}>Variable-quoted</b>}
+        caption="— no fixed fee. Admin contacts the customer after order."
+      />
     </div>
   );
 }
 
-function FlagToggle({
-  label,
-  checked,
+function PostcodeChipInput({
+  values,
   onChange,
 }: {
-  label: string;
+  values: string[];
+  onChange: (next: string[]) => void;
+}) {
+  const [draft, setDraft] = useState('');
+
+  function commit() {
+    const v = draft.trim().toUpperCase();
+    if (!v) return;
+    if (values.includes(v)) {
+      setDraft('');
+      return;
+    }
+    onChange([...values, v]);
+    setDraft('');
+  }
+
+  return (
+    <div className="chip-input">
+      {values.map((v) => (
+        <span key={v} className="chip">
+          {v}
+          <button
+            type="button"
+            className="chip__remove"
+            onClick={() => onChange(values.filter((x) => x !== v))}
+            aria-label={`Remove ${v}`}
+          >
+            ×
+          </button>
+        </span>
+      ))}
+      <input
+        type="text"
+        className="chip-input__input"
+        value={draft}
+        onChange={(e) => setDraft(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault();
+            commit();
+          } else if (e.key === 'Backspace' && !draft && values.length > 0) {
+            onChange(values.slice(0, -1));
+          }
+        }}
+        onBlur={commit}
+        placeholder="e.g., TS6"
+        style={{ textTransform: 'uppercase' }}
+      />
+    </div>
+  );
+}
+
+function CheckboxRow({
+  checked,
+  onChange,
+  label,
+  caption,
+}: {
   checked: boolean;
   onChange: (v: boolean) => void;
+  label: React.ReactNode;
+  caption: string;
 }) {
   return (
     <label
       style={{
         display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        gap: 12,
-        padding: '10px 14px',
-        border: '1px solid var(--color-rule)',
-        borderRadius: 2,
-        background: 'var(--color-cream-soft)',
-        cursor: 'pointer',
-        fontFamily: 'var(--font-serif)',
+        alignItems: 'flex-start',
+        gap: 10,
         fontSize: 14,
-        color: 'var(--color-walnut)',
+        fontFamily: 'var(--font-serif)',
+        cursor: 'pointer',
+        paddingTop: 4,
       }}
     >
-      <span>{label}</span>
-      <span className="switch">
-        <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
-        <span className="switch__track">
-          <span className="switch__thumb" />
-        </span>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(e) => onChange(e.target.checked)}
+        style={{ accentColor: 'var(--color-walnut)', marginTop: 3 }}
+      />
+      <span>
+        {label} {caption}
       </span>
     </label>
   );

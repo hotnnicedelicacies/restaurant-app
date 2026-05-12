@@ -2246,3 +2246,63 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -0.00
 .receipt-btn:hover { background: var(--color-walnut); color: var(--color-cream); }
 .receipt-btn--primary { background: var(--color-walnut); color: var(--color-cream); }
 .receipt-btn--primary:hover { background: var(--color-bronze-deep); }
+   WARNING / DANGER BANNER (advanced settings)
+   ============================================================ */
+
+.warning-banner {
+  background: rgba(139, 42, 26, 0.06);
+  border: 1px solid rgba(139, 42, 26, 0.3);
+  border-left-width: 4px;
+  padding: 18px 22px;
+  margin-bottom: 28px;
+  border-radius: 0 2px 2px 0;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.warning-banner__icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  color: #8B2A1A;
+  margin-top: 2px;
+}
+.warning-banner__content { flex: 1; }
+.warning-banner__title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 16px;
+  font-variant: small-caps;
+  letter-spacing: 0.08em;
+  color: #8B2A1A;
+  margin: 0 0 4px;
+}
+.warning-banner__body {
+  font-family: var(--font-serif);
+  font-size: 14px;
+  color: var(--color-walnut);
+  line-height: 1.55;
+  margin: 0;
+}
+.warning-banner__body em { font-style: italic; color: var(--color-ink-muted); }
+.warning-banner__body b { font-weight: 500; }
+
+/* Pending-confirmation state */
+.pending-confirm-banner {
+  background: rgba(165, 111, 64, 0.12);
+  border: 1px solid var(--color-bronze);
+  border-left-width: 4px;
+  padding: 12px 14px;
+  margin-top: 10px;
+  border-radius: 0 2px 2px 0;
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.pending-confirm-banner__content {
+  font-family: var(--font-serif);
+  font-size: 13px;
+  color: var(--color-walnut);
+  line-height: 1.5;
+}
+.pending-confirm-banner__content em { font-style: italic; color: var(--color-ink-muted); }
