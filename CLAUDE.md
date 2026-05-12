@@ -137,7 +137,17 @@ Large chunks of `design-explorations/shared/styles.css` are copied into `app/glo
 6. **next/font className goes on `<html>`** in `app/layout.tsx`. The CSS tokens use `var(--font-cormorant, 'Cormorant Garamond')` with explicit fallbacks so the chain stays valid before next/font has set the variable.
 7. **`unstable_cache` cannot wrap cookie-aware clients.** Always use `getPublicClient()` (in `lib/supabase/public.ts`) inside cached fetchers.
 8. **Admin vs customer split.** Middleware bounces admins off `/account`, `/cart`, `/checkout`, `/sign-in`, `/sign-up` straight to `/admin/orders`. They have different product surfaces.
-9. **Stripe webhook reconciliation.** If a webhook gets dropped (local dev without `stripe listen`, transient network), the admin order detail page surfaces a "Sync with Stripe" prompt for pending/failed card orders. Backed by `syncStripePayment` in `lib/admin/orderActions.ts`.
+9. **Stripe webhook reconciliation.** If a webhook gets dropped (local dev without `stripe listen`, transient network), the admin order detail page surfaces a "Sync with Stripe" prompt for pending/failed card orders. Backed by `syncStripePayment` in `lib/admin/orderActions.ts`. Auto-fires on `/admin/orders`, `/admin/orders/[ref]`, `/receipt/[ref]` when a card order is pending/failed and `<1h` old, throttled to one Stripe API call per 15 s per ref (`maybeBackSyncStripe`). Customer-facing receipt, track, and confirmation pages all carry `export const dynamic = 'force-dynamic'` so a sync visible in one tab is visible in another after reload.
+
+   **Stripe PaymentIntent → our `payment_status` mapping** (in `syncStripePayment`):
+   - `succeeded` + `refund_amount >= total` → `refunded`
+   - `succeeded` + `refund_amount > 0` → `partially_refunded`
+   - `succeeded` → `paid`
+   - `canceled` → `failed`
+   - `requires_payment_method` is **the initial state of every PI** (no method attached yet) — only treat as `failed` when `last_payment_error` is set or a `latest_charge` exists. Otherwise the customer simply abandoned mid-checkout; keep `pending` so they can still complete payment.
+   - Everything else (`requires_action` / `requires_confirmation` / `requires_capture` / `processing`) → `pending`.
+
+   **Do not** treat bare `requires_payment_method` as failed — that misclassifies every brand-new PI as failed and was the source of an entire batch of "all my test payments show failed" reports.
 10. **The Stripe webhook handler is in `app/api/stripe/webhook/route.ts`.** Use `runtime = 'nodejs'` and `dynamic = 'force-dynamic'` — never re-introduce the legacy `export const config = { api: { bodyParser: false } }` pages-router shape; Next 16 rejects it.
 11. **Hours come from admin settings, not siteConfig.** Anywhere you'd hardcode "Tue – Sun 12pm – 8pm", call `getHours()` (server) which reads the `settings.hours` row.
 12. **No legacy fallback in production.** `constants/meals.ts` and `app/order/` have been deleted on purpose. If you need to backfill empty menu/zones, do it in the DB, not in code.

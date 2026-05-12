@@ -310,16 +310,20 @@ export async function syncStripePayment(
   let cardBrand: string | null = null;
   let cardLast4: string | null = null;
   let refundedTotal = 0;
+  let hasLastPaymentError = false;
+  let hasCharge = false;
 
   try {
     const stripe = getStripe();
     const pi = await stripe.paymentIntents.retrieve(row.stripe_payment_intent_id, {
       expand: ['latest_charge'],
     });
-    stripeStatus = pi.status; // 'succeeded' | 'requires_payment_method' | 'requires_action' | etc.
+    stripeStatus = pi.status; // 'succeeded' | 'requires_payment_method' | 'requires_action' | 'processing' | 'canceled' | etc.
+    hasLastPaymentError = Boolean(pi.last_payment_error);
     const charge =
       pi.latest_charge && typeof pi.latest_charge !== 'string' ? pi.latest_charge : null;
     if (charge) {
+      hasCharge = true;
       cardBrand = charge.payment_method_details?.card?.brand ?? null;
       cardLast4 = charge.payment_method_details?.card?.last4 ?? null;
       refundedTotal = (charge.amount_refunded ?? 0) / 100;
@@ -328,15 +332,27 @@ export async function syncStripePayment(
     return { ok: false, error: err instanceof Error ? err.message : 'Stripe lookup failed.' };
   }
 
-  // Map Stripe states to our payment_status
+  // Map Stripe PaymentIntent states to our payment_status.
+  //
+  // Important nuance: `requires_payment_method` is the *initial* state of
+  // every PI (no method attached yet) AND the state Stripe returns to
+  // after a failed attempt. Treating it as "failed" unconditionally
+  // marks every brand-new / abandoned-mid-checkout order as failed,
+  // which is incorrect. Use last_payment_error / charge presence to
+  // distinguish "abandoned, can still pay" from "tried and was declined".
   let nextPaymentStatus: 'pending' | 'paid' | 'failed' | 'refunded' | 'partially_refunded';
   if (stripeStatus === 'succeeded') {
     if (refundedTotal >= Number(order.totalGbp)) nextPaymentStatus = 'refunded';
     else if (refundedTotal > 0) nextPaymentStatus = 'partially_refunded';
     else nextPaymentStatus = 'paid';
-  } else if (stripeStatus === 'canceled' || stripeStatus === 'requires_payment_method') {
+  } else if (stripeStatus === 'canceled') {
     nextPaymentStatus = 'failed';
+  } else if (stripeStatus === 'requires_payment_method') {
+    // Only "failed" if a previous attempt was actually rejected. Otherwise
+    // the customer just hasn't completed the PaymentElement step yet.
+    nextPaymentStatus = hasLastPaymentError || hasCharge ? 'failed' : 'pending';
   } else {
+    // requires_action / requires_confirmation / requires_capture / processing
     nextPaymentStatus = 'pending';
   }
 
