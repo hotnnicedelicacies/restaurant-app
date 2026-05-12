@@ -2533,7 +2533,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -0.00
 
 .receipt__paid-stamp {
   position: absolute;
-  top: 110px;
+  top: 90px;
   right: 56px;
   transform: rotate(-6deg);
   border: 2px solid var(--color-bronze);
@@ -2595,8 +2595,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -0.00
   .mockup-banner,
   .site-header,
   .site-footer,
-  .receipt-actions,
-  .receipt-page__footer { display: none !important; }
+  .receipt-actions { display: none !important; }
   .receipt-page { background: white; padding: 0; }
   .receipt {
     max-width: none;
@@ -2649,3 +2648,93 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -0.00
   color: var(--color-ink-muted);
 }
 .receipt-actions__right { display: flex; gap: 10px; flex-wrap: wrap; }
+
+/* ============================================================
+   SITE FOOTER — ported from design (used slim on /receipt)
+   ============================================================ */
+
+.site-footer {
+  background: var(--color-walnut);
+  color: var(--color-cream);
+  padding-top: 56px;
+  padding-bottom: 24px;
+  border-top: 1px solid var(--color-rule-light);
+}
+.site-footer__grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 48px;
+  padding-bottom: 40px;
+  border-bottom: 1px solid var(--color-rule-light);
+}
+.site-footer__brand img { height: 56px; margin-bottom: 16px; }
+.site-footer__tagline {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 15px;
+  color: rgba(241, 229, 205, 0.72);
+  line-height: 1.5;
+  margin: 0 0 20px;
+  max-width: 30ch;
+}
+.site-footer__hygiene {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-family: var(--font-serif);
+  font-size: 13px;
+}
+.site-footer__hygiene-stars {
+  color: var(--color-bronze);
+  letter-spacing: 0.16em;
+  font-variant: small-caps;
+}
+.site-footer__hygiene a {
+  color: rgba(241, 229, 205, 0.75);
+  border-bottom: 1px solid rgba(241, 229, 205, 0.3);
+  padding-bottom: 1px;
+  font-style: italic;
+  font-size: 13px;
+  align-self: flex-start;
+}
+.site-footer__col-title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 14px;
+  font-variant: small-caps;
+  letter-spacing: 0.16em;
+  color: var(--color-bronze);
+  margin: 0 0 16px;
+}
+.site-footer ul { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; }
+.site-footer ul a {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  color: rgba(241, 229, 205, 0.82);
+  transition: color 200ms ease;
+}
+.site-footer ul a:hover { color: var(--color-bronze); }
+.site-footer__copy {
+  padding-top: 20px;
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13px;
+  color: rgba(241, 229, 205, 0.55);
+  flex-wrap: wrap;
+}
+
+@media (max-width: 880px) {
+  .site-footer__grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+  }
+  .site-footer__brand { grid-column: 1 / -1; }
+}
+@media (max-width: 520px) {
+  .site-footer__grid { grid-template-columns: 1fr; }
+}
+
+
