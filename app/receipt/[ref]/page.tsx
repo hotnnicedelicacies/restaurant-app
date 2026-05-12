@@ -333,6 +333,32 @@ export default async function ReceiptPage({ params }: { params: Promise<{ ref: s
             <a href={`tel:${siteConfig.contact.phone}`}>{siteConfig.contact.phone}</a>
           </footer>
         </article>
+
+        {/* Page footer — hidden in print */}
+        <footer
+          className="receipt-page__footer print:hidden"
+          style={{
+            maxWidth: 760,
+            margin: '32px auto 0',
+            paddingTop: 20,
+            borderTop: '1px solid var(--color-rule)',
+            display: 'flex',
+            justifyContent: 'space-between',
+            gap: 12,
+            flexWrap: 'wrap',
+            fontFamily: 'var(--font-serif)',
+            fontStyle: 'italic',
+            fontSize: 12.5,
+            color: 'var(--color-ink-muted)',
+          }}
+        >
+          <span>
+            © {new Date().getFullYear()} {siteConfig.name} · Middlesbrough, UK
+          </span>
+          <span style={{ letterSpacing: '0.04em' }}>
+            ★ ★ ★ ★ ★ &nbsp;Food Hygiene · {siteConfig.foodHygiene.authority}
+          </span>
+        </footer>
       </div>
     </>
   );

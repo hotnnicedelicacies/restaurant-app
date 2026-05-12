@@ -2340,7 +2340,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -0.00
   background: var(--color-cream);
   border: 1px solid var(--color-rule);
   border-radius: 2px;
-  padding: clamp(32px, 5vw, 64px);
+  padding: clamp(28px, 4vw, 48px) clamp(28px, 5vw, 64px);
   position: relative;
 }
 
@@ -2589,22 +2589,39 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -0.00
   .receipt__paid-stamp { top: 20px; right: 20px; font-size: 18px; padding: 5px 14px; }
 }
 
-/* Print: clean white page, hide chrome */
+/* Print: clean white page, hide chrome, fit a single A4. */
 @media print {
   body { background: white; }
   .mockup-banner,
   .site-header,
   .site-footer,
-  .receipt-actions { display: none !important; }
+  .receipt-actions,
+  .receipt-page__footer { display: none !important; }
   .receipt-page { background: white; padding: 0; }
   .receipt {
     max-width: none;
     margin: 0;
     border: 0;
     box-shadow: none;
-    padding: 24mm;
+    padding: 14mm 16mm;
   }
+  /* Tighten the vertical rhythm so a 3-item receipt comfortably fits. */
+  .receipt__title { font-size: 22px; margin-top: 14px; }
+  .receipt__title-sub { margin: 4px 0 16px; font-size: 13px; }
+  .receipt__parties { margin: 18px 0; gap: 24px; }
+  .receipt__table th, .receipt__table td { padding: 8px 0; font-size: 12.5px; }
+  .receipt__totals { margin: 14px 0; }
+  .receipt__total-row { padding: 4px 0; }
+  .receipt__total-row--grand { padding: 8px 0; font-size: 15px; }
+  .receipt__payment { margin: 18px 0; gap: 24px; }
+  .receipt__thanks { margin-top: 18px; padding-top: 14px; font-size: 14px; }
+  .receipt__footer { margin-top: 18px; padding-top: 12px; font-size: 11.5px; }
   .receipt__paid-stamp { opacity: 0.5; }
+  /* Keep grouped sections from splitting across pages. */
+  .receipt__parties,
+  .receipt__payment,
+  .receipt__totals,
+  .receipt__footer { page-break-inside: avoid; }
   @page { margin: 0; size: A4; }
 }
 
