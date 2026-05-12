@@ -144,9 +144,9 @@ export default async function AdminOrderDetail({ params }: { params: Promise<{ r
                 return (
                   <div className="summary__item" key={item.id}>
                     {item.imagePath ? (
-                      <Image src={getStorageUrl(item.imagePath)} alt={item.name} width={64} height={64} />
+                      <Image src={getStorageUrl(item.imagePath)} alt={item.name} width={88} height={88} />
                     ) : (
-                      <div style={{ width: 64, height: 64, background: 'var(--color-cream-soft)', borderRadius: 2 }} />
+                      <div style={{ width: 44, height: 44, background: 'var(--color-cream-soft)', borderRadius: 2 }} />
                     )}
                     <div className="summary__item-text">
                       <h3 className="summary__item-name">{item.name}</h3>

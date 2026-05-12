@@ -60,9 +60,25 @@
   --container-gutter: 24px;
 }
 
-/* --- Base --- */
+/* --- Base ---
+   Mirrors design-explorations/shared/styles.css so admin / customer
+   pages render exactly like the mockups. Tailwind v4 preflight handles
+   most of these but is missing the `padding: 0; border: 0` defaults
+   for <button> the design relies on inside .receipt-btn / .status-btn /
+   .admin-table__action, which otherwise inherit the platform's chunky
+   default. */
 * { border-color: var(--color-border); box-sizing: border-box; }
 html { scroll-behavior: smooth; }
+img { display: block; max-width: 100%; height: auto; }
+button {
+  font: inherit;
+  cursor: pointer;
+  border: 0;
+  background: none;
+  padding: 0;
+  color: inherit;
+}
+a { color: inherit; text-decoration: none; }
 body {
   background-color: var(--color-background);
   color: var(--color-foreground);

@@ -21,10 +21,10 @@ const STATUS_PILLS: { value: string; label: string }[] = [
 ];
 
 const RANGES: { value: NonNullable<SearchParams['range']>; label: string }[] = [
+  { value: 'all', label: 'All time' },
   { value: 'today', label: 'Today' },
   { value: 'week', label: 'This week' },
   { value: 'month', label: 'This month' },
-  { value: 'all', label: 'All time' },
 ];
 
 function rangeStart(range: SearchParams['range']): string | null {
@@ -56,7 +56,7 @@ export default async function AdminOrdersPage({
 }) {
   const sp = await searchParams;
   const activeStatus = sp.status ?? 'all';
-  const range = sp.range ?? 'today';
+  const range = sp.range ?? 'all';
   const supabase = getServiceClient();
   const from = rangeStart(range);
 
@@ -130,7 +130,7 @@ export default async function AdminOrdersPage({
   }));
 
   const today = formatLongDate(new Date());
-  const rangeLabel = RANGES.find((r) => r.value === range)?.label ?? 'Today';
+  const rangeLabel = RANGES.find((r) => r.value === range)?.label ?? 'All time';
 
   return (
     <>
