@@ -148,6 +148,10 @@ Large chunks of `design-explorations/shared/styles.css` are copied into `app/glo
    - Everything else (`requires_action` / `requires_confirmation` / `requires_capture` / `processing`) → `pending`.
 
    **Do not** treat bare `requires_payment_method` as failed — that misclassifies every brand-new PI as failed and was the source of an entire batch of "all my test payments show failed" reports.
+
+   **Stripe PaymentIntent is pinned to `payment_method_types: ['card']`** in `lib/orders/create.ts`. **Don't** swap it to `automatic_payment_methods: { enabled: true }` — that adds Link / Klarna / Revolut Pay / Amazon Pay to the PaymentElement, all of which use redirect-based flows. A customer abandoning mid-redirect strands the PI in `requires_payment_method` with no method, no charge, no error — indistinguishable from "never tried". For a UK kitchen taking small card payments we want exactly one predictable path.
+
+   **`StripePaymentSection` uses `redirect: 'if_required'`** on `stripe.confirmPayment`. The 4242 test card and most live UK cards don't need 3DS — they succeed inline. Without that flag, Stripe always tries to redirect to `return_url`, which behaves unpredictably across localhost / iframed previews / popup blockers and was a likely cause of stranded PIs. On inline success we navigate the user to `/confirmation/[ref]` ourselves; on 3DS we let Stripe redirect as usual.
 10. **The Stripe webhook handler is in `app/api/stripe/webhook/route.ts`.** Use `runtime = 'nodejs'` and `dynamic = 'force-dynamic'` — never re-introduce the legacy `export const config = { api: { bodyParser: false } }` pages-router shape; Next 16 rejects it.
 11. **Hours come from admin settings, not siteConfig.** Anywhere you'd hardcode "Tue – Sun 12pm – 8pm", call `getHours()` (server) which reads the `settings.hours` row.
 12. **No legacy fallback in production.** `constants/meals.ts` and `app/order/` have been deleted on purpose. If you need to backfill empty menu/zones, do it in the DB, not in code.

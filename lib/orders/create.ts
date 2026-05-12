@@ -188,7 +188,14 @@ export async function createOrder(input: CreateOrderInput): Promise<CreateOrderR
       const pi = await stripe.paymentIntents.create({
         amount: Math.round(total * 100),
         currency: 'gbp',
-        automatic_payment_methods: { enabled: true },
+        // Card only. Don't use `automatic_payment_methods: { enabled: true }` here
+        // because that opens up Link / Klarna / Revolut Pay / Amazon Pay in the
+        // PaymentElement — all of which use redirect-based confirmation flows.
+        // If a customer picks one and abandons mid-redirect, Stripe leaves the
+        // PI in `requires_payment_method` forever (no payment_method, no
+        // last_payment_error, no charge — indistinguishable from a fresh PI).
+        // For a kitchen taking UK card payments we want exactly one path.
+        payment_method_types: ['card'],
         metadata: {
           order_id: order.id,
           order_ref: ref,

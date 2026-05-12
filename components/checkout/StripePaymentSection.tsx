@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useStripe, useElements, PaymentElement } from '@stripe/react-stripe-js';
 import { toast } from 'sonner';
 
@@ -16,32 +17,60 @@ export default function StripePaymentSection({
   orderRef: string;
   returnUrl: string;
 }) {
+  const router = useRouter();
   const stripe = useStripe();
   const elements = useElements();
   const [submitting, setSubmitting] = useState(false);
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!stripe || !elements) return;
+    if (!stripe || !elements) {
+      toast.error('Payment form is still loading. Try again in a moment.');
+      return;
+    }
 
     setSubmitting(true);
     // NB: don't clear the cart here. If we do, the parent CheckoutForm
     // sees an empty cart and unmounts these Elements before Stripe can
     // 3DS / redirect, dropping the user onto an "empty basket" screen.
     // The confirmation page clears the cart once payment lands.
-    const { error } = await stripe.confirmPayment({
+    //
+    // `redirect: 'if_required'` — for plain card payments that don't need
+    // 3DS (e.g. Stripe's 4242 test card), confirmPayment succeeds inline
+    // and we navigate to /confirmation ourselves. Without this flag,
+    // Stripe always tries to redirect, which behaves unpredictably across
+    // localhost / iframes / popup blockers and was a likely cause of
+    // PaymentIntents stranded in `requires_payment_method`.
+    const { error, paymentIntent } = await stripe.confirmPayment({
       elements,
       confirmParams: {
         return_url: returnUrl,
       },
+      redirect: 'if_required',
     });
 
-    // confirmPayment only returns here on immediate error (e.g. validation
-    // failure). On success Stripe redirects to return_url before we get here.
     if (error) {
+      // Validation error (invalid card / wrong CVC), card declined, etc.
+      // Stripe surfaces the message — show it loud.
+      console.error('[stripe] confirmPayment failed', error);
       toast.error(error.message ?? 'Payment failed. Please try again.');
       setSubmitting(false);
+      return;
     }
+
+    // Inline success path (no redirect was needed — typical for test card).
+    // Stripe also returns here after a successful 3DS redirect that didn't
+    // hit return_url for any reason. Either way, head to the confirmation.
+    if (paymentIntent && (paymentIntent.status === 'succeeded' || paymentIntent.status === 'processing')) {
+      router.push(returnUrl);
+      return;
+    }
+
+    // We're here without an error AND without a succeeded PI. That's
+    // ambiguous — surface it rather than silently leaving the user
+    // staring at a spinning button.
+    toast.error('Payment did not complete. Please try again.');
+    setSubmitting(false);
   };
 
   return (
