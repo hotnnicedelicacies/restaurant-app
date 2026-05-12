@@ -82,12 +82,17 @@ export default function SiteHeader({
         <div className="hidden items-center gap-2 md:flex">
           <HeaderAuthLink tone="onDark" />
           <HeaderCartLink tone="onDark" />
-          <Link
-            href={cta.href}
-            className="ml-1 rounded-[2px] bg-bronze px-[18px] py-[10px] font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] transition-colors hover:bg-cream hover:text-walnut"
-          >
-            {cta.label}
-          </Link>
+          {/* On /menu / /menu/[slug] the customer is already browsing — the
+              bronze "Order now" CTA is redundant. Show only the cart there;
+              elsewhere the CTA points them at the menu. */}
+          {!current.startsWith('/menu') && (
+            <Link
+              href={cta.href}
+              className="ml-1 rounded-[2px] bg-bronze px-[18px] py-[10px] font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] transition-colors hover:bg-cream hover:text-walnut"
+            >
+              {cta.label}
+            </Link>
+          )}
         </div>
 
         {/* Mobile: cart + burger */}
@@ -138,13 +143,15 @@ export default function SiteHeader({
                 <HeaderAuthLink tone="onDark" withLabel onClick={() => setMobileOpen(false)} />
                 <HeaderCartLink tone="onDark" withLabel onClick={() => setMobileOpen(false)} />
               </div>
-              <Link
-                href={cta.href}
-                onClick={() => setMobileOpen(false)}
-                className="mt-1 rounded-[2px] bg-bronze px-5 py-3 text-center font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps]"
-              >
-                {cta.label}
-              </Link>
+              {!current.startsWith('/menu') && (
+                <Link
+                  href={cta.href}
+                  onClick={() => setMobileOpen(false)}
+                  className="mt-1 rounded-[2px] bg-bronze px-5 py-3 text-center font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps]"
+                >
+                  {cta.label}
+                </Link>
+              )}
             </div>
           </motion.nav>
         )}

@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import CheckoutForm from '@/components/checkout/CheckoutForm';
+import CheckoutForm, { type CheckoutDefaults } from '@/components/checkout/CheckoutForm';
+import { getServerClient } from '@/lib/supabase/server';
 import { siteConfig } from '@/constants/siteConfig';
 
 export const metadata: Metadata = {
@@ -9,7 +10,44 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
-export default function CheckoutPage() {
+export const dynamic = 'force-dynamic';
+
+export default async function CheckoutPage() {
+  // For signed-in customers we pre-fill the form from their profile + default
+  // address. Guests start with an empty form.
+  const supabase = await getServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  let defaults: CheckoutDefaults | null = null;
+
+  if (user) {
+    const [{ data: profile }, { data: address }] = await Promise.all([
+      supabase
+        .from('profiles')
+        .select('display_name, phone')
+        .eq('id', user.id)
+        .single(),
+      supabase
+        .from('addresses')
+        .select('*')
+        .eq('profile_id', user.id)
+        .order('is_default', { ascending: false })
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
+    const [first = '', last = ''] = (profile?.display_name ?? '').split(' ', 2);
+    defaults = {
+      firstName: first,
+      lastName: last,
+      email: user.email ?? '',
+      phone: profile?.phone ?? '',
+      address1: address?.line1 ?? '',
+      address2: address?.line2 ?? '',
+      city: address?.city ?? 'Middlesbrough',
+      postcode: address?.postcode ?? '',
+    };
+  }
+
   return (
     <>
       {/* Slim header (less escape distraction) */}
@@ -47,7 +85,7 @@ export default function CheckoutPage() {
       </nav>
 
       <main className="container py-[clamp(32px,5vw,56px)] pb-[clamp(48px,7vw,88px)]">
-        <CheckoutForm />
+        <CheckoutForm defaults={defaults} />
       </main>
 
       <footer className="bg-walnut py-4 text-center font-serif text-[12px] italic text-[#F1E5CD8C]">

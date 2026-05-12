@@ -2,10 +2,12 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { headers } from 'next/headers';
 import { getServerClient } from '@/lib/supabase/server';
 import { absoluteUrl } from '@/lib/utils';
 import { siteConfig } from '@/constants/siteConfig';
+import { claimOrdersByEmail } from '@/lib/account/profile';
+import { sendEmail } from '@/lib/email/send';
+import { welcomeEmail } from '@/lib/email/templates';
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -21,7 +23,7 @@ export async function signUpAction(formData: FormData): Promise<ActionResult> {
   }
 
   const supabase = await getServerClient();
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
@@ -30,6 +32,24 @@ export async function signUpAction(formData: FormData): Promise<ActionResult> {
     },
   });
   if (error) return { ok: false, error: error.message };
+
+  // Best-effort: send our own welcome email + back-link any guest orders
+  // placed earlier with this email. Both swallow errors so they never
+  // block the auth flow.
+  if (data.user) {
+    await claimOrdersByEmail(email, data.user.id);
+    try {
+      const welcome = welcomeEmail(name);
+      await sendEmail({
+        to: email,
+        subject: welcome.subject,
+        html: welcome.html,
+        text: welcome.text,
+      });
+    } catch (e) {
+      console.error('[signUpAction] welcome email failed:', e);
+    }
+  }
 
   revalidatePath('/', 'layout');
   redirect(next);
@@ -48,6 +68,9 @@ export async function signInAction(formData: FormData): Promise<ActionResult> {
   const supabase = await getServerClient();
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) return { ok: false, error: error.message };
+
+  // Back-link any guest orders placed with this email. Quiet on failure.
+  if (data.user) await claimOrdersByEmail(email, data.user.id);
 
   revalidatePath('/', 'layout');
 

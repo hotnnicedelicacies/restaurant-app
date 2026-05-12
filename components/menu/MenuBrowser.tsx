@@ -20,6 +20,9 @@ function toFareRowItem(item: MenuItemView, index: number): FareRowItem {
     price: item.priceGbp,
     image: item.image,
     imageAlt: item.name,
+    // Tag chips on a fare row are informational only (design renders <span>);
+    // the clickable filters live in the toolbar at the top. Including
+    // allergens here is purely visual disclosure.
     tags: [...item.dietaryTags, ...item.allergenTags],
     badges: item.badges,
     available: item.isAvailable,
@@ -245,7 +248,6 @@ export default function MenuBrowser({ categories, itemsByCategory }: Props) {
                       key={it.slug}
                       item={toFareRowItem(it, counter++)}
                       divider={j < items.length - 1}
-                      onTagClick={(tag) => setActiveTag(tag === activeTag ? null : tag)}
                     />
                   ))}
                 </div>

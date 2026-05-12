@@ -1,33 +1,47 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import Link from 'next/link';
 import SiteHeader from '@/components/layout/SiteHeader';
 import SiteFooter from '@/components/layout/SiteFooter';
 import PageHero from '@/components/layout/PageHero';
-import HeritageButton from '@/components/ui/HeritageButton';
 import { getServerClient } from '@/lib/supabase/server';
 import { siteConfig } from '@/constants/siteConfig';
 import { formatLongDate } from '@/lib/utils';
-import { signOutAction } from '@/lib/auth/actions';
+import AccountSidebar from '@/components/account/AccountSidebar';
 import AddressManager from '@/components/account/AddressManager';
+import ProfileForm from '@/components/account/ProfileForm';
+import PasswordForm from '@/components/account/PasswordForm';
+import CloseAccountCard from '@/components/account/CloseAccountCard';
+import OrderHistory, { type OrderHistoryRow } from '@/components/account/OrderHistory';
 
 export const metadata: Metadata = {
   title: 'My account',
   robots: { index: false, follow: false },
 };
 
+// PI status and order data change behind the scenes — never cache.
+export const dynamic = 'force-dynamic';
+
 export default async function AccountPage() {
   const supabase = await getServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect(siteConfig.routes.signIn);
 
-  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-  const { data: addressRows } = await supabase
-    .from('addresses')
-    .select('*')
-    .eq('profile_id', user.id)
-    .order('is_default', { ascending: false })
-    .order('created_at', { ascending: false });
+  const [{ data: profile }, { data: addressRows }, { data: orderRows }] = await Promise.all([
+    supabase.from('profiles').select('*').eq('id', user.id).single(),
+    supabase
+      .from('addresses')
+      .select('*')
+      .eq('profile_id', user.id)
+      .order('is_default', { ascending: false })
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('orders')
+      .select('id, ref, status, payment_status, total_gbp, created_at')
+      .eq('profile_id', user.id)
+      .order('created_at', { ascending: false })
+      .limit(30),
+  ]);
+
   const addresses = (addressRows ?? []).map((a) => ({
     id: a.id,
     label: a.label,
@@ -39,7 +53,34 @@ export default async function AccountPage() {
     phone: a.phone,
     isDefault: a.is_default,
   }));
+
+  // Aggregate items per order in one round-trip so we can render the
+  // "Jollof Rice with Plantain · Plantain Lasagna · Suya × 2" summary line.
+  const orderIds = (orderRows ?? []).map((o) => o.id);
+  const itemsByOrder: Record<string, string[]> = {};
+  if (orderIds.length > 0) {
+    const { data: items } = await supabase
+      .from('order_items')
+      .select('order_id, name, quantity')
+      .in('order_id', orderIds);
+    for (const it of items ?? []) {
+      const arr = itemsByOrder[it.order_id] ?? (itemsByOrder[it.order_id] = []);
+      arr.push(it.quantity > 1 ? `${it.name} × ${it.quantity}` : it.name);
+    }
+  }
+
+  const orders: OrderHistoryRow[] = (orderRows ?? []).map((o) => ({
+    ref: o.ref,
+    status: o.status,
+    paymentStatus: o.payment_status,
+    totalGbp: Number(o.total_gbp),
+    createdAt: o.created_at,
+    itemsLine: (itemsByOrder[o.id] ?? []).join(' · ') || '—',
+  }));
+
   const memberSince = user.created_at ? formatLongDate(user.created_at) : '';
+  const [first = '', last = ''] = (profile?.display_name ?? '').split(' ', 2);
+  const friendlyFirst = first || 'friend';
 
   return (
     <>
@@ -54,54 +95,21 @@ export default async function AccountPage() {
       <main>
         <PageHero
           eyebrow={`Member since ${memberSince} · Middlesbrough`}
-          title={<>Welcome back, <em>{profile?.display_name?.split(' ')[0] ?? 'friend'}.</em></>}
-          sub="Your orders, saved addresses, and profile — all in one place."
+          title={<>Welcome back, <em>{friendlyFirst}.</em></>}
+          sub="Your orders, saved addresses, and account settings — all in one place."
         />
 
         <section className="container py-[clamp(28px,4vw,48px)] pb-[clamp(56px,7vw,96px)]">
           <div className="grid items-start gap-[clamp(28px,4vw,56px)] md:grid-cols-[240px_1fr]">
-            {/* SIDEBAR */}
-            <aside className="sticky top-[92px] flex flex-col gap-1">
-              <p className="m-0 mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-bronze-deep">
-                My account
-              </p>
-              <Link
-                href="#orders"
-                className="border-l-2 border-bronze bg-cream-soft px-3.5 py-2.5 font-serif text-[15px] font-medium text-walnut"
-              >
-                Orders
-              </Link>
-              <Link
-                href="#addresses"
-                className="border-l-2 border-transparent px-3.5 py-2.5 font-serif text-[15px] font-medium text-ink-muted transition-colors hover:bg-cream-soft hover:text-walnut"
-              >
-                Saved addresses
-              </Link>
-              <Link
-                href="#profile"
-                className="border-l-2 border-transparent px-3.5 py-2.5 font-serif text-[15px] font-medium text-ink-muted transition-colors hover:bg-cream-soft hover:text-walnut"
-              >
-                Profile &amp; password
-              </Link>
-              <form action={signOutAction} className="mt-3 border-t border-rule pt-4">
-                <button
-                  type="submit"
-                  className="inline-flex w-full cursor-pointer items-center justify-center gap-2 rounded-[2px] border border-walnut bg-transparent px-4 py-2.5 font-serif text-[12.5px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] transition-colors hover:border-danger hover:bg-danger hover:text-cream"
-                >
-                  Sign out →
-                </button>
-              </form>
-            </aside>
+            <AccountSidebar />
 
-            {/* MAIN */}
             <div className="flex flex-col gap-[clamp(40px,5vw,64px)]">
-              <AccountSection id="orders" title={<>Your <em>orders</em></>} count="0 orders">
-                <EmptyState
-                  eyebrow="No orders yet"
-                  title={<>You haven't ordered <em>yet</em>.</>}
-                  body="Browse today's bill of fare — order by 10am for same-day delivery."
-                  cta={{ label: "See today's menu", href: siteConfig.routes.menu }}
-                />
+              <AccountSection
+                id="orders"
+                title={<>Your <em>orders</em></>}
+                count={`${orders.length} order${orders.length === 1 ? '' : 's'}`}
+              >
+                <OrderHistory orders={orders} />
               </AccountSection>
 
               <AccountSection
@@ -112,8 +120,24 @@ export default async function AccountPage() {
                 <AddressManager addresses={addresses} />
               </AccountSection>
 
-              <AccountSection id="profile" title={<>Profile &amp; <em>password</em></>}>
-                <ProfileForm profile={profile} email={user.email ?? ''} />
+              <AccountSection id="profile" title={<>Profile &amp; <em>details</em></>}>
+                <ProfileForm
+                  initial={{
+                    firstName: first,
+                    lastName: last,
+                    email: user.email ?? '',
+                    phone: profile?.phone ?? '',
+                    notifyStatusChanges: profile?.notify_status_changes ?? true,
+                  }}
+                />
+              </AccountSection>
+
+              <AccountSection id="password" title={<>Password &amp; <em>security</em></>}>
+                <PasswordForm />
+              </AccountSection>
+
+              <AccountSection id="close" title={<>Close <em>account</em></>}>
+                <CloseAccountCard />
               </AccountSection>
             </div>
           </div>
@@ -149,108 +173,5 @@ function AccountSection({
       </header>
       {children}
     </section>
-  );
-}
-
-function EmptyState({
-  eyebrow,
-  title,
-  body,
-  cta,
-}: {
-  eyebrow: string;
-  title: React.ReactNode;
-  body: string;
-  cta: { label: string; href: string };
-}) {
-  return (
-    <div className="mx-auto max-w-[480px] py-[clamp(48px,8vw,96px)] text-center">
-      <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-bronze-deep">
-        {eyebrow}
-      </p>
-      <h3 className="m-0 mb-3 font-serif text-[clamp(26px,3.4vw,36px)] font-medium tracking-[-0.005em] text-walnut [&_em]:font-normal [&_em]:italic">
-        {title}
-      </h3>
-      <p className="m-0 mb-7 font-serif text-[16px] italic leading-[1.5] text-ink-muted">
-        {body}
-      </p>
-      <HeritageButton href={cta.href} variant="primary">
-        {cta.label}
-      </HeritageButton>
-    </div>
-  );
-}
-
-function ProfileForm({
-  profile,
-  email,
-}: {
-  profile: { display_name: string | null; phone: string | null; notify_status_changes: boolean } | null;
-  email: string;
-}) {
-  const [first = '', last = ''] = (profile?.display_name ?? '').split(' ', 2);
-  return (
-    <div className="rounded-[2px] border border-rule bg-cream p-6 sm:p-8">
-      <header className="mb-5 flex items-baseline justify-between gap-3 border-b border-rule pb-3.5">
-        <h3 className="m-0 font-serif text-[clamp(20px,2.4vw,24px)] font-medium text-walnut [&_em]:font-normal [&_em]:italic">
-          Your <em>details</em>
-        </h3>
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-bronze-deep">№ 01</span>
-      </header>
-
-      {/* TODO Phase 3: wire this form to a server action that updates `profiles` */}
-      <form className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <ProfileField label="First name" defaultValue={first} name="first" />
-        <ProfileField label="Last name" defaultValue={last} name="last" />
-        <ProfileField label="Email" defaultValue={email} name="email" type="email" disabled />
-        <ProfileField label="Phone" defaultValue={profile?.phone ?? ''} name="phone" type="tel" />
-        <label className="col-span-full flex cursor-pointer items-start gap-2.5 font-serif text-[14px] italic leading-[1.5] text-ink-muted">
-          <input
-            type="checkbox"
-            name="notify_status_changes"
-            defaultChecked={profile?.notify_status_changes ?? true}
-            className="mt-0.5 h-[18px] w-[18px] accent-walnut"
-          />
-          <span>Email me when my orders change status (out for delivery, delivered, etc.)</span>
-        </label>
-        <button
-          type="submit"
-          disabled
-          className="mt-3 w-fit min-w-[200px] cursor-not-allowed rounded-[2px] bg-walnut px-5 py-[14px] font-serif text-[14px] font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] opacity-60 sm:col-span-2"
-          title="Saving profiles will be wired in Phase 3"
-        >
-          Save profile
-        </button>
-      </form>
-    </div>
-  );
-}
-
-function ProfileField({
-  label,
-  name,
-  type = 'text',
-  defaultValue,
-  disabled,
-}: {
-  label: string;
-  name: string;
-  type?: string;
-  defaultValue: string;
-  disabled?: boolean;
-}) {
-  return (
-    <div className="flex flex-col gap-1.5">
-      <label className="font-serif text-[13px] font-medium tracking-[0.14em] text-walnut [font-variant:small-caps]">
-        {label}
-      </label>
-      <input
-        name={name}
-        type={type}
-        defaultValue={defaultValue}
-        disabled={disabled}
-        className="w-full rounded-[2px] border border-rule bg-transparent px-3.5 py-3 font-serif text-[16px] text-walnut outline-none transition-colors focus:border-walnut disabled:opacity-60"
-      />
-    </div>
   );
 }

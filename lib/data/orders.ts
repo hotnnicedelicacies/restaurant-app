@@ -3,6 +3,7 @@ import { getServiceClient } from '@/lib/supabase/server';
 export interface OrderView {
   id: string;
   ref: string;
+  profileId: string | null;
   status: 'received' | 'preparing' | 'on_its_way' | 'delivered' | 'cancelled';
   paymentMethod: 'card' | 'cod';
   paymentStatus: 'pending' | 'paid' | 'refunded' | 'partially_refunded' | 'failed';
@@ -71,6 +72,7 @@ export async function getOrderByRef(ref: string): Promise<OrderView | null> {
   return {
     id: order.id,
     ref: order.ref,
+    profileId: order.profile_id,
     status: order.status,
     paymentMethod: order.payment_method,
     paymentStatus: order.payment_status,

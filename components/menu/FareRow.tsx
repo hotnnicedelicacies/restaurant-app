@@ -26,8 +26,6 @@ interface Props {
   href?: string;
   /** When false, suppresses the divider — used for the last row. */
   divider?: boolean;
-  /** Optional — when provided, dietary tags become clickable filter chips. */
-  onTagClick?: (tag: string) => void;
 }
 
 /**
@@ -35,7 +33,7 @@ interface Props {
  * description + chip tags · price + "Add to order →".
  * Mobile (<640px) collapses to 96px image + stacked text + inline price row.
  */
-export default function FareRow({ item, href, divider = true, onTagClick }: Props) {
+export default function FareRow({ item, href, divider = true }: Props) {
   const target = href ?? siteConfig.routes.itemDetail(item.slug);
   const isOut = item.available === false;
 
@@ -81,29 +79,14 @@ export default function FareRow({ item, href, divider = true, onTagClick }: Prop
           </p>
           {item.tags && item.tags.length > 0 && (
             <div className="mt-1.5 flex flex-wrap gap-1.5">
-              {item.tags.map((tag) =>
-                onTagClick ? (
-                  <button
-                    key={tag}
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      onTagClick(tag);
-                    }}
-                    className="rounded-[2px] border border-rule bg-transparent px-2 py-[3px] font-mono text-[9px] uppercase tracking-[0.16em] text-ink-muted transition-colors hover:border-walnut hover:text-walnut"
-                  >
-                    {tag}
-                  </button>
-                ) : (
-                  <span
-                    key={tag}
-                    className="rounded-[2px] border border-rule px-2 py-[3px] font-mono text-[9px] uppercase tracking-[0.16em] text-ink-muted"
-                  >
-                    {tag}
-                  </span>
-                )
-              )}
+              {item.tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded-[2px] border border-rule px-2 py-[3px] font-mono text-[9px] uppercase tracking-[0.16em] text-ink-muted"
+                >
+                  {tag}
+                </span>
+              ))}
             </div>
           )}
         </div>

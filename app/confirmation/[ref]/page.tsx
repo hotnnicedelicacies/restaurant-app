@@ -5,9 +5,11 @@ import SiteHeader from '@/components/layout/SiteHeader';
 import SiteFooter from '@/components/layout/SiteFooter';
 import HeritageButton from '@/components/ui/HeritageButton';
 import { getOrderByRef } from '@/lib/data/orders';
+import { getServerClient } from '@/lib/supabase/server';
 import { siteConfig } from '@/constants/siteConfig';
 import { formatGBP, formatLongDate, formatTime } from '@/lib/utils';
 import ClearCartOnMount from '@/components/checkout/ClearCartOnMount';
+import ClaimOrderBanner from '@/components/account/ClaimOrderBanner';
 
 export const metadata: Metadata = {
   title: 'Order confirmed',
@@ -37,6 +39,9 @@ export default async function ConfirmationPage({ params, searchParams }: Props) 
   const sp = await searchParams;
   const cardPending = order.paymentMethod === 'card' && order.paymentStatus === 'pending';
   const cardFailed = sp.redirect_status === 'failed';
+
+  const supabase = await getServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
   return (
     <>
@@ -108,6 +113,14 @@ export default async function ConfirmationPage({ params, searchParams }: Props) 
                 <b className="font-medium not-italic text-walnut">{order.customer.email}</b>.
               </p>
             </div>
+
+            {!cardFailed && (
+              <ClaimOrderBanner
+                orderRef={order.ref}
+                signedIn={Boolean(user)}
+                alreadyClaimed={Boolean(order.profileId)}
+              />
+            )}
           </div>
         </section>
       </main>

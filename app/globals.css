@@ -2766,3 +2766,277 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -0.00
 }
 
 
+
+/* ============================================================
+   ACCOUNT DASHBOARD — ported from design (orders / addresses / profile)
+   ============================================================ */
+
+/* ============================================================
+   ACCOUNT DASHBOARD (orders / addresses / profile)
+   ============================================================ */
+
+.account-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: clamp(28px, 4vw, 56px);
+  padding-top: clamp(28px, 4vw, 48px);
+  padding-bottom: clamp(56px, 7vw, 96px);
+  align-items: start;
+}
+.account-sidebar {
+  position: sticky;
+  top: 92px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.account-sidebar__title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-bronze-deep);
+  margin: 0 0 12px;
+}
+.account-sidebar__link {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 15px;
+  color: var(--color-ink-muted);
+  padding: 12px 14px;
+  border-left: 2px solid transparent;
+  transition: color 200ms ease, border-color 200ms ease, background 200ms ease;
+}
+.account-sidebar__link:hover { color: var(--color-walnut); background: var(--color-cream-soft); }
+.account-sidebar__link.is-active {
+  color: var(--color-walnut);
+  border-left-color: var(--color-bronze);
+  background: var(--color-cream-soft);
+}
+.account-sidebar__signout {
+  margin-top: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-rule);
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--color-ink-muted);
+  padding-left: 14px;
+}
+.account-sidebar__signout:hover { color: #8B2A1A; }
+
+.account-main { display: flex; flex-direction: column; gap: clamp(40px, 5vw, 64px); }
+
+.account-section { scroll-margin-top: 92px; }
+.account-section__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 14px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--color-walnut);
+}
+.account-section__title {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: clamp(24px, 3.2vw, 32px);
+  letter-spacing: -0.005em;
+  color: var(--color-walnut);
+  margin: 0;
+}
+.account-section__title em { font-style: italic; font-weight: 400; }
+.account-section__count {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-bronze-deep);
+}
+
+/* Order history rows */
+.order-history { display: flex; flex-direction: column; }
+.order-row {
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  gap: 20px;
+  align-items: start;
+  padding: 22px 0;
+  border-bottom: 1px dashed var(--color-rule);
+}
+.order-row:last-child { border-bottom: none; }
+.order-row__thumb {
+  width: 96px;
+  height: 96px;
+  object-fit: cover;
+  border-radius: 2px;
+}
+.order-row__body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.order-row__top {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.order-row__ref {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-bronze-deep);
+}
+.order-row__date {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13.5px;
+  color: var(--color-ink-muted);
+}
+.order-row__status {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 2px;
+  background: var(--color-cream-soft);
+  color: var(--color-walnut);
+  border: 1px solid var(--color-rule);
+}
+.order-row__status.is-delivered { background: var(--color-walnut); color: var(--color-cream); border-color: var(--color-walnut); }
+.order-row__status.is-progress { background: var(--color-bronze); color: var(--color-walnut); border-color: var(--color-bronze); }
+.order-row__status.is-cancelled { background: var(--color-cream); color: #8B2A1A; border-color: rgba(139, 42, 26, 0.3); }
+.order-row__items {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  color: var(--color-walnut);
+  margin: 4px 0 0;
+  line-height: 1.4;
+}
+.order-row__items em { font-style: italic; color: var(--color-ink-muted); }
+.order-row__right {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+  padding-top: 14px;
+}
+.order-row__price {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--color-walnut);
+  white-space: nowrap;
+}
+.order-row__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+.order-row__action {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--color-bronze-deep);
+  border-bottom: 1px solid var(--color-bronze-deep);
+  padding-bottom: 1px;
+}
+.order-row__action:hover { color: var(--color-walnut); border-color: var(--color-walnut); }
+
+/* Address cards */
+.address-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+.address-card {
+  border: 1px solid var(--color-rule);
+  border-radius: 2px;
+  padding: 20px;
+  background: var(--color-cream);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.address-card.is-default { border-color: var(--color-walnut); }
+.address-card__label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-bronze-deep);
+  margin-bottom: 4px;
+}
+.address-card__default-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--color-cream);
+  background: var(--color-walnut);
+  padding: 3px 8px;
+  border-radius: 2px;
+}
+.address-card__name {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--color-walnut);
+}
+.address-card__lines {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 14px;
+  color: var(--color-ink-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+.address-card__actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-rule);
+}
+.address-card__action {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 13px;
+  color: var(--color-bronze-deep);
+  border-bottom: 1px solid var(--color-bronze-deep);
+  padding-bottom: 1px;
+  cursor: pointer;
+  background: transparent;
+}
+.address-card__action--danger { color: #8B2A1A; border-color: rgba(139, 42, 26, 0.5); }
+.address-card--add {
+  border-style: dashed;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 160px;
+  cursor: pointer;
+  color: var(--color-ink-muted);
+  font-family: var(--font-serif);
+  font-style: italic;
+  transition: border-color 200ms ease, color 200ms ease;
+}
+.address-card--add:hover { border-color: var(--color-walnut); color: var(--color-walnut); }
+
+@media (max-width: 760px) {
+  .account-layout { grid-template-columns: 1fr; }
+  .account-sidebar { position: static; flex-direction: row; overflow-x: auto; gap: 0; padding: 8px 0; border-top: 1px solid var(--color-rule); border-bottom: 1px solid var(--color-rule); }
+  .account-sidebar__title { display: none; }
+  .account-sidebar__link { border-left: 0; border-bottom: 2px solid transparent; padding: 10px 14px; white-space: nowrap; }
+  .account-sidebar__link.is-active { border-left: 0; border-bottom-color: var(--color-bronze); }
+  .account-sidebar__signout { border-top: 0; padding-top: 10px; margin-top: 0; padding-left: 14px; white-space: nowrap; }
+  .order-row { grid-template-columns: 72px 1fr; gap: 12px; }
+  .order-row__thumb { width: 72px; height: 72px; }
+  .order-row__right { grid-column: 1 / -1; flex-direction: row; justify-content: space-between; align-items: center; padding-top: 8px; }
+}
+
+

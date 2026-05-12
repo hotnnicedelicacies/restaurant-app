@@ -65,3 +65,47 @@ export async function deleteAddress(id: string): Promise<{ ok: true } | { ok: fa
   revalidatePath('/account');
   return { ok: true };
 }
+
+export async function setDefaultAddress(id: string): Promise<{ ok: true } | { ok: false; error: string }> {
+  const supabase = await getServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: 'You must be signed in.' };
+
+  // Unset existing default, then set the chosen one.
+  await supabase.from('addresses').update({ is_default: false }).eq('profile_id', user.id);
+  const { error } = await supabase
+    .from('addresses')
+    .update({ is_default: true })
+    .eq('id', id)
+    .eq('profile_id', user.id);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath('/account');
+  return { ok: true };
+}
+
+export async function updateAddress(input: unknown & { id: string }): Promise<{ ok: true } | { ok: false; error: string }> {
+  const parsed = addressSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? 'Invalid address.' };
+  }
+  const supabase = await getServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: 'You must be signed in.' };
+
+  const { error } = await supabase
+    .from('addresses')
+    .update({
+      label: parsed.data.label?.trim() || null,
+      recipient_name: parsed.data.recipientName.trim(),
+      line1: parsed.data.line1.trim(),
+      line2: parsed.data.line2?.trim() || null,
+      city: parsed.data.city.trim(),
+      postcode: parsed.data.postcode.trim().toUpperCase(),
+      phone: parsed.data.phone?.trim() || null,
+    })
+    .eq('id', input.id)
+    .eq('profile_id', user.id);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath('/account');
+  return { ok: true };
+}

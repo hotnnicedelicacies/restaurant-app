@@ -2,11 +2,12 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import SiteHeader from '@/components/layout/SiteHeader';
 import SiteFooter from '@/components/layout/SiteFooter';
+import ClaimOrderBanner from '@/components/account/ClaimOrderBanner';
 import PageHero from '@/components/layout/PageHero';
 import HeritageButton from '@/components/ui/HeritageButton';
 import CustomerCancelButton from './CustomerCancelButton';
 import { getOrderByRef } from '@/lib/data/orders';
-import { getServiceClient } from '@/lib/supabase/server';
+import { getServerClient, getServiceClient } from '@/lib/supabase/server';
 import { siteConfig } from '@/constants/siteConfig';
 import { formatGBP, formatShortDate, formatTime } from '@/lib/utils';
 import Image from 'next/image';
@@ -36,6 +37,9 @@ export default async function TrackPage({ params }: { params: Promise<{ ref: str
   if (!order) notFound();
 
   // Latest kitchen note (visible-to-customer)
+  const userClient = await getServerClient();
+  const { data: { user } } = await userClient.auth.getUser();
+
   const supabase = getServiceClient();
   const { data: notes } = await supabase
     .from('kitchen_notes')
@@ -277,6 +281,14 @@ export default async function TrackPage({ params }: { params: Promise<{ ref: str
               </div>
             </aside>
           </div>
+
+          {!isCancelled && (
+            <ClaimOrderBanner
+              orderRef={order.ref}
+              signedIn={Boolean(user)}
+              alreadyClaimed={Boolean(order.profileId)}
+            />
+          )}
         </section>
       </main>
       <SiteFooter />

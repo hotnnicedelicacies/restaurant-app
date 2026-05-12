@@ -158,6 +158,12 @@ Large chunks of `design-explorations/shared/styles.css` are copied into `app/glo
 11. **Hours come from admin settings, not siteConfig.** Anywhere you'd hardcode "Tue – Sun 12pm – 8pm", call `getHours()` (server) which reads the `settings.hours` row.
 12. **No legacy fallback in production.** `constants/meals.ts` and `app/order/` have been deleted on purpose. If you need to backfill empty menu/zones, do it in the DB, not in code.
 
+13. **Auth email confirmation.** Supabase Auth's "Confirm email" toggle in the dashboard (Authentication → Providers → Email) should be **off**. We send our own welcome email via Resend from `signUpAction` (template `welcomeEmail` in `lib/email/templates.ts`). With Supabase confirmation on, `signUp` returns a session-less user, the redirect lands on `/account`, middleware bounces them to `/sign-in` because they aren't authenticated yet — confusing UX. With it off, the cookie is issued immediately on sign-up and the redirect works.
+
+14. **Order ownership / claim flow.** Orders created during guest checkout have `profile_id = null`. After sign-in / sign-up, `claimOrdersByEmail` in `lib/account/profile.ts` walks `orders` and back-links every row whose `customer_email` matches the new user's email and has no `profile_id` yet. There's also a manual `claimOrder(ref)` server action surfaced via `<ClaimOrderBanner>` on `/confirmation/[ref]` and `/track/[ref]` for the case where a signed-in user finds a guest order placed with their email.
+
+15. **Account `closeAccount` anonymises rather than deletes.** Closing the account scrubs PII on `profiles` + on historical `orders` (display_name, customer_email, customer_phone, delivery_line1) and hard-deletes `addresses`, then calls `auth.admin.deleteUser`. The order row stays — UK tax record-keeping needs the line items + amounts for 6 years.
+
 ## Confirmation modals
 
 Every admin destructive / state-changing action uses `components/admin/ConfirmModal.tsx`. The shape:

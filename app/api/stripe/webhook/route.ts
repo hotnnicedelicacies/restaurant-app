@@ -86,7 +86,8 @@ export async function POST(request: Request) {
         break;
       }
 
-      case 'payment_intent.payment_failed': {
+      case 'payment_intent.payment_failed':
+      case 'payment_intent.canceled': {
         const pi = event.data.object as Stripe.PaymentIntent;
         const orderId = pi.metadata.order_id;
         if (!orderId) break;
@@ -123,10 +124,37 @@ export async function POST(request: Request) {
       }
 
       case 'charge.dispute.created': {
-        // Phase 5: send urgent admin email
+        // Disputes have a hard ~7-day response SLA from Stripe — get an
+        // alert into the kitchen inbox immediately so admin can pull the
+        // evidence together. Best-effort: never throw out of the webhook.
         const dispute = event.data.object as Stripe.Dispute;
-        console.warn('[stripe] Dispute created on charge', dispute.charge, 'amount:', dispute.amount);
-        // TODO: log to admin_alerts table or send email
+        const chargeId = typeof dispute.charge === 'string' ? dispute.charge : dispute.charge?.id;
+        const amount = (dispute.amount ?? 0) / 100;
+        console.warn('[stripe] Dispute created on charge', chargeId, 'amount:', amount, 'reason:', dispute.reason);
+        try {
+          const adminTo = process.env.ORDER_NOTIFICATION_EMAIL || siteConfig.email.notificationToDefault;
+          if (adminTo) {
+            const stripeUrl = chargeId ? `https://dashboard.stripe.com/charges/${chargeId}` : 'https://dashboard.stripe.com/disputes';
+            await sendEmail({
+              to: adminTo,
+              subject: `⚠ Stripe dispute · ${dispute.reason ?? 'unknown reason'} · £${amount.toFixed(2)}`,
+              html: `
+                <div style="font-family:'Cormorant Garamond',serif;color:#2D1F18;">
+                  <p style="font-family:'Geist Mono',monospace;font-size:11px;letter-spacing:0.18em;color:#7E5530;text-transform:uppercase;">Dispute created</p>
+                  <h1 style="margin:0 0 12px;font-size:24px;">A customer has disputed a charge.</h1>
+                  <p><b>Charge:</b> ${chargeId ?? '—'}</p>
+                  <p><b>Amount:</b> £${amount.toFixed(2)}</p>
+                  <p><b>Reason:</b> ${dispute.reason ?? 'unknown'}</p>
+                  <p><a href="${stripeUrl}" style="color:#7E5530;">Open in Stripe →</a></p>
+                  <p style="font-style:italic;color:#4a3a2c;">Respond within 7 days or the dispute is lost. Submit evidence (receipt, delivery confirmation, kitchen notes) from the Stripe dashboard.</p>
+                </div>
+              `,
+              text: `Stripe dispute created.\nCharge: ${chargeId ?? '—'}\nAmount: £${amount.toFixed(2)}\nReason: ${dispute.reason ?? 'unknown'}\n\nOpen in Stripe: ${stripeUrl}\n\nRespond within 7 days.`,
+            });
+          }
+        } catch (err) {
+          console.error('[stripe webhook] dispute email failed:', err);
+        }
         break;
       }
 

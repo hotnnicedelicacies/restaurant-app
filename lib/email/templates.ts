@@ -242,3 +242,35 @@ export function cancellationEmail(order: OrderView, reason?: string) {
     text: `Your order ${order.ref} has been cancelled.\n${refundLine}${reason ? `\nReason: ${reason}` : ''}`,
   };
 }
+
+// =====================================================================
+// 4. Welcome (new account)
+// =====================================================================
+export function welcomeEmail(displayName: string) {
+  const first = displayName.split(' ')[0] || 'friend';
+  const menuUrl = absoluteUrl(siteConfig.routes.menu);
+  const accountUrl = absoluteUrl(siteConfig.routes.account);
+  const preheader = `Welcome, ${escapeHtml(first)} — your kitchen account is ready.`;
+  const body = `
+    <p style="font-family:${MONO};font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:${COLOURS.bronzeDeep};margin:0 0 12px;">Welcome to the kitchen</p>
+    <h1 style="font-family:${SERIF};font-weight:500;font-size:32px;line-height:1.04;color:${COLOURS.walnut};margin:0 0 16px;">
+      Hello, <em style="font-style:italic;font-weight:400;color:${COLOURS.bronzeDeep};">${escapeHtml(first)}.</em>
+    </h1>
+    <p style="font-family:${SERIF};font-size:16px;line-height:1.55;color:${COLOURS.walnut};margin:0 0 16px;">
+      Your account at ${escapeHtml(siteConfig.name)} is set up. Browse today's menu, save your delivery address, and we'll keep your past orders and receipts handy in your account dashboard.
+    </p>
+    <p style="font-family:${SERIF};font-size:16px;line-height:1.55;color:${COLOURS.walnut};margin:0 0 24px;">
+      We cook from scratch every morning — ${escapeHtml(siteConfig.hours.cutoffShort.toLowerCase())}.
+    </p>
+    ${ctaButton(menuUrl, "See today's menu →")}
+    <p style="font-family:${SERIF};font-style:italic;font-size:13px;color:${COLOURS.inkMuted};margin:28px 0 0;">
+      Manage your account any time at <a href="${accountUrl}" style="color:${COLOURS.bronzeDeep};">${accountUrl}</a>.
+    </p>
+  `;
+  return {
+    subject: `Welcome to ${siteConfig.name}, ${first}`,
+    preheader,
+    html: shell({ preheader, title: 'Welcome', body }),
+    text: `Welcome, ${first}.\n\nYour account at ${siteConfig.name} is ready. Browse today's menu and place an order any time:\n${menuUrl}\n\nManage your account: ${accountUrl}`,
+  };
+}

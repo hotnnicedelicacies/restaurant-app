@@ -37,7 +37,18 @@ interface ZoneResponse {
  *   COD flow:   fill form → "Place order" → server creates order → redirect
  *               to /confirmation/[ref]
  */
-export default function CheckoutForm() {
+export interface CheckoutDefaults {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  address1: string;
+  address2: string;
+  city: string;
+  postcode: string;
+}
+
+export default function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults | null }) {
   const router = useRouter();
   const cartLines = useCart((s) => s.lines);
   const cartCount = useCart((s) => s.count());
@@ -47,16 +58,17 @@ export default function CheckoutForm() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
-  // Form fields
+  // Form fields — pre-filled from saved profile + default address when
+  // the customer is signed in; empty for guests.
   const [form, setForm] = useState({
-    firstName: '',
-    lastName: '',
-    phone: '',
-    email: '',
-    address1: '',
-    address2: '',
-    city: 'Middlesbrough',
-    postcode: '',
+    firstName: defaults?.firstName ?? '',
+    lastName: defaults?.lastName ?? '',
+    phone: defaults?.phone ?? '',
+    email: defaults?.email ?? '',
+    address1: defaults?.address1 ?? '',
+    address2: defaults?.address2 ?? '',
+    city: defaults?.city ?? 'Middlesbrough',
+    postcode: defaults?.postcode ?? '',
     deliveryDate: '',
     deliveryWindowStart: '12:00',
     deliveryWindowEnd: '14:00',
