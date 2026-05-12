@@ -2606,7 +2606,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -0.00
   }
   /* Tighten the vertical rhythm so a long-itemised receipt fits one A4. */
   .receipt__header { padding-bottom: 14px; margin-bottom: 14px; }
-  .receipt__brand img { height: 44px; }
+  .receipt__brand img { height: 44px; width: auto; }
   .receipt__brand-meta { font-size: 11.5px; line-height: 1.45; }
   .receipt__doc-type { font-size: 9px; }
   .receipt__ref { font-size: 13px; }
@@ -2620,7 +2620,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -0.00
   .receipt__table th, .receipt__table td { padding: 7px 0; font-size: 12px; }
   .receipt__item-name { font-size: 13px; }
   .receipt__item-meta, .receipt__item-note { font-size: 11.5px; }
-  .receipt__totals { margin: 10px 0; }
+  .receipt__totals { margin: 0; gap: 0px; }
   .receipt__total-row { padding: 3px 0; font-size: 12.5px; }
   .receipt__total-row--grand { padding: 6px 0; font-size: 14px; }
   /* Payment block — pack method + status into one tight row pair. */
@@ -2635,7 +2635,7 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -0.00
   .receipt__thanks { margin-top: 12px; padding-top: 10px; font-size: 13px; }
   .receipt__footer { margin-top: 12px; padding-top: 10px; font-size: 11px; }
   .receipt__footer-hygiene { font-size: 10.5px; margin-bottom: 4px; }
-  .receipt__paid-stamp { opacity: 0.55; font-size: 18px; padding: 5px 14px; top: 14px; right: 14px; }
+  .receipt__paid-stamp { opacity: 0.55; font-size: 18px; padding: 5px 14px; top: 90px; right: 60px; }
   /* Keep grouped sections from splitting across pages. */
   .receipt__parties,
   .receipt__payment,
