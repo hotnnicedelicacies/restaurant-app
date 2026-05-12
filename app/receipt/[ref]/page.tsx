@@ -1,9 +1,10 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import Link from 'next/link';
+import Image from 'next/image';
 import { getOrderByRef } from '@/lib/data/orders';
 import { siteConfig } from '@/constants/siteConfig';
 import { formatGBP, formatLongDate, formatTime } from '@/lib/utils';
+import { maybeBackSyncStripe } from '@/lib/admin/orderActions';
 import PrintButton from './PrintButton';
 
 export const metadata: Metadata = {
@@ -15,196 +16,324 @@ export const metadata: Metadata = {
 // Stripe re-sync at any point and the receipt must show the latest truth.
 export const dynamic = 'force-dynamic';
 
-const STATUS_LABELS: Record<string, string> = {
-  received: 'Received',
-  preparing: 'Preparing',
-  on_its_way: 'On its way',
-  delivered: 'Delivered',
-  cancelled: 'Cancelled',
-};
+const SYNC_LOOKBACK_MS = 60 * 60 * 1000;
 
 export default async function ReceiptPage({ params }: { params: Promise<{ ref: string }> }) {
   const { ref } = await params;
-  const order = await getOrderByRef(ref);
+  let order = await getOrderByRef(ref);
   if (!order) notFound();
 
-  const paymentLabel =
-    order.paymentMethod === 'card'
-      ? order.paymentStatus === 'refunded'
-        ? 'Refunded · Card'
-        : order.paymentStatus === 'partially_refunded'
-          ? 'Partially refunded · Card'
-          : order.paymentStatus === 'paid'
-            ? `Paid · ${order.cardBrand ? `${order.cardBrand} ending ${order.cardLast4}` : 'Card'}`
-            : 'Card · pending'
-      : order.codStatus === 'collected'
-        ? 'Paid · Cash on delivery'
-        : 'Due on delivery · Cash';
+  // If a customer lands here with a card payment still pending or failed
+  // and the order is recent, re-pull from Stripe before rendering.
+  if (
+    order.paymentMethod === 'card' &&
+    (order.paymentStatus === 'pending' || order.paymentStatus === 'failed') &&
+    Date.now() - new Date(order.createdAt).getTime() < SYNC_LOOKBACK_MS
+  ) {
+    await maybeBackSyncStripe(order.ref, 'receipt');
+    const refreshed = await getOrderByRef(ref);
+    if (refreshed) order = refreshed;
+  }
+
+  const isPaid =
+    (order.paymentMethod === 'card' && order.paymentStatus === 'paid') ||
+    (order.paymentMethod === 'cod' && order.codStatus === 'collected');
+  const isRefunded = order.paymentStatus === 'refunded';
+  const isPartial = order.paymentStatus === 'partially_refunded';
+  const isPending = order.paymentMethod === 'card' && order.paymentStatus === 'pending';
+  const isFailed = order.paymentStatus === 'failed';
+
+  const stampLabel = isRefunded
+    ? 'Refunded'
+    : isPartial
+      ? 'Partial refund'
+      : isPaid
+        ? 'Paid'
+        : isFailed
+          ? 'Failed'
+          : isPending
+            ? 'Pending'
+            : 'Due on delivery';
+
+  const stampColor = isPaid
+    ? '#1e7d3f'
+    : isRefunded || isFailed
+      ? '#8B2A1A'
+      : 'var(--color-bronze-deep)';
+
+  const paymentStatusLine = isPaid
+    ? 'Paid in full'
+    : isRefunded
+      ? `Refunded ${formatGBP(order.refundAmountGbp ?? order.totalGbp)}`
+      : isPartial
+        ? `Partially refunded ${formatGBP(order.refundAmountGbp ?? 0)}`
+        : isPending
+          ? 'Awaiting confirmation from Stripe'
+          : isFailed
+            ? "Payment didn't go through"
+            : order.paymentMethod === 'cod'
+              ? 'Due on delivery (cash)'
+              : 'Pending';
 
   return (
-    <div className="min-h-screen bg-cream-soft text-walnut">
-      {/* Action bar — hidden when printing */}
-      <div className="print:hidden">
-        <div className="border-b border-rule bg-cream">
-          <div className="mx-auto flex max-w-[820px] items-center justify-between gap-3 px-6 py-4">
-            <Link
-              href={siteConfig.routes.track(order.ref)}
-              className="font-mono text-[11px] uppercase tracking-[0.2em] text-walnut hover:text-bronze-deep"
-            >
-              ← Back to tracking
-            </Link>
+    <>
+      {/* Slim header — hidden when printing */}
+      <header
+        className="print:hidden"
+        style={{
+          background: 'var(--color-walnut)',
+          color: 'var(--color-cream)',
+          borderBottom: '1px solid var(--color-rule-light)',
+        }}
+      >
+        <div
+          className="container"
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '16px 24px',
+            gap: 16,
+          }}
+        >
+          <a href="/" style={{ display: 'inline-flex' }}>
+            <Image src="/logo.png" alt={siteConfig.name} width={36} height={36} />
+          </a>
+          <span className="t-mono" style={{ color: 'var(--color-bronze)', letterSpacing: '0.22em' }}>
+            Receipt
+          </span>
+          <a
+            href="/account"
+            style={{
+              color: 'var(--color-cream)',
+              fontFamily: 'var(--font-serif)',
+              fontStyle: 'italic',
+              fontSize: 14,
+              borderBottom: '1px solid var(--color-rule-light)',
+              paddingBottom: 2,
+            }}
+          >
+            ← My account
+          </a>
+        </div>
+      </header>
+
+      <div className="receipt-page">
+        {/* Action bar (hidden in print) */}
+        <div className="receipt-actions print:hidden">
+          <div className="receipt-actions__left">
+            For your records · We&apos;ve also emailed a copy.
+          </div>
+          <div className="receipt-actions__right">
             <PrintButton />
           </div>
         </div>
-      </div>
 
-      <main className="mx-auto max-w-[820px] px-6 py-10 print:px-0 print:py-0">
-        <article className="rounded-[2px] border border-rule bg-cream p-[clamp(28px,5vw,56px)] print:rounded-none print:border-0 print:p-10">
-          {/* Letterhead */}
-          <header className="mb-8 flex items-start justify-between gap-6 border-b border-rule pb-7">
-            <div>
-              <p className="m-0 mb-1 font-mono text-[10px] uppercase tracking-[0.24em] text-bronze-deep">
-                Vol. 01 · Receipt
-              </p>
-              <h1 className="m-0 font-serif text-[clamp(28px,4vw,36px)] font-medium leading-[1.04] tracking-[-0.005em] text-walnut">
-                {siteConfig.name}
-              </h1>
-              <p className="m-0 mt-1 font-serif text-[13px] italic text-ink-muted">
-                {siteConfig.voice.kitchenLocation}
-              </p>
+        {/* Receipt document */}
+        <article className="receipt">
+          <div className="receipt__paid-stamp" style={{ color: stampColor, borderColor: stampColor }}>
+            {stampLabel}
+          </div>
+
+          <header className="receipt__header">
+            <div className="receipt__brand">
+              <Image src="/logo.png" alt={siteConfig.name} width={60} height={60} />
+              <div className="receipt__brand-meta">
+                A home kitchen · Middlesbrough
+                <br />
+                {siteConfig.contact.email}
+                <br />
+                {siteConfig.contact.phone}
+              </div>
             </div>
-            <div className="text-right">
-              <p className="m-0 font-mono text-[10px] uppercase tracking-[0.24em] text-bronze-deep">
-                Order №
-              </p>
-              <p className="m-0 mt-1 font-mono text-[15px] tracking-[0.04em] text-walnut">
-                {order.ref}
-              </p>
-              <p className="m-0 mt-2 font-serif text-[12px] italic text-ink-muted">
-                Issued {formatLongDate(order.createdAt)}
-              </p>
+            <div className="receipt__doc-info">
+              <div className="receipt__doc-type">Receipt</div>
+              <div className="receipt__ref">№ {order.ref}</div>
+              <div className="receipt__date">
+                Issued · {formatLongDate(order.createdAt)}
+              </div>
             </div>
           </header>
 
-          {/* Customer + delivery + payment grid */}
-          <section className="mb-8 grid grid-cols-1 gap-6 sm:grid-cols-3">
-            <MetaBlock label="Billed to">
-              <b className="font-medium">{order.customer.firstName} {order.customer.lastName}</b>
-              <br />
-              <span className="italic text-ink-muted">{order.customer.email}</span>
-              <br />
-              <span className="italic text-ink-muted">{order.customer.phone}</span>
-            </MetaBlock>
-            <MetaBlock label="Delivered to">
-              {order.delivery.line1}
-              {order.delivery.line2 && <><br />{order.delivery.line2}</>}
-              <br />{order.delivery.city}
-              <br />{order.delivery.postcode}
-            </MetaBlock>
-            <MetaBlock label="Delivery window">
-              <b className="font-medium">{formatLongDate(order.delivery.date)}</b>
-              <br />
-              {order.delivery.windowStart.slice(0, 5)} – {order.delivery.windowEnd.slice(0, 5)}
-              <br />
-              <span className="italic text-ink-muted">Status · {STATUS_LABELS[order.status] ?? order.status}</span>
-            </MetaBlock>
-          </section>
+          <h1 className="receipt__title">
+            Receipt for your <em>order</em>
+          </h1>
+          <p className="receipt__title-sub">
+            Thank you for ordering with us. This is your record of payment.
+          </p>
 
-          {/* Line items */}
-          <section className="mb-6">
-            <h2 className="mb-3 border-b border-rule pb-2 font-mono text-[10px] uppercase tracking-[0.24em] text-bronze-deep">
-              Items ordered
-            </h2>
-            <table className="w-full border-collapse">
-              <thead>
-                <tr className="text-left font-mono text-[10px] uppercase tracking-[0.2em] text-bronze-deep">
-                  <th className="py-2.5 font-normal">Description</th>
-                  <th className="py-2.5 text-right font-normal">Qty</th>
-                  <th className="py-2.5 text-right font-normal">Unit</th>
-                  <th className="py-2.5 text-right font-normal">Total</th>
-                </tr>
-              </thead>
-              <tbody className="font-serif text-[14px] text-walnut">
-                {order.items.map((item) => {
-                  const variantParts = Object.values(item.variantsChosen ?? {}).map((v) => v.label);
-                  const addonsLine = (item.addonsChosen ?? []).map((a) => a.label).join(', ');
-                  const sublines = [variantParts.join(' · '), addonsLine].filter(Boolean).join(' · ');
-                  return (
-                    <tr key={item.id} className="border-t border-rule align-top">
-                      <td className="py-3 pr-3">
-                        <div className="font-medium">{item.name}</div>
-                        {sublines && (
-                          <div className="mt-0.5 font-serif text-[12.5px] italic text-ink-muted">{sublines}</div>
-                        )}
-                        {item.specialInstructions && (
-                          <div className="mt-1 border-l-2 border-rule pl-2.5 font-serif text-[12.5px] italic text-ink-muted">
-                            "{item.specialInstructions}"
-                          </div>
-                        )}
-                      </td>
-                      <td className="py-3 text-right font-mono text-[13px] tabular-nums">× {item.quantity}</td>
-                      <td className="py-3 text-right tabular-nums">{formatGBP(item.unitPriceGbp)}</td>
-                      <td className="py-3 text-right tabular-nums font-medium">{formatGBP(item.lineTotalGbp)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </section>
+          {/* Parties */}
+          <div className="receipt__parties">
+            <div>
+              <div className="receipt__party-label">Billed to</div>
+              <p className="receipt__party-name">
+                {order.customer.firstName} {order.customer.lastName}
+              </p>
+              <p className="receipt__party-lines">
+                {order.delivery.line1}
+                {order.delivery.line2 && <>, {order.delivery.line2}</>}
+                <br />
+                {order.delivery.city} · {order.delivery.postcode}
+                <br />
+                {order.customer.email}
+                <br />
+                {order.customer.phone}
+              </p>
+            </div>
+            <div>
+              <div className="receipt__party-label">Delivered to</div>
+              <p className="receipt__party-name">
+                {order.customer.firstName} {order.customer.lastName}
+              </p>
+              <p className="receipt__party-lines">
+                {order.delivery.line1}
+                {order.delivery.line2 && <>, {order.delivery.line2}</>}
+                <br />
+                {order.delivery.city} · {order.delivery.postcode}
+                <br />
+                <b>
+                  {order.status === 'delivered'
+                    ? 'Delivered'
+                    : order.status === 'cancelled'
+                      ? 'Cancelled'
+                      : 'Scheduled'}
+                </b>{' '}
+                · {formatLongDate(order.delivery.date)}
+                {order.status !== 'cancelled' && (
+                  <>
+                    <br />
+                    Window {order.delivery.windowStart.slice(0, 5)} – {order.delivery.windowEnd.slice(0, 5)}
+                  </>
+                )}
+              </p>
+            </div>
+          </div>
+
+          {/* Itemized table */}
+          <table className="receipt__table">
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th className="receipt__qty-col">Qty</th>
+                <th className="receipt__unit-col">Unit</th>
+                <th className="receipt__total-col">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {order.items.map((item) => {
+                const variantParts = Object.values(item.variantsChosen ?? {}).map((v) => v.label);
+                const addonsLine = (item.addonsChosen ?? []).map((a) => a.label).join(', ');
+                const meta = [variantParts.join(' · '), addonsLine].filter(Boolean).join(' · ');
+                return (
+                  <tr key={item.id}>
+                    <td>
+                      <div className="receipt__item-name">{item.name}</div>
+                      {meta && <div className="receipt__item-meta">{meta}</div>}
+                      {item.specialInstructions && (
+                        <div className="receipt__item-note">
+                          &quot;{item.specialInstructions}&quot;
+                        </div>
+                      )}
+                    </td>
+                    <td className="receipt__qty">{item.quantity}</td>
+                    <td style={{ textAlign: 'right', paddingRight: 12 }}>
+                      {formatGBP(item.unitPriceGbp)}
+                    </td>
+                    <td>{formatGBP(item.lineTotalGbp)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
 
           {/* Totals */}
-          <section className="mb-8 ml-auto max-w-[360px]">
-            <div className="flex justify-between border-t border-rule py-2 font-serif text-[14px] text-walnut">
+          <div className="receipt__totals">
+            <div className="receipt__total-row">
               <span>Subtotal</span>
-              <span className="tabular-nums">{formatGBP(order.subtotalGbp)}</span>
+              <span>{formatGBP(order.subtotalGbp)}</span>
             </div>
-            <div className="flex justify-between py-2 font-serif text-[14px] italic text-ink-muted">
-              <span>Delivery</span>
-              <span className="tabular-nums">{formatGBP(order.delivery.feeGbp)}</span>
+            <div className="receipt__total-row receipt__total-row--muted">
+              <span>
+                Delivery <em>· {order.delivery.city} {order.delivery.postcode.split(' ')[0]}</em>
+              </span>
+              <span>{formatGBP(order.delivery.feeGbp)}</span>
             </div>
-            <div className="flex justify-between border-t border-walnut py-3 font-serif text-[17px] font-semibold text-walnut">
-              <span>Total</span>
-              <span className="tabular-nums">{formatGBP(order.totalGbp)}</span>
+            <div className="receipt__total-row receipt__total-row--grand">
+              <span>{isPaid ? 'Total paid' : isRefunded ? 'Total (refunded)' : 'Total'}</span>
+              <span>{formatGBP(order.totalGbp)}</span>
             </div>
-            <p className="m-0 mt-1 text-right font-serif text-[12px] italic text-ink-muted">
-              {paymentLabel}
-            </p>
-            {order.refundAmountGbp && order.refundAmountGbp > 0 && (
-              <div className="mt-2 flex justify-between border-t border-dashed border-rule pt-2 font-serif text-[13px] italic text-ink-muted">
-                <span>Refunded</span>
-                <span className="tabular-nums">{formatGBP(order.refundAmountGbp)}</span>
+            {order.refundAmountGbp && order.refundAmountGbp > 0 && !isRefunded && (
+              <div className="receipt__total-row receipt__total-row--muted">
+                <span>
+                  <em>Refunded</em>
+                </span>
+                <span>− {formatGBP(order.refundAmountGbp)}</span>
               </div>
             )}
-          </section>
+          </div>
+
+          {/* Payment */}
+          <div className="receipt__payment">
+            <div>
+              <div className="receipt__payment-label">Payment method</div>
+              <p className="receipt__payment-value">
+                {order.paymentMethod === 'card' ? (
+                  <>
+                    {order.cardBrand ? (
+                      <>
+                        <b>{order.cardBrand}</b> ending {order.cardLast4 ?? '••••'}
+                      </>
+                    ) : (
+                      <b>Card</b>
+                    )}
+                    <br />
+                    <em>Processed securely by Stripe</em>
+                  </>
+                ) : (
+                  <>
+                    <b>Cash on delivery</b>
+                    <br />
+                    <em>Paid to the driver on arrival</em>
+                  </>
+                )}
+              </p>
+            </div>
+            <div>
+              <div className="receipt__payment-label">Payment status</div>
+              <p className="receipt__payment-value">
+                <b style={{ color: stampColor }}>{paymentStatusLine}</b>
+                <br />
+                <em>
+                  {isPaid
+                    ? `Receipt · ${formatLongDate(order.createdAt)}, ${formatTime(order.createdAt)}`
+                    : isPending
+                      ? 'This page will update when payment clears.'
+                      : isFailed
+                        ? 'Please retry payment or contact us.'
+                        : `Order placed · ${formatTime(order.createdAt)}`}
+                </em>
+              </p>
+            </div>
+          </div>
+
+          {/* Thanks */}
+          <p className="receipt__thanks">
+            &quot;No shortcuts. No frozen meals. Just dinner. Thank you for ordering.&quot;
+          </p>
 
           {/* Footer */}
-          <footer className="border-t border-rule pt-5 text-center">
-            <p className="m-0 font-serif text-[14px] italic text-ink-muted">
-              {siteConfig.voice.tagline}
-            </p>
-            <p className="m-0 mt-2 font-mono text-[10px] uppercase tracking-[0.24em] text-bronze-deep">
-              {siteConfig.contact.email} · {siteConfig.contact.phone}
-            </p>
-            <p className="m-0 mt-3 font-serif text-[12px] italic text-ink-muted">
-              Food hygiene rating · {siteConfig.foodHygiene.rating}/5 ({siteConfig.foodHygiene.ratingLabel}) ·{' '}
-              {siteConfig.foodHygiene.authority}
-            </p>
+          <footer className="receipt__footer">
+            <div className="receipt__footer-hygiene">
+              ★ ★ ★ ★ ★ &nbsp;Food Hygiene · {siteConfig.foodHygiene.authority}
+            </div>
+            {siteConfig.name} · Middlesbrough, UK
+            <br />
+            Questions about this receipt?{' '}
+            <a href={`mailto:${siteConfig.contact.email}`}>{siteConfig.contact.email}</a> ·{' '}
+            <a href={`tel:${siteConfig.contact.phone}`}>{siteConfig.contact.phone}</a>
           </footer>
         </article>
-
-        <p className="mt-6 text-center font-serif text-[12px] italic text-ink-muted print:hidden">
-          Need this as a PDF? Use your browser's "Save as PDF" option from the print dialog.
-        </p>
-      </main>
-    </div>
-  );
-}
-
-function MetaBlock({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <div className="mb-1.5 font-mono text-[9px] uppercase tracking-[0.2em] text-bronze-deep">{label}</div>
-      <div className="font-serif text-[14px] leading-[1.4] text-walnut">{children}</div>
-    </div>
+      </div>
+    </>
   );
 }
