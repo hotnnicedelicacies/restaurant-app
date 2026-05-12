@@ -2246,6 +2246,9 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -0.00
 .receipt-btn:hover { background: var(--color-walnut); color: var(--color-cream); }
 .receipt-btn--primary { background: var(--color-walnut); color: var(--color-cream); }
 .receipt-btn--primary:hover { background: var(--color-bronze-deep); }
+
+
+/* ============================================================
    WARNING / DANGER BANNER (advanced settings)
    ============================================================ */
 
