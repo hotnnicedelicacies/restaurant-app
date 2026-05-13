@@ -1,0 +1,60 @@
+/**
+ * Resolve the kitchen's operational toggles from the Supabase `settings`
+ * table — admin's "Pause new orders" switch and the global cash-on-delivery
+ * gate. Both flags are *authoritative*: every customer-facing surface that
+ * shows the order CTA, and the server-side `createOrder`, must read them.
+ *
+ * Cached via unstable_cache; admin mutations call
+ * `revalidateTag(OPERATIONS_TAG, 'default')` from `updateSetting`.
+ */
+
+import { unstable_cache } from 'next/cache';
+import { getPublicClient } from '@/lib/supabase/public';
+
+export const OPERATIONS_TAG = 'operations';
+
+export interface OperationsView {
+  /** Owner toggle: when false, /menu and /checkout show "kitchen closed" and `createOrder` rejects. */
+  storeOpen: boolean;
+  /** Global cash-on-delivery switch; ANDed with zone + per-meal flags at checkout. */
+  codEnabled: boolean;
+  /** Optional message shown to customers when the store is paused. */
+  closedMessage: string | null;
+}
+
+const FALLBACK: OperationsView = {
+  // Fail-open on cold-cache + DB-down so the kitchen doesn't appear closed
+  // due to infrastructure. Pausing the store is an active admin action;
+  // the absence of a row should not silently pause the business.
+  storeOpen: true,
+  codEnabled: true,
+  closedMessage: null,
+};
+
+async function _getOperations(): Promise<OperationsView> {
+  try {
+    const supabase = getPublicClient();
+    const { data, error } = await supabase
+      .from('settings')
+      .select('key, value')
+      .in('key', ['store_open', 'cod_enabled', 'closed_message']);
+    if (error || !data) return FALLBACK;
+    const byKey = new Map(data.map((r) => [r.key, r.value]));
+    return {
+      storeOpen: byKey.get('store_open') === false ? false : FALLBACK.storeOpen,
+      codEnabled: byKey.get('cod_enabled') === false ? false : FALLBACK.codEnabled,
+      closedMessage:
+        typeof byKey.get('closed_message') === 'string'
+          ? (byKey.get('closed_message') as string)
+          : FALLBACK.closedMessage,
+    };
+  } catch (err) {
+    console.error('[operations] getOperations threw:', err);
+    return FALLBACK;
+  }
+}
+
+export const getOperations = unstable_cache(_getOperations, ['settings:operations'], {
+  revalidate: 60,
+  tags: [OPERATIONS_TAG],
+});

@@ -4,6 +4,7 @@ import { revalidatePath, revalidateTag } from 'next/cache';
 import { MENU_TAG } from '@/lib/data/menu';
 import { ZONES_TAG } from '@/lib/data/zones';
 import { HOURS_TAG } from '@/lib/data/hours';
+import { OPERATIONS_TAG } from '@/lib/data/operations';
 import { getServiceClient } from '@/lib/supabase/server';
 import { requireAdmin } from './auth';
 import type { VariantsBlob, AddonsBlob } from '@/lib/supabase/types';
@@ -295,8 +296,11 @@ export async function updateSetting(key: string, value: unknown): Promise<Result
   if (error) return { ok: false, error: error.message };
   revalidatePath('/admin/settings');
   revalidatePath('/', 'layout');
-  // Hours appears on most public pages via getHours(); bust its cache so
-  // edits take effect immediately instead of waiting on the 60s revalidate.
+  // Bust the cache tag for the consumer that watches this key so the edit
+  // takes effect immediately instead of waiting on the 60s revalidate.
   if (key === 'hours') revalidateTag(HOURS_TAG, 'default');
+  if (key === 'store_open' || key === 'cod_enabled' || key === 'closed_message') {
+    revalidateTag(OPERATIONS_TAG, 'default');
+  }
   return { ok: true };
 }

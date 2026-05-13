@@ -3,6 +3,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import CheckoutForm, { type CheckoutDefaults } from '@/components/checkout/CheckoutForm';
 import { getServerClient } from '@/lib/supabase/server';
+import { getOperations } from '@/lib/data/operations';
+import { getHours } from '@/lib/data/hours';
 import { siteConfig } from '@/constants/siteConfig';
 
 export const metadata: Metadata = {
@@ -13,6 +15,11 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 export default async function CheckoutPage() {
+  // Operations gate first — if the owner has paused the kitchen we don't
+  // even render the form. Hours / cutoff drive the date picker; both come
+  // from admin-controlled `settings` rows.
+  const [operations, hours] = await Promise.all([getOperations(), getHours()]);
+
   // For signed-in customers we pre-fill the form from their profile + default
   // address. Guests start with an empty form.
   const supabase = await getServerClient();
@@ -97,7 +104,35 @@ export default async function CheckoutPage() {
       </nav>
 
       <main className="container py-[clamp(32px,5vw,56px)] pb-[clamp(48px,7vw,88px)]">
-        <CheckoutForm defaults={defaults} />
+        {operations.storeOpen ? (
+          <CheckoutForm
+            defaults={defaults}
+            codGloballyEnabled={operations.codEnabled}
+            openDays={hours.days}
+            sameDayCutoff={hours.sameDayCutoff}
+          />
+        ) : (
+          <div className="mx-auto max-w-[560px] rounded-[2px] border border-rule bg-cream p-8 text-center sm:p-10">
+            <p className="mb-3 font-mono text-[10px] uppercase tracking-[0.22em] text-bronze-deep">
+              Kitchen paused
+            </p>
+            <h2 className="m-0 mb-3 font-serif text-[clamp(24px,3vw,32px)] font-medium text-walnut">
+              We&apos;re not <em className="font-normal italic">accepting orders</em> right now.
+            </h2>
+            <p className="m-0 font-serif text-[15px] italic leading-[1.55] text-ink-muted">
+              {operations.closedMessage ||
+                'The kitchen is paused for new orders. Please check back soon — or message us on WhatsApp.'}
+            </p>
+            <Link
+              href={`https://wa.me/${siteConfig.contact.whatsapp}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 inline-block rounded-[2px] bg-walnut px-6 py-3 font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] transition-colors hover:bg-bronze-deep"
+            >
+              Message us on WhatsApp →
+            </Link>
+          </div>
+        )}
       </main>
 
       <footer className="bg-walnut py-4 text-center font-serif text-[12px] italic text-[#F1E5CD8C]">

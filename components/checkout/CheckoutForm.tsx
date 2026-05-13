@@ -64,7 +64,23 @@ export interface CheckoutDefaults {
   selectedAddressId?: string | null;
 }
 
-export default function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults | null }) {
+export type WeekDay =
+  | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
+
+export default function CheckoutForm({
+  defaults,
+  codGloballyEnabled = true,
+  openDays,
+  sameDayCutoff,
+}: {
+  defaults?: CheckoutDefaults | null;
+  /** Admin-controlled global COD switch. Combined with zone + per-meal flags. */
+  codGloballyEnabled?: boolean;
+  /** Days the kitchen is open — drives the date picker. */
+  openDays: WeekDay[];
+  /** Same-day cutoff (`HH:mm`) — past this, "today" is hidden. */
+  sameDayCutoff: string;
+}) {
   const router = useRouter();
   const cartLines = useCart((s) => s.lines);
   const cartCount = useCart((s) => s.count());
@@ -139,7 +155,7 @@ export default function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults
   const codIneligibleItems = cartLines.filter((l) => l.isCodEligible === false);
   const cartCodEligible = codIneligibleItems.length === 0;
   const zoneCodEligible = zone?.allowsCod ?? true;
-  const codAvailable = cartCodEligible && zoneCodEligible;
+  const codAvailable = codGloballyEnabled && cartCodEligible && zoneCodEligible;
 
   // Debounced postcode → zone check
   useEffect(() => {
@@ -385,7 +401,7 @@ export default function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults
                       className="w-full rounded-[2px] border border-rule bg-transparent px-3.5 py-3 font-serif text-[16px] text-walnut outline-none focus:border-walnut"
                     >
                       <option value="">Choose a date…</option>
-                      {nextSevenDays().map((d) => (
+                      {nextSevenDays(openDays, sameDayCutoff).map((d) => (
                         <option key={d.iso} value={d.iso}>{d.label}</option>
                       ))}
                     </select>
@@ -443,9 +459,11 @@ export default function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults
                   description={
                     codAvailable
                       ? 'Pay the driver in cash when your order arrives.'
-                      : !cartCodEligible
-                        ? `Not available for: ${codIneligibleItems.map((l) => l.name).join(', ')}. Pay by card to keep this item.`
-                        : `Not available for ${zone?.name ?? 'this zone'}.`
+                      : !codGloballyEnabled
+                        ? 'Cash on delivery is currently unavailable.'
+                        : !cartCodEligible
+                          ? `Not available for: ${codIneligibleItems.map((l) => l.name).join(', ')}. Pay by card to keep this item.`
+                          : `Not available for ${zone?.name ?? 'this zone'}.`
                   }
                   badge={codAvailable ? 'Cash' : 'Unavailable'}
                   disabled={!codAvailable}
@@ -550,15 +568,27 @@ const DELIVERY_WINDOWS = [
   { start: '18:00', end: '20:00' },
 ];
 
-function nextSevenDays(): { iso: string; label: string }[] {
+function nextSevenDays(
+  openDays: WeekDay[],
+  sameDayCutoff: string,
+): { iso: string; label: string }[] {
+  const open = new Set<string>(openDays);
   const out: { iso: string; label: string }[] = [];
   const start = new Date();
-  for (let i = 0; i < 7; i++) {
+  const nowHm = new Intl.DateTimeFormat('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(start);
+  const pastCutoff = nowHm >= sameDayCutoff;
+
+  for (let i = 0; i < 14 && out.length < 7; i++) {
     const d = new Date(start);
     d.setDate(start.getDate() + i);
-    const iso = d.toISOString().slice(0, 10);
     const dayName = d.toLocaleDateString('en-GB', { weekday: 'long' });
-    if (dayName === 'Monday') continue; // closed Mondays
+    if (!open.has(dayName)) continue;
+    if (i === 0 && pastCutoff) continue; // same-day cutoff has passed
+    const iso = d.toISOString().slice(0, 10);
     const label = i === 0 ? `Today · ${d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}` :
                   i === 1 ? `Tomorrow · ${d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}` :
                   d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
