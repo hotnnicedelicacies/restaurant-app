@@ -1,5 +1,5 @@
 import { Resend } from 'resend';
-import { siteConfig } from '@/constants/siteConfig';
+import { getEmailConfig } from '@/lib/data/emailConfig';
 
 let _resend: Resend | null = null;
 
@@ -18,24 +18,31 @@ interface SendArgs {
   html: string;
   /** Optional plain-text fallback. */
   text?: string;
-  /** Reply-to address (defaults to siteConfig). */
+  /** Override the admin-configured reply-to for this one send (e.g. contact-form replies). */
   replyTo?: string;
 }
 
 /**
- * Send an email via Resend. Swallows errors and logs; do NOT block order
- * creation on email delivery — webhook will retry.
+ * Send an email via Resend. Reads the from-address, name, and reply-to
+ * from admin's `/admin/settings/advanced` — never from siteConfig — so
+ * the owner can edit them at runtime without redeploying.
+ *
+ * Swallows errors and logs; do NOT block order creation on email
+ * delivery — webhook will retry.
  */
 export async function sendEmail({ to, subject, html, text, replyTo }: SendArgs) {
   try {
-    const resend = getResend();
+    const [resend, cfg] = await Promise.all([
+      Promise.resolve(getResend()),
+      getEmailConfig(),
+    ]);
     const result = await resend.emails.send({
-      from: process.env.ORDER_FROM_EMAIL || siteConfig.email.fromDefault,
+      from: cfg.fromHeader,
       to: Array.isArray(to) ? to : [to],
       subject,
       html,
       text,
-      replyTo: replyTo || siteConfig.email.replyTo,
+      replyTo: replyTo || cfg.replyTo,
     });
     if (result.error) {
       console.error('[email] Resend error:', result.error);

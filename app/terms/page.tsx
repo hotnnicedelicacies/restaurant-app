@@ -3,6 +3,7 @@ import LegalLayout from '@/components/legal/LegalLayout';
 import { siteConfig } from '@/constants/siteConfig';
 import { absoluteUrl } from '@/lib/utils';
 import { getHours } from '@/lib/data/hours';
+import { getContact } from '@/lib/data/contact';
 
 export const metadata: Metadata = {
   title: 'Terms of Service',
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 };
 
 export default async function TermsPage() {
-  const hours = await getHours();
+  const [hours, contact] = await Promise.all([getHours(), getContact()]);
   const cutoffLabel = hours.cutoffShort.replace(/^Order by /i, '').replace(/ for same-day delivery$/i, '');
   return (
     <LegalLayout
@@ -124,8 +125,8 @@ export default async function TermsPage() {
       <h2 id="contact">12. <em>Contact</em></h2>
       <p>Questions, complaints, or feedback:</p>
       <ul>
-        <li>Email: <a href={`mailto:${siteConfig.contact.email}`}>{siteConfig.contact.email}</a></li>
-        <li>Phone / WhatsApp: <a href={`tel:${siteConfig.contact.phone}`}>{siteConfig.contact.phone}</a></li>
+        <li>Email: <a href={`mailto:${contact.email}`}>{contact.email}</a></li>
+        <li>Phone / WhatsApp: <a href={`tel:${contact.phone}`}>{contact.phone}</a></li>
         <li>Post: {siteConfig.name}, Middlesbrough, UK</li>
       </ul>
 

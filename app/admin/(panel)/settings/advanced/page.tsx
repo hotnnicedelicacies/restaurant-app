@@ -4,6 +4,9 @@ import { siteConfig } from '@/constants/siteConfig';
 import { formatLongDate, formatTime } from '@/lib/utils';
 import AdvancedSettingsForm from './AdvancedSettingsForm';
 import { getDatasetSummaries } from '@/lib/admin/dataExport';
+import { getEmailConfig } from '@/lib/data/emailConfig';
+import { getContact } from '@/lib/data/contact';
+import { getActiveZones } from '@/lib/data/zones';
 
 interface AdvancedBlob {
   email_from_name?: string;
@@ -22,21 +25,30 @@ export default async function AdminAdvancedSettingsPage() {
   const { data: settingsRows } = await svc.from('settings').select('key, value');
   const map = new Map((settingsRows ?? []).map((r) => [r.key, r.value]));
 
+  // Compute admin-form defaults from the DB getters when settings haven't
+  // been saved yet — keeps siteConfig free of contact / email / delivery
+  // values that the admin owns at runtime.
+  const [emailCfg, contact, zones] = await Promise.all([
+    getEmailConfig(),
+    getContact(),
+    getActiveZones(),
+  ]);
   const initial: AdvancedBlob = {
     email_from_name:
-      (map.get('email_from_name') as string | undefined) ?? siteConfig.name,
+      (map.get('email_from_name') as string | undefined) ?? emailCfg.fromName,
     email_from:
-      (map.get('email_from') as string | undefined) ??
-      siteConfig.email.fromDefault.replace(/^.*<(.+)>.*$/, '$1'),
+      (map.get('email_from') as string | undefined) ?? emailCfg.fromAddress,
     email_reply_to:
-      (map.get('email_reply_to') as string | undefined) ?? siteConfig.email.replyTo,
+      (map.get('email_reply_to') as string | undefined) ?? emailCfg.replyTo,
     email_signature:
       (map.get('email_signature') as string | undefined) ??
       [
         `${siteConfig.name} · ${siteConfig.tagline}`,
-        `${siteConfig.contact.phone} · ${siteConfig.contact.email}`,
-        siteConfig.delivery.areas.join(' · '),
-      ].join('\n'),
+        `${contact.phone} · ${contact.email}`,
+        zones.length > 0 ? zones.map((z) => z.name).join(' · ') : '',
+      ]
+        .filter(Boolean)
+        .join('\n'),
   };
 
   const { data: profile } = user

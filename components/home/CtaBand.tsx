@@ -1,4 +1,4 @@
-import { siteConfig } from '@/constants/siteConfig';
+import { getContact } from '@/lib/data/contact';
 
 interface Props {
   eyebrow?: string;
@@ -12,9 +12,12 @@ interface Props {
 /**
  * Pre-footer dark walnut CTA band. Centered with an eyebrow, italic-
  * emphasised title, supporting sub, primary CTA, and optional contact-
- * channel links beneath.
+ * channel links beneath. Contact details are read from admin settings
+ * via `getContact()` so the displayed number/email always match what
+ * the owner has set.
  */
-export default function CtaBand({ eyebrow, title, sub, cta, showChannels = true }: Props) {
+export default async function CtaBand({ eyebrow, title, sub, cta, showChannels = true }: Props) {
+  const contact = showChannels ? await getContact() : null;
   return (
     <section className="bg-walnut py-[clamp(64px,9vw,112px)] text-center text-cream">
       <div className="container">
@@ -38,24 +41,24 @@ export default function CtaBand({ eyebrow, title, sub, cta, showChannels = true 
           {cta.label}
         </a>
 
-        {showChannels && (
+        {contact && (
           <div className="mt-8 flex flex-wrap justify-center gap-6 font-serif text-[14px] italic text-[#F1E5CDB3]">
             <a
-              href={`https://wa.me/${siteConfig.contact.whatsapp}`}
+              href={`https://wa.me/${contact.whatsapp}`}
               target="_blank"
               rel="noopener noreferrer"
               className="border-b border-[rgba(241,229,205,0.3)] pb-px text-[#F1E5CDD9] transition-colors hover:border-bronze hover:text-bronze"
             >
-              WhatsApp · {siteConfig.contact.whatsappDisplay}
+              WhatsApp · {contact.whatsappDisplay}
             </a>
             <a
-              href={`tel:${siteConfig.contact.phone}`}
+              href={`tel:${contact.phone}`}
               className="border-b border-[rgba(241,229,205,0.3)] pb-px text-[#F1E5CDD9] transition-colors hover:border-bronze hover:text-bronze"
             >
-              Call · {siteConfig.contact.phone}
+              Call · {contact.phone}
             </a>
             <a
-              href={`mailto:${siteConfig.contact.email}`}
+              href={`mailto:${contact.email}`}
               className="border-b border-[rgba(241,229,205,0.3)] pb-px text-[#F1E5CDD9] transition-colors hover:border-bronze hover:text-bronze"
             >
               Email

@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { getOrderByRef } from '@/lib/data/orders';
+import { getContact } from '@/lib/data/contact';
 import { siteConfig } from '@/constants/siteConfig';
 import { formatGBP, formatLongDate, formatTime } from '@/lib/utils';
 import { maybeBackSyncStripe } from '@/lib/admin/orderActions';
@@ -20,7 +21,8 @@ const SYNC_LOOKBACK_MS = 60 * 60 * 1000;
 
 export default async function ReceiptPage({ params }: { params: Promise<{ ref: string }> }) {
   const { ref } = await params;
-  let order = await getOrderByRef(ref);
+  const [orderInitial, contact] = await Promise.all([getOrderByRef(ref), getContact()]);
+  let order = orderInitial;
   if (!order) notFound();
 
   // If a customer lands here with a card payment still pending or failed
@@ -141,9 +143,9 @@ export default async function ReceiptPage({ params }: { params: Promise<{ ref: s
               <div className="receipt__brand-meta">
                 A home kitchen · Middlesbrough
                 <br />
-                {siteConfig.contact.email}
+                {contact.email}
                 <br />
-                {siteConfig.contact.phone}
+                {contact.phone}
               </div>
             </div>
             <div className="receipt__doc-info">
@@ -329,8 +331,8 @@ export default async function ReceiptPage({ params }: { params: Promise<{ ref: s
             {siteConfig.name} · Middlesbrough, UK
             <br />
             Questions about this receipt?{' '}
-            <a href={`mailto:${siteConfig.contact.email}`}>{siteConfig.contact.email}</a> ·{' '}
-            <a href={`tel:${siteConfig.contact.phone}`}>{siteConfig.contact.phone}</a>
+            <a href={`mailto:${contact.email}`}>{contact.email}</a> ·{' '}
+            <a href={`tel:${contact.phone}`}>{contact.phone}</a>
           </footer>
         </article>
 

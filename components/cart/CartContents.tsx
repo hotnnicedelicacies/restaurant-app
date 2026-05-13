@@ -12,9 +12,11 @@ import { useEffect, useState } from 'react';
  * @param minDeliveryFee  Cheapest base fee across the admin-controlled
  *                        `delivery_zones` table — used for the "from £X"
  *                        indicator before the customer enters a postcode
- *                        at checkout.
+ *                        at checkout. Null when zones haven't loaded
+ *                        (cold cache + DB down) so we render "—" instead
+ *                        of a stale business value.
  */
-export default function CartContents({ minDeliveryFee }: { minDeliveryFee: number }) {
+export default function CartContents({ minDeliveryFee }: { minDeliveryFee: number | null }) {
   // Avoid hydration mismatch: zustand-persist reads from localStorage on mount
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -55,7 +57,7 @@ export default function CartContents({ minDeliveryFee }: { minDeliveryFee: numbe
   // server component). The exact fee is bound at checkout once the
   // postcode → zone match runs.
   const deliveryFeeFrom = minDeliveryFee;
-  const total = subtotal + deliveryFeeFrom;
+  const total = subtotal + (deliveryFeeFrom ?? 0);
 
   return (
     <div className="grid items-start gap-[clamp(32px,5vw,64px)] md:grid-cols-[1.4fr_1fr]">
@@ -112,7 +114,7 @@ export default function CartContents({ minDeliveryFee }: { minDeliveryFee: numbe
                   Delivery <em className="italic text-ink-muted">· from</em>
                 </span>
               }
-              value={formatGBP(deliveryFeeFrom)}
+              value={deliveryFeeFrom !== null ? formatGBP(deliveryFeeFrom) : '—'}
               muted
             />
             <SummaryRow label="Estimated total" value={formatGBP(total)} grand />

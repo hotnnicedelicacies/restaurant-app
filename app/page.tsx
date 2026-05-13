@@ -12,6 +12,7 @@ import { siteConfig } from '@/constants/siteConfig';
 import { formatLongDate, absoluteUrl } from '@/lib/utils';
 import { getFeaturedItems, type MenuItemView } from '@/lib/data/menu';
 import { getHours } from '@/lib/data/hours';
+import { getContact } from '@/lib/data/contact';
 import { type FareRowItem } from '@/components/menu/FareRow';
 
 import heroImg from '@/assets/hero-food.png';
@@ -52,7 +53,11 @@ const websiteSchema = {
 };
 
 export default async function HomePage() {
-  const [featuredRaw, hours] = await Promise.all([getFeaturedItems(6), getHours()]);
+  const [featuredRaw, hours, contact] = await Promise.all([
+    getFeaturedItems(6),
+    getHours(),
+    getContact(),
+  ]);
   const featured = featuredRaw.map(toFareRowItem);
   const today = formatLongDate(new Date());
 
@@ -82,7 +87,7 @@ export default async function HomePage() {
           primaryCta={{ label: "See today's menu", href: siteConfig.routes.menu }}
           secondaryCta={{
             label: 'or message us on WhatsApp',
-            href: `https://wa.me/${siteConfig.contact.whatsapp}`,
+            href: `https://wa.me/${contact.whatsapp}`,
           }}
         />
 

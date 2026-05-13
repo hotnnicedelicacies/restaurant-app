@@ -1,7 +1,7 @@
 import { getServiceClient } from '@/lib/supabase/server';
 import SettingsForm from './SettingsForm';
-import { siteConfig } from '@/constants/siteConfig';
-import type { WeekDay } from '@/lib/data/hours';
+import { getHours, type WeekDay } from '@/lib/data/hours';
+import { getContact } from '@/lib/data/contact';
 
 interface HoursBlob {
   days: WeekDay[];
@@ -28,6 +28,10 @@ export default async function AdminSettingsPage() {
   const { data } = await supabase.from('settings').select('key, value');
   const map = new Map((data ?? []).map((row) => [row.key, row.value]));
 
+  // Pull DB-backed defaults from the fetchers so this page never shows a
+  // hardcoded business value (siteConfig stays free of those).
+  const [hoursFallback, contactFallback] = await Promise.all([getHours(), getContact()]);
+
   const initial: SettingsBlob = {
     store_open: (map.get('store_open') as boolean | undefined) ?? true,
     cod_enabled: (map.get('cod_enabled') as boolean | undefined) ?? true,
@@ -36,17 +40,17 @@ export default async function AdminSettingsPage() {
       (map.get('closed_message') as string | undefined) ??
       "We're closed for service right now — back tomorrow at noon.",
     contact_phone:
-      (map.get('contact_phone') as string | undefined) ?? siteConfig.contact.phone,
+      (map.get('contact_phone') as string | undefined) ?? contactFallback.phone,
     contact_email:
-      (map.get('contact_email') as string | undefined) ?? siteConfig.contact.email,
+      (map.get('contact_email') as string | undefined) ?? contactFallback.email,
     default_prep_time_min: (map.get('default_prep_time_min') as number | undefined) ?? 60,
     default_prep_time_max: (map.get('default_prep_time_max') as number | undefined) ?? 90,
     global_min_order_gbp: (map.get('global_min_order_gbp') as number | undefined) ?? 10,
     hours: (map.get('hours') as HoursBlob | undefined) ?? {
-      days: [...siteConfig.hours.days] as WeekDay[],
-      open: siteConfig.hours.open,
-      close: siteConfig.hours.close,
-      sameDayCutoff: siteConfig.hours.sameDayCutoff,
+      days: [...hoursFallback.days] as WeekDay[],
+      open: hoursFallback.open,
+      close: hoursFallback.close,
+      sameDayCutoff: hoursFallback.sameDayCutoff,
     },
   };
 

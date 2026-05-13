@@ -4,6 +4,7 @@ import { siteConfig } from '@/constants/siteConfig';
 import { absoluteUrl } from '@/lib/utils';
 import { getHours } from '@/lib/data/hours';
 import { getActiveZones } from '@/lib/data/zones';
+import { getContact } from '@/lib/data/contact';
 import { Toaster } from 'sonner';
 import CookieBanner from '@/components/CookieBanner';
 import './globals.css';
@@ -119,6 +120,7 @@ export const metadata: Metadata = {
 function buildRestaurantSchema(
   hours: { days: string[]; open: string; close: string },
   areaServedNames: string[],
+  contact: { phone: string; email: string },
 ) {
   return {
   '@context': 'https://schema.org',
@@ -127,8 +129,8 @@ function buildRestaurantSchema(
   name: siteConfig.name,
   description: siteConfig.description,
   url: absoluteUrl(),
-  telephone: siteConfig.contact.phone,
-  email: siteConfig.contact.email,
+  telephone: contact.phone,
+  email: contact.email,
   image: absoluteUrl('/og-image.jpg'),
   logo: absoluteUrl('/logo.png'),
   priceRange: '££',
@@ -167,12 +169,18 @@ function buildRestaurantSchema(
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const [hours, zones] = await Promise.all([getHours(), getActiveZones()]);
-  const areaServed: string[] =
-    zones.length > 0 ? zones.map((z) => z.name) : [...siteConfig.delivery.areas];
+  const [hours, zones, contact] = await Promise.all([
+    getHours(),
+    getActiveZones(),
+    getContact(),
+  ]);
+  // Empty list = render no `areaServed`. Schema spec allows omission and a
+  // wrong/stale list is worse for SEO than absence.
+  const areaServed: string[] = zones.map((z) => z.name);
   const restaurantSchema = buildRestaurantSchema(
     { days: hours.days, open: hours.open, close: hours.close },
     areaServed,
+    contact,
   );
   return (
     <html

@@ -6,7 +6,8 @@ import { getServiceClient } from '@/lib/supabase/server';
 import { getOrderByRef } from '@/lib/data/orders';
 import { sendEmail } from '@/lib/email/send';
 import { orderConfirmationEmail } from '@/lib/email/templates';
-import { siteConfig } from '@/constants/siteConfig';
+import { getEmailConfig } from '@/lib/data/emailConfig';
+import { getContact } from '@/lib/data/contact';
 
 /**
  * Stripe webhook handler.
@@ -65,7 +66,11 @@ export async function POST(request: Request) {
         if (ref) {
           const order = await getOrderByRef(ref);
           if (order) {
-            const email = orderConfirmationEmail(order);
+            const contact = await getContact();
+            const email = orderConfirmationEmail(order, {
+              contactEmail: contact.email,
+              contactWhatsapp: contact.whatsapp,
+            });
             await sendEmail({
               to: order.customer.email,
               subject: email.subject,
@@ -73,10 +78,10 @@ export async function POST(request: Request) {
               text: email.text,
             });
             // Notify admin too (best-effort)
-            const adminTo = process.env.ORDER_NOTIFICATION_EMAIL || siteConfig.email.notificationToDefault;
-            if (adminTo) {
+            const cfg = await getEmailConfig();
+            if (cfg.notificationTo) {
               await sendEmail({
-                to: adminTo,
+                to: cfg.notificationTo,
                 subject: `New order · ${order.ref} · ${email.subject.replace('Order received · ', '')}`,
                 html: email.html,
               });
@@ -132,11 +137,11 @@ export async function POST(request: Request) {
         const amount = (dispute.amount ?? 0) / 100;
         console.warn('[stripe] Dispute created on charge', chargeId, 'amount:', amount, 'reason:', dispute.reason);
         try {
-          const adminTo = process.env.ORDER_NOTIFICATION_EMAIL || siteConfig.email.notificationToDefault;
-          if (adminTo) {
+          const cfg = await getEmailConfig();
+          if (cfg.notificationTo) {
             const stripeUrl = chargeId ? `https://dashboard.stripe.com/charges/${chargeId}` : 'https://dashboard.stripe.com/disputes';
             await sendEmail({
-              to: adminTo,
+              to: cfg.notificationTo,
               subject: `⚠ Stripe dispute · ${dispute.reason ?? 'unknown reason'} · £${amount.toFixed(2)}`,
               html: `
                 <div style="font-family:'Cormorant Garamond',serif;color:#2D1F18;">

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { siteConfig } from '@/constants/siteConfig';
 import { getHours } from '@/lib/data/hours';
+import { getContact } from '@/lib/data/contact';
 
 /**
  * Customer-facing footer. Walnut band, four columns on desktop, stacks on
@@ -9,7 +10,7 @@ import { getHours } from '@/lib/data/hours';
  * practice (always-visible, one click away).
  */
 export default async function SiteFooter() {
-  const hours = await getHours();
+  const [hours, contact] = await Promise.all([getHours(), getContact()]);
   return (
     <footer className="border-t border-[rgba(241,229,205,0.22)] bg-walnut pt-14 pb-6 text-cream">
       <div className="container">
@@ -51,15 +52,15 @@ export default async function SiteFooter() {
 
           {/* Contact */}
           <FooterColumn title="Contact">
-            <a href={`tel:${siteConfig.contact.phone}`}>{siteConfig.contact.phone}</a>
+            <a href={`tel:${contact.phone}`}>{contact.whatsappDisplay}</a>
             <a
-              href={`https://wa.me/${siteConfig.contact.whatsapp}`}
+              href={`https://wa.me/${contact.whatsapp}`}
               target="_blank"
               rel="noopener noreferrer"
             >
               WhatsApp
             </a>
-            <a href={`mailto:${siteConfig.contact.email}`}>Email us</a>
+            <a href={`mailto:${contact.email}`}>Email us</a>
             {siteConfig.social.instagram && (
               <a href={siteConfig.social.instagram} target="_blank" rel="noopener noreferrer">
                 Instagram

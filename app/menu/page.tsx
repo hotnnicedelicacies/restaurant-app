@@ -7,6 +7,7 @@ import MenuBrowser from '@/components/menu/MenuBrowser';
 import { getCategoriesWithItems } from '@/lib/data/menu';
 import { getHours } from '@/lib/data/hours';
 import { getActiveZones } from '@/lib/data/zones';
+import { getContact } from '@/lib/data/contact';
 import { siteConfig } from '@/constants/siteConfig';
 import { absoluteUrl, formatGBP } from '@/lib/utils';
 
@@ -30,16 +31,16 @@ const DIETARY_SCHEMA_MAP: Record<string, string> = {
 };
 
 export default async function MenuPage() {
-  const [{ categories, itemsByCategory }, hours, zones] = await Promise.all([
+  const [{ categories, itemsByCategory }, hours, zones, contact] = await Promise.all([
     getCategoriesWithItems(),
     getHours(),
     getActiveZones(),
+    getContact(),
   ]);
-  const minDeliveryFee =
-    zones.length > 0
-      ? Math.min(...zones.map((z) => z.baseFeeGbp))
-      : siteConfig.delivery.pricing.middlesbrough;
-  const cheapestZoneName = zones.find((z) => z.baseFeeGbp === minDeliveryFee)?.name ?? 'Middlesbrough';
+  // When zones haven't loaded yet (cold cache + DB down) we'd rather hide
+  // the "from £X" line than surface a stale business value.
+  const minDeliveryFee = zones.length > 0 ? Math.min(...zones.map((z) => z.baseFeeGbp)) : null;
+  const cheapestZoneName = zones.find((z) => z.baseFeeGbp === minDeliveryFee)?.name ?? null;
 
   // JSON-LD: Menu schema (helps Google show the menu in search)
   const menuSchema = {
@@ -93,7 +94,7 @@ export default async function MenuPage() {
               </h2>
               <p className="m-0 font-serif text-[16px] italic leading-[1.5] text-ink-muted">
                 The kitchen is being set up. Check back shortly — or message us on{' '}
-                <a href={`https://wa.me/${siteConfig.contact.whatsapp}`} className="link-underline">
+                <a href={`https://wa.me/${contact.whatsapp}`} className="link-underline">
                   WhatsApp
                 </a>
                 .
@@ -107,7 +108,11 @@ export default async function MenuPage() {
         <CtaBand
           eyebrow="Ready when you are"
           title={<>Tonight&apos;s dinner, <em>handled.</em></>}
-          sub={`Delivery from ${formatGBP(minDeliveryFee)} within ${cheapestZoneName}. Place your order before ten.`}
+          sub={
+            minDeliveryFee !== null && cheapestZoneName
+              ? `Delivery from ${formatGBP(minDeliveryFee)} within ${cheapestZoneName}. Place your order before ten.`
+              : 'Place your order before ten.'
+          }
           cta={{ label: 'Review your basket', href: siteConfig.routes.cart }}
         />
       </main>

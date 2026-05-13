@@ -7,6 +7,7 @@ import { getOrderByRef } from '@/lib/data/orders';
 import { sendEmail } from '@/lib/email/send';
 import { cancellationEmail } from '@/lib/email/templates';
 import { siteConfig } from '@/constants/siteConfig';
+import { getContact } from '@/lib/data/contact';
 
 type Result = { ok: true } | { ok: false; error: string };
 
@@ -89,7 +90,11 @@ export async function customerCancelOrder(ref: string): Promise<Result> {
   // Send cancellation email (best-effort)
   const refreshed = await getOrderByRef(ref);
   if (refreshed) {
-    const email = cancellationEmail(refreshed, 'Cancelled by customer before cooking started');
+    const contact = await getContact();
+    const email = cancellationEmail(refreshed, {
+      contactEmail: contact.email,
+      contactWhatsapp: contact.whatsapp,
+    }, 'Cancelled by customer before cooking started');
     await sendEmail({
       to: refreshed.customer.email,
       subject: email.subject,

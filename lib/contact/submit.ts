@@ -2,7 +2,7 @@
 
 import { z } from 'zod';
 import { sendEmail } from '@/lib/email/send';
-import { siteConfig } from '@/constants/siteConfig';
+import { getEmailConfig } from '@/lib/data/emailConfig';
 
 const schema = z.object({
   name: z.string().min(1, 'Name is required.'),
@@ -29,7 +29,8 @@ export async function submitContact(input: unknown): Promise<ContactSubmitResult
   // Honeypot: pretend success without sending
   if (data.website && data.website.trim()) return { ok: true };
 
-  const to = process.env.ORDER_NOTIFICATION_EMAIL || siteConfig.email.notificationToDefault;
+  const cfg = await getEmailConfig();
+  const to = cfg.notificationTo;
   if (!to) return { ok: false, error: 'Contact inbox not configured.' };
 
   const subject = `Contact form · ${data.topic} · ${data.name}`;

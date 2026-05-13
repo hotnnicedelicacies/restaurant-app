@@ -8,6 +8,7 @@ import HeritageButton from '@/components/ui/HeritageButton';
 import CustomerCancelButton from './CustomerCancelButton';
 import { getOrderByRef } from '@/lib/data/orders';
 import { getServerClient, getServiceClient } from '@/lib/supabase/server';
+import { getContact } from '@/lib/data/contact';
 import { siteConfig } from '@/constants/siteConfig';
 import { formatGBP, formatShortDate, formatTime } from '@/lib/utils';
 import Image from 'next/image';
@@ -32,6 +33,7 @@ const STATUS_LABELS: Record<string, { label: string; numeral: string }> = {
 const STAGES = ['received', 'preparing', 'on_its_way', 'delivered'] as const;
 
 export default async function TrackPage({ params }: { params: Promise<{ ref: string }> }) {
+  const contact = await getContact();
   const { ref } = await params;
   const order = await getOrderByRef(ref);
   if (!order) notFound();
@@ -217,7 +219,7 @@ export default async function TrackPage({ params }: { params: Promise<{ ref: str
                       </p>
                       <div className="flex flex-wrap justify-center gap-3">
                         <HeritageButton
-                          href={`https://wa.me/${siteConfig.contact.whatsapp}?text=${encodeURIComponent(`Hi Hot N Nice — I have a question about my order ${order.ref}.\n\n`)}`}
+                          href={`https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(`Hi Hot N Nice — I have a question about my order ${order.ref}.\n\n`)}`}
                           variant="ghost"
                         >
                           Message us on WhatsApp
@@ -235,12 +237,12 @@ export default async function TrackPage({ params }: { params: Promise<{ ref: str
                     {!isCancelled && (
                       <div className="flex flex-wrap justify-center gap-3">
                         <HeritageButton
-                          href={`https://wa.me/${siteConfig.contact.whatsapp}?text=${encodeURIComponent(`Hi Hot N Nice — I have a question about my order ${order.ref}.\n\n`)}`}
+                          href={`https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(`Hi Hot N Nice — I have a question about my order ${order.ref}.\n\n`)}`}
                           variant="primary"
                         >
                           Message us on WhatsApp →
                         </HeritageButton>
-                        <HeritageButton href={`tel:${siteConfig.contact.phone}`} variant="ghost">
+                        <HeritageButton href={`tel:${contact.phone}`} variant="ghost">
                           Call the kitchen
                         </HeritageButton>
                       </div>

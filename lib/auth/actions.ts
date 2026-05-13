@@ -8,6 +8,8 @@ import { siteConfig } from '@/constants/siteConfig';
 import { claimOrdersByEmail } from '@/lib/account/profile';
 import { sendEmail } from '@/lib/email/send';
 import { welcomeEmail } from '@/lib/email/templates';
+import { getHours } from '@/lib/data/hours';
+import { getContact } from '@/lib/data/contact';
 
 type ActionResult = { ok: true } | { ok: false; error: string };
 
@@ -39,7 +41,11 @@ export async function signUpAction(formData: FormData): Promise<ActionResult> {
   if (data.user) {
     await claimOrdersByEmail(email, data.user.id);
     try {
-      const welcome = welcomeEmail(name);
+      const [hours, contact] = await Promise.all([getHours(), getContact()]);
+      const welcome = welcomeEmail(name, hours.cutoffShort, {
+        contactEmail: contact.email,
+        contactWhatsapp: contact.whatsapp,
+      });
       await sendEmail({
         to: email,
         subject: welcome.subject,

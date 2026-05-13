@@ -9,7 +9,6 @@
 
 import { unstable_cache } from 'next/cache';
 import { getPublicClient } from '@/lib/supabase/public';
-import { siteConfig } from '@/constants/siteConfig';
 
 export const HOURS_TAG = 'hours';
 
@@ -86,11 +85,14 @@ function buildView(input: {
   };
 }
 
+// Deploy-time defaults. Kept inline (not in siteConfig) so the bundle
+// stays free of "real value" business data — the admin's `settings.hours`
+// row is authoritative once configured.
 const FALLBACK = buildView({
-  days: [...siteConfig.hours.days] as WeekDay[],
-  open: siteConfig.hours.open,
-  close: siteConfig.hours.close,
-  sameDayCutoff: siteConfig.hours.sameDayCutoff,
+  days: ['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+  open: '12:00',
+  close: '20:00',
+  sameDayCutoff: '10:00',
 });
 
 async function _getHours(): Promise<HoursView> {

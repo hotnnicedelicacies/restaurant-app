@@ -5,6 +5,8 @@ import { MENU_TAG } from '@/lib/data/menu';
 import { ZONES_TAG } from '@/lib/data/zones';
 import { HOURS_TAG } from '@/lib/data/hours';
 import { OPERATIONS_TAG } from '@/lib/data/operations';
+import { EMAIL_CONFIG_TAG } from '@/lib/data/emailConfig';
+import { CONTACT_TAG } from '@/lib/data/contact';
 import { getServiceClient } from '@/lib/supabase/server';
 import { requireAdmin } from './auth';
 import type { VariantsBlob, AddonsBlob } from '@/lib/supabase/types';
@@ -299,8 +301,27 @@ export async function updateSetting(key: string, value: unknown): Promise<Result
   // Bust the cache tag for the consumer that watches this key so the edit
   // takes effect immediately instead of waiting on the 60s revalidate.
   if (key === 'hours') revalidateTag(HOURS_TAG, 'default');
-  if (key === 'store_open' || key === 'cod_enabled' || key === 'closed_message') {
+  if (
+    key === 'store_open' ||
+    key === 'cod_enabled' ||
+    key === 'pickup_enabled' ||
+    key === 'closed_message' ||
+    key === 'global_min_order_gbp' ||
+    key === 'default_prep_time_min' ||
+    key === 'default_prep_time_max'
+  ) {
     revalidateTag(OPERATIONS_TAG, 'default');
+  }
+  if (
+    key === 'email_from_name' ||
+    key === 'email_from' ||
+    key === 'email_reply_to' ||
+    key === 'email_signature'
+  ) {
+    revalidateTag(EMAIL_CONFIG_TAG, 'default');
+  }
+  if (key === 'contact_email' || key === 'contact_phone') {
+    revalidateTag(CONTACT_TAG, 'default');
   }
   return { ok: true };
 }

@@ -2,10 +2,9 @@
 
 import { useState, useRef, type FormEvent } from 'react';
 import { toast } from 'sonner';
-import { siteConfig } from '@/constants/siteConfig';
 import { submitContact } from '@/lib/contact/submit';
 
-export default function ContactForm() {
+export default function ContactForm({ whatsappNumber }: { whatsappNumber: string }) {
   const [submitting, setSubmitting] = useState(false);
   const formRef = useRef<HTMLFormElement>(null);
 
@@ -96,7 +95,7 @@ export default function ContactForm() {
         <p className="m-0 text-center text-ink-muted italic font-serif text-[13px]">
           For anything urgent about a live order, message us on{' '}
           <a
-            href={`https://wa.me/${siteConfig.contact.whatsapp}`}
+            href={`https://wa.me/${whatsappNumber}`}
             className="link-underline"
             target="_blank"
             rel="noopener noreferrer"

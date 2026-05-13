@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import LegalLayout from '@/components/legal/LegalLayout';
 import { siteConfig } from '@/constants/siteConfig';
 import { absoluteUrl } from '@/lib/utils';
+import { getContact } from '@/lib/data/contact';
 
 export const metadata: Metadata = {
   title: 'Refund & Cancellation Policy',
@@ -10,7 +11,8 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function RefundPage() {
+export default async function RefundPage() {
+  const contact = await getContact();
   return (
     <LegalLayout
       eyebrow="Legal · Refunds & Cancellation"
@@ -41,7 +43,7 @@ export default function RefundPage() {
       <p>A full refund is issued automatically via Stripe back to the card you paid with. It typically arrives in your bank within 5–10 business days.</p>
 
       <h3>1.2 After cooking starts (status: <em>Preparing</em> or later)</h3>
-      <p>Once we've started cooking, we've committed ingredients and labour. We can't always refund — but contact us as soon as possible via WhatsApp on <a href={`tel:${siteConfig.contact.phone}`}>{siteConfig.contact.phone}</a> and we'll work something out. Possibilities include:</p>
+      <p>Once we've started cooking, we've committed ingredients and labour. We can't always refund — but contact us as soon as possible via WhatsApp on <a href={`tel:${contact.phone}`}>{contact.phone}</a> and we'll work something out. Possibilities include:</p>
       <ul>
         <li>Partial refund (e.g., we refund items we haven't started yet)</li>
         <li>Credit toward a future order</li>
@@ -65,7 +67,7 @@ export default function RefundPage() {
       <p>If you've had an allergic reaction or believe the dish contained an allergen not listed:</p>
       <ul>
         <li>Seek medical attention first if needed</li>
-        <li>Contact us immediately on <a href={`tel:${siteConfig.contact.phone}`}>{siteConfig.contact.phone}</a></li>
+        <li>Contact us immediately on <a href={`tel:${contact.phone}`}>{contact.phone}</a></li>
         <li>We will refund in full, investigate, and report to the FSA if appropriate</li>
       </ul>
 
@@ -102,9 +104,9 @@ export default function RefundPage() {
       <h2>6. <em>Contact</em></h2>
       <p>For refund requests or disputes:</p>
       <ul>
-        <li>WhatsApp (fastest): <a href={`https://wa.me/${siteConfig.contact.whatsapp}`}>{siteConfig.contact.whatsappDisplay}</a></li>
-        <li>Email: <a href={`mailto:${siteConfig.contact.email}`}>{siteConfig.contact.email}</a></li>
-        <li>Phone (kitchen hours): <a href={`tel:${siteConfig.contact.phone}`}>{siteConfig.contact.phone}</a></li>
+        <li>WhatsApp (fastest): <a href={`https://wa.me/${contact.whatsapp}`}>{contact.whatsappDisplay}</a></li>
+        <li>Email: <a href={`mailto:${contact.email}`}>{contact.email}</a></li>
+        <li>Phone (kitchen hours): <a href={`tel:${contact.phone}`}>{contact.phone}</a></li>
       </ul>
 
       <blockquote>This document is a template prepared for the rebuild of hotnnicedelicacies.com and should be reviewed by a qualified solicitor in England &amp; Wales before publication, and aligned with the operator's actual practice.</blockquote>

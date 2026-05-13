@@ -7,6 +7,7 @@ import ContactForm from '@/components/contact/ContactForm';
 import { siteConfig } from '@/constants/siteConfig';
 import { absoluteUrl } from '@/lib/utils';
 import { getHours, type WeekDay } from '@/lib/data/hours';
+import { getContact } from '@/lib/data/contact';
 
 const ALL_DAYS: WeekDay[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -22,60 +23,58 @@ export const metadata: Metadata = {
   },
 };
 
-const CONTACT_PAGE_SCHEMA = {
-  '@context': 'https://schema.org',
-  '@type': 'ContactPage',
-  url: absoluteUrl(siteConfig.routes.contact),
-  name: `Contact ${siteConfig.name}`,
-  description: 'Get in touch — WhatsApp, phone, email, and kitchen hours.',
-  mainEntity: {
-    '@type': 'Organization',
-    name: siteConfig.name,
-    telephone: siteConfig.contact.phone,
-    email: siteConfig.contact.email,
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: 'Middlesbrough',
-      addressRegion: 'North Yorkshire',
-      addressCountry: 'GB',
-    },
-  },
-};
-
-const CHANNELS: {
-  label: string;
-  value: string;
-  caption: string;
-  cta: { label: string; href: string };
-}[] = [
-  {
-    label: 'WhatsApp',
-    value: siteConfig.contact.whatsappDisplay,
-    caption: 'Fastest reply · live orders, custom requests',
-    cta: { label: 'Open chat →', href: `https://wa.me/${siteConfig.contact.whatsapp}` },
-  },
-  {
-    label: 'Phone',
-    value: siteConfig.contact.phone,
-    caption: 'Available during kitchen hours',
-    cta: { label: 'Call →', href: `tel:${siteConfig.contact.phone}` },
-  },
-  {
-    label: 'Email',
-    value: siteConfig.contact.email,
-    caption: 'For invoices, larger orders, press',
-    cta: { label: 'Email us →', href: `mailto:${siteConfig.contact.email}` },
-  },
-  {
-    label: 'Instagram',
-    value: '@hotnnicedelicacies',
-    caption: "Today's kitchen, behind the scenes",
-    cta: { label: 'Follow →', href: siteConfig.social.instagram },
-  },
-];
-
 export default async function ContactPage() {
-  const hours = await getHours();
+  const [hours, contact] = await Promise.all([getHours(), getContact()]);
+  const contactSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    url: absoluteUrl(siteConfig.routes.contact),
+    name: `Contact ${siteConfig.name}`,
+    description: 'Get in touch — WhatsApp, phone, email, and kitchen hours.',
+    mainEntity: {
+      '@type': 'Organization',
+      name: siteConfig.name,
+      telephone: contact.phone,
+      email: contact.email,
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Middlesbrough',
+        addressRegion: 'North Yorkshire',
+        addressCountry: 'GB',
+      },
+    },
+  };
+  const channels: {
+    label: string;
+    value: string;
+    caption: string;
+    cta: { label: string; href: string };
+  }[] = [
+    {
+      label: 'WhatsApp',
+      value: contact.whatsappDisplay,
+      caption: 'Fastest reply · live orders, custom requests',
+      cta: { label: 'Open chat →', href: `https://wa.me/${contact.whatsapp}` },
+    },
+    {
+      label: 'Phone',
+      value: contact.phone,
+      caption: 'Available during kitchen hours',
+      cta: { label: 'Call →', href: `tel:${contact.phone}` },
+    },
+    {
+      label: 'Email',
+      value: contact.email,
+      caption: 'For invoices, larger orders, press',
+      cta: { label: 'Email us →', href: `mailto:${contact.email}` },
+    },
+    {
+      label: 'Instagram',
+      value: '@hotnnicedelicacies',
+      caption: "Today's kitchen, behind the scenes",
+      cta: { label: 'Follow →', href: siteConfig.social.instagram },
+    },
+  ];
   const openSet = new Set<string>(hours.days);
   const HOURS = ALL_DAYS.map((day) => ({
     day,
@@ -87,7 +86,7 @@ export default async function ContactPage() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(CONTACT_PAGE_SCHEMA) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(contactSchema) }}
       />
       <SiteHeader />
       <main>
@@ -109,7 +108,7 @@ export default async function ContactPage() {
                 </p>
 
                 <div className="mt-2 flex flex-col border-t border-rule">
-                  {CHANNELS.map((ch) => (
+                  {channels.map((ch) => (
                     <div
                       key={ch.label}
                       className="grid items-center gap-4 border-b border-rule py-[18px] sm:grid-cols-[90px_1fr_auto]"
@@ -163,7 +162,7 @@ export default async function ContactPage() {
 
               {/* RIGHT: form */}
               <div>
-                <ContactForm />
+                <ContactForm whatsappNumber={contact.whatsapp} />
               </div>
             </div>
           </div>

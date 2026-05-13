@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import LegalLayout from '@/components/legal/LegalLayout';
 import { siteConfig } from '@/constants/siteConfig';
 import { absoluteUrl } from '@/lib/utils';
+import { getContact } from '@/lib/data/contact';
 
 export const metadata: Metadata = {
   title: 'Privacy Policy',
@@ -10,7 +11,8 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const contact = await getContact();
   return (
     <LegalLayout
       eyebrow="Legal · Privacy"
@@ -43,8 +45,8 @@ export default function PrivacyPage() {
       <p>{siteConfig.name} ("<b>we</b>", "<b>us</b>", "<b>our</b>") is a home-kitchen meal delivery service operating from Middlesbrough, North Yorkshire, United Kingdom. We are the <b>data controller</b> for the personal information described in this policy.</p>
       <p>Our registered contact for data protection matters is:</p>
       <ul>
-        <li>Email: <a href={`mailto:${siteConfig.contact.email}`}>{siteConfig.contact.email}</a></li>
-        <li>Phone: <a href={`tel:${siteConfig.contact.phone}`}>{siteConfig.contact.phone}</a></li>
+        <li>Email: <a href={`mailto:${contact.email}`}>{contact.email}</a></li>
+        <li>Phone: <a href={`tel:${contact.phone}`}>{contact.phone}</a></li>
         <li>Post: {siteConfig.name}, Middlesbrough, UK</li>
       </ul>
 
@@ -127,7 +129,7 @@ export default function PrivacyPage() {
       </ul>
 
       <h2 id="rights">6. Your <em>rights</em></h2>
-      <p>Under UK GDPR you have the following rights — exercise any of them by emailing <a href={`mailto:${siteConfig.contact.email}`}>{siteConfig.contact.email}</a>. We'll respond within <b>one calendar month</b>.</p>
+      <p>Under UK GDPR you have the following rights — exercise any of them by emailing <a href={`mailto:${contact.email}`}>{contact.email}</a>. We'll respond within <b>one calendar month</b>.</p>
       <ul>
         <li><b>Right to be informed</b> — this policy is that</li>
         <li><b>Right of access</b> — request a copy of your personal data we hold</li>
@@ -160,8 +162,8 @@ export default function PrivacyPage() {
       <h2 id="contact">11. <em>Contact</em></h2>
       <p>For privacy questions, data subject access requests, or any other concerns:</p>
       <ul>
-        <li>Email: <a href={`mailto:${siteConfig.contact.email}`}>{siteConfig.contact.email}</a></li>
-        <li>Phone: <a href={`tel:${siteConfig.contact.phone}`}>{siteConfig.contact.phone}</a></li>
+        <li>Email: <a href={`mailto:${contact.email}`}>{contact.email}</a></li>
+        <li>Phone: <a href={`tel:${contact.phone}`}>{contact.phone}</a></li>
         <li>Post: {siteConfig.name}, Middlesbrough, UK</li>
       </ul>
 

@@ -5,6 +5,7 @@ import CheckoutForm, { type CheckoutDefaults } from '@/components/checkout/Check
 import { getServerClient } from '@/lib/supabase/server';
 import { getOperations } from '@/lib/data/operations';
 import { getHours } from '@/lib/data/hours';
+import { getContact } from '@/lib/data/contact';
 import { siteConfig } from '@/constants/siteConfig';
 
 export const metadata: Metadata = {
@@ -16,9 +17,13 @@ export const dynamic = 'force-dynamic';
 
 export default async function CheckoutPage() {
   // Operations gate first — if the owner has paused the kitchen we don't
-  // even render the form. Hours / cutoff drive the date picker; both come
-  // from admin-controlled `settings` rows.
-  const [operations, hours] = await Promise.all([getOperations(), getHours()]);
+  // even render the form. Hours / cutoff drive the date picker; contact
+  // drives the "kitchen paused" WhatsApp escape hatch. All admin-controlled.
+  const [operations, hours, contact] = await Promise.all([
+    getOperations(),
+    getHours(),
+    getContact(),
+  ]);
 
   // For signed-in customers we pre-fill the form from their profile + default
   // address. Guests start with an empty form.
@@ -110,6 +115,9 @@ export default async function CheckoutPage() {
             codGloballyEnabled={operations.codEnabled}
             openDays={hours.days}
             sameDayCutoff={hours.sameDayCutoff}
+            openTime={hours.open}
+            closeTime={hours.close}
+            whatsappNumber={contact.whatsapp}
           />
         ) : (
           <div className="mx-auto max-w-[560px] rounded-[2px] border border-rule bg-cream p-8 text-center sm:p-10">
@@ -124,7 +132,7 @@ export default async function CheckoutPage() {
                 'The kitchen is paused for new orders. Please check back soon — or message us on WhatsApp.'}
             </p>
             <Link
-              href={`https://wa.me/${siteConfig.contact.whatsapp}`}
+              href={`https://wa.me/${contact.whatsapp}`}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-6 inline-block rounded-[2px] bg-walnut px-6 py-3 font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] transition-colors hover:bg-bronze-deep"

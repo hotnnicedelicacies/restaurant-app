@@ -5,6 +5,8 @@ import { getServerClient, getServiceClient } from '@/lib/supabase/server';
 import { matchZoneByPostcode } from '@/lib/data/zones';
 import { getHours, type WeekDay } from '@/lib/data/hours';
 import { getOperations } from '@/lib/data/operations';
+import { getEmailConfig } from '@/lib/data/emailConfig';
+import { getContact } from '@/lib/data/contact';
 import { getStripe } from '@/lib/stripe/server';
 import { siteConfig } from '@/constants/siteConfig';
 import { sendEmail } from '@/lib/email/send';
@@ -104,6 +106,13 @@ export async function createOrder(input: CreateOrderInput): Promise<CreateOrderR
       error: "We don't deliver to this postcode by default. Please message us on WhatsApp.",
     };
   }
+  if (zone.isQuoted) {
+    return {
+      ok: false,
+      field: 'postcode',
+      error: `Delivery to ${zone.name} is quote-only — please message us on WhatsApp with your order and we'll confirm the fee before charging you.`,
+    };
+  }
 
   // 5. Re-load every menu item from the DB and rebuild the line totals
   //    from authoritative values. The client can lie about price /
@@ -160,13 +169,23 @@ export async function createOrder(input: CreateOrderInput): Promise<CreateOrderR
     });
   }
 
-  // 6. Compute server-trusted totals + zone min check
+  // 6. Compute server-trusted totals + minimum-order check.
+  //    The effective floor is the LARGER of the zone min and the global
+  //    `settings.global_min_order_gbp` (admin can set a site-wide floor
+  //    above a per-zone value).
   const subtotal = resolvedLines.reduce((s, l) => s + l.lineTotalGbp, 0);
-  if (subtotal < zone.minOrderGbp) {
+  const effectiveMin = Math.max(
+    zone.minOrderGbp,
+    operations.globalMinOrderGbp ?? 0,
+  );
+  if (subtotal < effectiveMin) {
+    const minLabel = effectiveMin === zone.minOrderGbp
+      ? `Minimum order for ${zone.name} is £${effectiveMin.toFixed(2)}`
+      : `Minimum order is £${effectiveMin.toFixed(2)}`;
     return {
       ok: false,
       field: 'lines',
-      error: `Minimum order for ${zone.name} is £${zone.minOrderGbp.toFixed(2)} — your basket is £${subtotal.toFixed(2)}.`,
+      error: `${minLabel} — your basket is £${subtotal.toFixed(2)}.`,
     };
   }
   const total = subtotal + zone.baseFeeGbp;
@@ -318,17 +337,21 @@ export async function createOrder(input: CreateOrderInput): Promise<CreateOrderR
   try {
     const fullOrder = await getOrderByRef(ref);
     if (fullOrder) {
-      const email = orderConfirmationEmail(fullOrder);
+      const contact = await getContact();
+      const email = orderConfirmationEmail(fullOrder, {
+        contactEmail: contact.email,
+        contactWhatsapp: contact.whatsapp,
+      });
       await sendEmail({
         to: fullOrder.customer.email,
         subject: email.subject,
         html: email.html,
         text: email.text,
       });
-      const adminTo = process.env.ORDER_NOTIFICATION_EMAIL || siteConfig.email.notificationToDefault;
-      if (adminTo) {
+      const cfg = await getEmailConfig();
+      if (cfg.notificationTo) {
         await sendEmail({
-          to: adminTo,
+          to: cfg.notificationTo,
           subject: `New COD order · ${fullOrder.ref}`,
           html: email.html,
         });

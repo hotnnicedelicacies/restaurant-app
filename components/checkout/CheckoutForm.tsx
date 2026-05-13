@@ -23,6 +23,8 @@ interface ZoneResponse {
     minOrderGbp: number;
     prepTimeMin: number;
     prepTimeMax: number;
+    /** When true, this zone is quote-only — no self-serve fee, bounce to WhatsApp. */
+    isQuoted: boolean;
     allowsCod: boolean;
   };
 }
@@ -72,6 +74,9 @@ export default function CheckoutForm({
   codGloballyEnabled = true,
   openDays,
   sameDayCutoff,
+  openTime,
+  closeTime,
+  whatsappNumber,
 }: {
   defaults?: CheckoutDefaults | null;
   /** Admin-controlled global COD switch. Combined with zone + per-meal flags. */
@@ -80,7 +85,17 @@ export default function CheckoutForm({
   openDays: WeekDay[];
   /** Same-day cutoff (`HH:mm`) — past this, "today" is hidden. */
   sameDayCutoff: string;
+  /** Kitchen opening hour (`HH:mm`) — drives the start of the delivery-window list. */
+  openTime: string;
+  /** Kitchen closing hour (`HH:mm`) — drives the end of the delivery-window list. */
+  closeTime: string;
+  /** Bare WhatsApp digits (no `+`) for the "outside delivery area" and quote-only escape hatches. */
+  whatsappNumber: string;
 }) {
+  // Delivery windows derived from admin's `hours.open`/`hours.close` so a
+  // change in trading hours immediately flows through to the customer's
+  // window picker — no hardcoded "12-14 / 14-16 / …" list.
+  const deliveryWindows = useMemo(() => buildWindows(openTime, closeTime), [openTime, closeTime]);
   const router = useRouter();
   const cartLines = useCart((s) => s.lines);
   const cartCount = useCart((s) => s.count());
@@ -102,8 +117,8 @@ export default function CheckoutForm({
     city: defaults?.city ?? 'Middlesbrough',
     postcode: defaults?.postcode ?? '',
     deliveryDate: '',
-    deliveryWindowStart: '12:00',
-    deliveryWindowEnd: '14:00',
+    deliveryWindowStart: deliveryWindows[0]?.start ?? openTime,
+    deliveryWindowEnd: deliveryWindows[0]?.end ?? closeTime,
     deliveryNotes: '',
     paymentMethod: 'card' as 'card' | 'cod',
   });
@@ -202,6 +217,10 @@ export default function CheckoutForm({
     }
     if (zoneStatus !== 'matched' || !zone) {
       toast.error('We need a deliverable postcode before we can place the order.');
+      return;
+    }
+    if (zone.isQuoted) {
+      toast.error(`Delivery to ${zone.name} is quote-only — please message us on WhatsApp to arrange it.`);
       return;
     }
     if (!meetsMin) {
@@ -387,7 +406,7 @@ export default function CheckoutForm({
                     />
                   </div>
                 </div>
-                <ZoneBanner status={zoneStatus} zone={zone} subtotal={subtotal} postcode={form.postcode} customerForm={form} cartLines={cartLines} />
+                <ZoneBanner status={zoneStatus} zone={zone} subtotal={subtotal} postcode={form.postcode} customerForm={form} cartLines={cartLines} whatsappNumber={whatsappNumber} />
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div className="flex flex-col gap-1.5">
@@ -415,14 +434,14 @@ export default function CheckoutForm({
                       onChange={(e) => setForm((f) => ({ ...f, deliveryWindowStart: e.target.value }))}
                       className="rounded-[2px] border border-rule bg-transparent px-3.5 py-3 font-serif text-[16px] text-walnut outline-none focus:border-walnut"
                     >
-                      {DELIVERY_WINDOWS.map((w) => <option key={w.start} value={w.start}>{w.start}</option>)}
+                      {deliveryWindows.map((w) => <option key={w.start} value={w.start}>{w.start}</option>)}
                     </select>
                     <select
                       value={form.deliveryWindowEnd}
                       onChange={(e) => setForm((f) => ({ ...f, deliveryWindowEnd: e.target.value }))}
                       className="rounded-[2px] border border-rule bg-transparent px-3.5 py-3 font-serif text-[16px] text-walnut outline-none focus:border-walnut"
                     >
-                      {DELIVERY_WINDOWS.map((w) => <option key={w.end} value={w.end}>{w.end}</option>)}
+                      {deliveryWindows.map((w) => <option key={w.end} value={w.end}>{w.end}</option>)}
                     </select>
                   </div>
                 </div>
@@ -479,10 +498,14 @@ export default function CheckoutForm({
 
             <button
               type="submit"
-              disabled={submitting || zoneStatus !== 'matched' || !meetsMin}
+              disabled={submitting || zoneStatus !== 'matched' || !meetsMin || zone?.isQuoted === true}
               className="mt-2 w-full rounded-[2px] bg-walnut px-5 py-4 font-serif text-[15px] font-semibold uppercase tracking-[0.16em] text-cream [font-variant:small-caps] transition-colors hover:bg-bronze-deep disabled:opacity-50"
             >
-              {submitting ? 'Placing order…' : `Place order · ${formatGBP(total)}`}
+              {submitting
+                ? 'Placing order…'
+                : zone?.isQuoted
+                  ? 'Quote-only · message us on WhatsApp'
+                  : `Place order · ${formatGBP(total)}`}
             </button>
           </form>
         )}
@@ -561,12 +584,38 @@ export default function CheckoutForm({
 // Helpers
 // =========================================================================
 
-const DELIVERY_WINDOWS = [
-  { start: '12:00', end: '14:00' },
-  { start: '14:00', end: '16:00' },
-  { start: '16:00', end: '18:00' },
-  { start: '18:00', end: '20:00' },
-];
+/**
+ * Build a list of 2-hour delivery windows between `openTime` and `closeTime`
+ * (both `HH:mm`). Used to populate the start / end selects on the delivery
+ * step — derived from admin's trading hours instead of a hardcoded list so
+ * a kitchen that opens at 11 or runs until 21 isn't stuck with 12–20.
+ */
+function buildWindows(openTime: string, closeTime: string): { start: string; end: string }[] {
+  const toMinutes = (hm: string): number => {
+    const [h, m] = hm.split(':').map(Number);
+    if (Number.isNaN(h)) return 0;
+    return h * 60 + (Number.isNaN(m) ? 0 : m);
+  };
+  const fromMinutes = (mins: number): string => {
+    const h = Math.floor(mins / 60).toString().padStart(2, '0');
+    const m = (mins % 60).toString().padStart(2, '0');
+    return `${h}:${m}`;
+  };
+  const start = toMinutes(openTime);
+  const end = toMinutes(closeTime);
+  if (end <= start) return [{ start: openTime, end: closeTime }];
+  const STEP = 120; // 2-hour slots
+  const out: { start: string; end: string }[] = [];
+  for (let t = start; t + STEP <= end; t += STEP) {
+    out.push({ start: fromMinutes(t), end: fromMinutes(t + STEP) });
+  }
+  // If the trading window isn't a clean multiple of 2h, add a final shorter slot.
+  if (out.length === 0 || out[out.length - 1].end !== closeTime) {
+    const lastEnd = out.length > 0 ? toMinutes(out[out.length - 1].end) : start;
+    if (lastEnd < end) out.push({ start: fromMinutes(lastEnd), end: closeTime });
+  }
+  return out;
+}
 
 function nextSevenDays(
   openDays: WeekDay[],
@@ -682,7 +731,7 @@ function SummaryRow({ label, value, muted, grand }: {
 }
 
 function ZoneBanner({
-  status, zone, subtotal, postcode, customerForm, cartLines,
+  status, zone, subtotal, postcode, customerForm, cartLines, whatsappNumber,
 }: {
   status: 'idle' | 'checking' | 'matched' | 'no_match';
   zone: ZoneResponse['zone'] | null;
@@ -690,10 +739,47 @@ function ZoneBanner({
   postcode: string;
   customerForm: { firstName: string; lastName: string; phone: string; email: string; address1: string; address2: string; city: string };
   cartLines: ReturnType<typeof useCart.getState>['lines'];
+  whatsappNumber: string;
 }) {
   if (status === 'idle' || status === 'checking') return null;
 
   if (status === 'matched' && zone) {
+    // Quote-only zones don't have a self-serve fee. Surface the same UX
+    // we use for unknown postcodes — pre-fill the WhatsApp message and
+    // disable the place-order button via the parent's `zone.isQuoted` check.
+    if (zone.isQuoted) {
+      const quoteMessage = encodeURIComponent([
+        `Hi Hot N Nice — I'd like to place an order for ${zone.name}, which is one of your quote-only delivery areas.`,
+        '',
+        '*Delivery to*',
+        `Name: ${[customerForm.firstName, customerForm.lastName].filter(Boolean).join(' ') || '[your name]'}`,
+        `Phone: ${customerForm.phone || '[your phone]'}`,
+        `Address: ${[customerForm.address1, customerForm.address2, customerForm.city, postcode].filter(Boolean).join(', ')}`,
+        '',
+        '*In my basket*',
+        ...cartLines.map((l) => `• ${l.name} × ${l.quantity}`),
+        '',
+        `Subtotal: ${formatGBP(subtotal)} (delivery TBD)`,
+        '',
+        'Many thanks.',
+      ].join('\n'));
+      return (
+        <div className="rounded-[2px] border-l-[3px] border-bronze bg-cream-soft px-4 py-3">
+          <p className="m-0 mb-1 font-serif text-[14px] font-medium text-walnut">{zone.name} · quote-only delivery</p>
+          <p className="m-0 font-serif text-[13px] italic text-ink-muted">
+            We deliver here but the fee depends on the exact address. Send us your order and we&apos;ll confirm before charging you.{' '}
+            <a
+              href={`https://wa.me/${whatsappNumber}?text=${quoteMessage}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="link-underline italic"
+            >
+              Message us on WhatsApp →
+            </a>
+          </p>
+        </div>
+      );
+    }
     const belowMin = subtotal < zone.minOrderGbp;
     return (
       <div className={`rounded-[2px] border-l-[3px] px-4 py-3 ${belowMin ? 'border-[#8B2A1A] bg-[rgba(139,42,26,0.06)]' : 'border-bronze bg-cream-soft'}`}>
@@ -737,7 +823,7 @@ function ZoneBanner({
       <p className="m-0 font-serif text-[13px] italic text-ink-muted">
         We don't deliver to this postcode by default — but get in touch with your order details and we may be able to arrange it.{' '}
         <a
-          href={`https://wa.me/${siteConfig.contact.whatsapp}?text=${message}`}
+          href={`https://wa.me/${whatsappNumber}?text=${message}`}
           target="_blank"
           rel="noopener noreferrer"
           className="link-underline italic"

@@ -15,10 +15,9 @@ export default async function CartPage() {
   // zone in the admin-controlled `delivery_zones` table — the customer
   // hasn't entered a postcode yet, so we can't bind the exact fee.
   const zones = await getActiveZones();
-  const minDeliveryFee =
-    zones.length > 0
-      ? Math.min(...zones.map((z) => z.baseFeeGbp))
-      : siteConfig.delivery.pricing.middlesbrough;
+  // When zones haven't loaded (cold cache + DB down) we hide the "from"
+  // indicator rather than show a stale business value.
+  const minDeliveryFee = zones.length > 0 ? Math.min(...zones.map((z) => z.baseFeeGbp)) : null;
 
   return (
     <>

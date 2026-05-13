@@ -1,9 +1,19 @@
 import { StaticImageData } from 'next/image';
 
 /**
- * Public site configuration — values that don't change per request and can
- * safely live in the bundle. Anything dynamic / admin-editable goes through
- * the Supabase settings table and is loaded server-side per request.
+ * Public site configuration — brand-static values that don't change per
+ * request and can safely live in the bundle. Anything dynamic or
+ * admin-editable is read at runtime via a fetcher in `lib/data/*`:
+ *
+ *   - Contact details (phone/email/WhatsApp)  → `getContact()`
+ *   - Trading hours + cutoff                  → `getHours()`
+ *   - Delivery zones, fees, COD              → `getActiveZones()`
+ *   - Transactional email config             → `getEmailConfig()`
+ *   - Operations toggles + global min order  → `getOperations()`
+ *
+ * Do NOT add a hardcoded business value here as a "fallback" — every
+ * fetcher carries its own deploy-time default so siteConfig stays free
+ * of values that could drift from what the admin has set.
  */
 export const siteConfig = {
   name: 'Hot N Nice Delicacies',
@@ -12,31 +22,6 @@ export const siteConfig = {
   domain: 'hotnnicedelicacies.com',
   description:
     'A home kitchen in Middlesbrough cooking Italian classics and West African staples from scratch every morning — delivered hot to your door across Teesside.',
-
-  contact: {
-    email: 'hotnnicedelicacies@gmail.com',
-    phone: '+44 7776 320068',
-    whatsapp: '447776320068',
-    whatsappDisplay: '+44 7776 320068',
-  },
-
-  delivery: {
-    areas: ['Middlesbrough', 'Stockton-on-Tees', 'Redcar', 'Thornaby', 'Billingham'],
-    minOrder: 10,
-    pricing: {
-      middlesbrough: 5,
-      surroundingNote: 'Contact us for pricing',
-    },
-  },
-
-  hours: {
-    days: ['Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] as const,
-    open: '12:00',
-    close: '20:00',
-    sameDayCutoff: '10:00',
-    displayShort: 'Tue – Sun · 12 – 8pm',
-    cutoffShort: 'Order by 10am for same-day delivery',
-  },
 
   social: {
     instagram: 'https://instagram.com/hotnnicedelicacies',
@@ -49,12 +34,6 @@ export const siteConfig = {
     ratingLabel: 'Very Good',
     authority: 'Food Standards Agency',
     listingUrl: 'https://ratings.food.gov.uk/business/1913815/hot-n-nice-delicacies',
-  },
-
-  email: {
-    fromDefault: 'Hot N Nice Delicacies <orders@hotnnicedelicacies.com>',
-    notificationToDefault: 'hotnnicedelicacies@gmail.com',
-    replyTo: 'hotnnicedelicacies@gmail.com',
   },
 
   /** Voice signature lines reused across UI. */
@@ -111,9 +90,10 @@ export type MealItem = {
   category: 'rice' | 'soup' | 'grill' | 'sides' | 'party' | string;
 };
 
-/** Cuisine + delivery copy fragments used by JSON-LD generators and SEO. */
+/** Cuisine + SEO copy fragments. `areaServed` is intentionally absent —
+ *  consumers should pull active zone names from `getActiveZones()`
+ *  instead of a stale constant. */
 export const seoCopy = {
   cuisine: ['Italian', 'West African', 'British', 'International'],
-  areaServed: siteConfig.delivery.areas,
   ogImageAlt: `${siteConfig.name} — Italian & West African home cooking, delivered hot across Teesside.`,
 };

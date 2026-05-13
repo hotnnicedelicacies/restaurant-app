@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { updateSetting } from '@/lib/admin/catalogActions';
+import SettingsSidebar from '@/components/admin/SettingsSidebar';
 
 type WeekDay =
   | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
@@ -93,28 +94,16 @@ export default function SettingsForm({ initial }: { initial: SettingsBlob }) {
       </div>
 
       <div className="settings-layout">
-        <aside className="settings-sidebar">
-          <p className="settings-sidebar__title">Settings</p>
-          <a href="#hours" className="settings-sidebar__link is-active">
-            Hours &amp; cutoff
-          </a>
-          <a href="#contact" className="settings-sidebar__link">
-            Contact
-          </a>
-          <a href="#flags" className="settings-sidebar__link">
-            Operational toggles
-          </a>
-          <a href="#operations" className="settings-sidebar__link">
-            Operations
-          </a>
-          <a
-            href="/admin/settings/advanced"
-            className="settings-sidebar__link"
-            style={{ marginTop: 16, borderTop: '1px solid var(--color-rule)', paddingTop: 18, color: 'var(--color-bronze-deep)' }}
-          >
-            Advanced &amp; security →
-          </a>
-        </aside>
+        <SettingsSidebar
+          title="Settings"
+          items={[
+            { href: '#hours', sectionId: 'hours', label: 'Hours & cutoff' },
+            { href: '#contact', sectionId: 'contact', label: 'Contact' },
+            { href: '#flags', sectionId: 'flags', label: 'Operational toggles' },
+            { href: '#operations', sectionId: 'operations', label: 'Operations' },
+            { href: '/admin/settings/advanced', label: 'Advanced & security →', separated: true },
+          ]}
+        />
 
         <div className="settings-main">
           {/* HOURS */}

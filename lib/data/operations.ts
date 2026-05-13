@@ -18,8 +18,15 @@ export interface OperationsView {
   storeOpen: boolean;
   /** Global cash-on-delivery switch; ANDed with zone + per-meal flags at checkout. */
   codEnabled: boolean;
+  /** Whether self-serve customer pickup is offered. Not yet wired into checkout. */
+  pickupEnabled: boolean;
   /** Optional message shown to customers when the store is paused. */
   closedMessage: string | null;
+  /** Global floor for every order, in £. ANDed with the zone's `min_order_gbp` (the higher wins). */
+  globalMinOrderGbp: number | null;
+  /** Default kitchen prep window in minutes — falls through to a zone's prep time when no zone-specific value is set. */
+  defaultPrepTimeMin: number | null;
+  defaultPrepTimeMax: number | null;
 }
 
 const FALLBACK: OperationsView = {
@@ -28,8 +35,18 @@ const FALLBACK: OperationsView = {
   // the absence of a row should not silently pause the business.
   storeOpen: true,
   codEnabled: true,
+  pickupEnabled: false,
   closedMessage: null,
+  globalMinOrderGbp: null,
+  defaultPrepTimeMin: null,
+  defaultPrepTimeMax: null,
 };
+
+function num(v: unknown): number | null {
+  if (typeof v === 'number' && Number.isFinite(v)) return v;
+  if (typeof v === 'string' && v.trim() !== '' && Number.isFinite(Number(v))) return Number(v);
+  return null;
+}
 
 async function _getOperations(): Promise<OperationsView> {
   try {
@@ -37,16 +54,28 @@ async function _getOperations(): Promise<OperationsView> {
     const { data, error } = await supabase
       .from('settings')
       .select('key, value')
-      .in('key', ['store_open', 'cod_enabled', 'closed_message']);
+      .in('key', [
+        'store_open',
+        'cod_enabled',
+        'pickup_enabled',
+        'closed_message',
+        'global_min_order_gbp',
+        'default_prep_time_min',
+        'default_prep_time_max',
+      ]);
     if (error || !data) return FALLBACK;
     const byKey = new Map(data.map((r) => [r.key, r.value]));
     return {
       storeOpen: byKey.get('store_open') === false ? false : FALLBACK.storeOpen,
       codEnabled: byKey.get('cod_enabled') === false ? false : FALLBACK.codEnabled,
+      pickupEnabled: byKey.get('pickup_enabled') === true,
       closedMessage:
         typeof byKey.get('closed_message') === 'string'
           ? (byKey.get('closed_message') as string)
           : FALLBACK.closedMessage,
+      globalMinOrderGbp: num(byKey.get('global_min_order_gbp')),
+      defaultPrepTimeMin: num(byKey.get('default_prep_time_min')),
+      defaultPrepTimeMax: num(byKey.get('default_prep_time_max')),
     };
   } catch (err) {
     console.error('[operations] getOperations threw:', err);

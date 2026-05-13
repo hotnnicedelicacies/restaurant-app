@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import LegalLayout from '@/components/legal/LegalLayout';
 import { siteConfig } from '@/constants/siteConfig';
 import { absoluteUrl } from '@/lib/utils';
+import { getContact } from '@/lib/data/contact';
 
 export const metadata: Metadata = {
   title: 'Cookie Notice',
@@ -10,7 +11,8 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function CookieNoticePage() {
+export default async function CookieNoticePage() {
+  const contact = await getContact();
   return (
     <LegalLayout
       eyebrow="Legal · Cookies"
@@ -76,7 +78,7 @@ export default function CookieNoticePage() {
       <h2>6. <em>Contact</em></h2>
       <p>Questions about cookies, or want to revoke a consent decision?</p>
       <ul>
-        <li>Email: <a href={`mailto:${siteConfig.contact.email}`}>{siteConfig.contact.email}</a></li>
+        <li>Email: <a href={`mailto:${contact.email}`}>{contact.email}</a></li>
         <li>Or refer to our <a href={siteConfig.routes.legal.privacy}>Privacy Policy</a> for your full data rights</li>
       </ul>
 

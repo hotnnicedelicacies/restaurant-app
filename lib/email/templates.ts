@@ -23,12 +23,20 @@ const COLOURS = {
 const SERIF = "'Cormorant Garamond', Georgia, 'Times New Roman', serif";
 const MONO = "'Geist Mono', 'SF Mono', Menlo, monospace";
 
+export interface EmailContext {
+  /** Customer-facing inbox shown in the email footer. */
+  contactEmail: string;
+  /** Bare WhatsApp digits (no `+`) for the wa.me link. */
+  contactWhatsapp: string;
+}
+
 function shell(args: {
   preheader: string;
   title: string;
   body: string;
+  ctx: EmailContext;
 }): string {
-  const { preheader, title, body } = args;
+  const { preheader, title, body, ctx } = args;
   return `<!DOCTYPE html>
 <html lang="en-GB">
 <head>
@@ -54,7 +62,7 @@ function shell(args: {
         <td style="padding:24px 32px;border-top:1px solid ${COLOURS.rule};text-align:center;color:${COLOURS.inkMuted};font-family:${SERIF};font-size:13px;font-style:italic;line-height:1.6;">
           <div style="margin-bottom:8px;color:${COLOURS.bronzeDeep};font-style:normal;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;">★ ★ ★ ★ ★&nbsp;&nbsp;Food Hygiene · FSA</div>
           ${escapeHtml(siteConfig.name)} · Middlesbrough, UK<br>
-          Questions? <a href="mailto:${siteConfig.contact.email}" style="color:${COLOURS.bronzeDeep};">${siteConfig.contact.email}</a> · <a href="https://wa.me/${siteConfig.contact.whatsapp}" style="color:${COLOURS.bronzeDeep};">WhatsApp</a>
+          Questions? <a href="mailto:${ctx.contactEmail}" style="color:${COLOURS.bronzeDeep};">${ctx.contactEmail}</a> · <a href="https://wa.me/${ctx.contactWhatsapp}" style="color:${COLOURS.bronzeDeep};">WhatsApp</a>
         </td>
       </tr>
     </table>
@@ -130,7 +138,7 @@ function ctaButton(href: string, label: string): string {
 // =====================================================================
 // 1. Order confirmation
 // =====================================================================
-export function orderConfirmationEmail(order: OrderView) {
+export function orderConfirmationEmail(order: OrderView, ctx: EmailContext) {
   const firstName = order.customer.firstName;
   const trackUrl = absoluteUrl(siteConfig.routes.track(order.ref));
   const receiptUrl = absoluteUrl(siteConfig.routes.receipt(order.ref));
@@ -185,7 +193,7 @@ export function orderConfirmationEmail(order: OrderView) {
   return {
     subject: `Order received · № ${order.ref} · ${siteConfig.name}`,
     preheader: `Thank you ${firstName} — your order is in. We'll deliver on ${formatLongDate(order.delivery.date)}.`,
-    html: shell({ preheader: `Thank you ${firstName} — your order is in.`, title: 'Order received', body }),
+    html: shell({ preheader: `Thank you ${firstName} — your order is in.`, title: 'Order received', body, ctx }),
     text: `Thank you ${firstName}.\n\nYour order ${order.ref} is in. We'll deliver on ${formatLongDate(order.delivery.date)} between ${order.delivery.windowStart} and ${order.delivery.windowEnd}.\n\nTotal: ${formatGBP(order.totalGbp)} (${order.paymentMethod === 'card' ? 'paid' : 'cash on delivery'})\n\nTrack your order: ${trackUrl}\nView your receipt: ${receiptUrl}\n\n— ${siteConfig.name}`,
   };
 }
@@ -193,7 +201,7 @@ export function orderConfirmationEmail(order: OrderView) {
 // =====================================================================
 // 2. Status update (kitchen note)
 // =====================================================================
-export function statusUpdateEmail(order: OrderView, note: { author: string; body: string; statusLabel: string }) {
+export function statusUpdateEmail(order: OrderView, note: { author: string; body: string; statusLabel: string }, ctx: EmailContext) {
   const trackUrl = absoluteUrl(siteConfig.routes.track(order.ref));
   const body = `
     <p style="font-family:${MONO};font-size:10px;letter-spacing:0.22em;text-transform:uppercase;color:${COLOURS.bronzeDeep};margin:0 0 12px;">
@@ -213,7 +221,7 @@ export function statusUpdateEmail(order: OrderView, note: { author: string; body
   return {
     subject: `${note.statusLabel} · Order № ${order.ref}`,
     preheader: note.body.slice(0, 100),
-    html: shell({ preheader: note.body.slice(0, 100), title: note.statusLabel, body }),
+    html: shell({ preheader: note.body.slice(0, 100), title: note.statusLabel, body, ctx }),
     text: `Order ${order.ref}: ${note.body}\n\nTrack: ${trackUrl}`,
   };
 }
@@ -221,7 +229,7 @@ export function statusUpdateEmail(order: OrderView, note: { author: string; body
 // =====================================================================
 // 3. Order cancelled / refunded
 // =====================================================================
-export function cancellationEmail(order: OrderView, reason?: string) {
+export function cancellationEmail(order: OrderView, ctx: EmailContext, reason?: string) {
   const refundLine = order.refundAmountGbp
     ? `A refund of ${formatGBP(order.refundAmountGbp)} has been issued. It typically arrives in 5–10 business days.`
     : 'No payment was taken.';
@@ -238,7 +246,7 @@ export function cancellationEmail(order: OrderView, reason?: string) {
   return {
     subject: `Order cancelled · № ${order.ref}`,
     preheader: refundLine,
-    html: shell({ preheader: refundLine, title: 'Order cancelled', body }),
+    html: shell({ preheader: refundLine, title: 'Order cancelled', body, ctx }),
     text: `Your order ${order.ref} has been cancelled.\n${refundLine}${reason ? `\nReason: ${reason}` : ''}`,
   };
 }
@@ -246,7 +254,7 @@ export function cancellationEmail(order: OrderView, reason?: string) {
 // =====================================================================
 // 4. Welcome (new account)
 // =====================================================================
-export function welcomeEmail(displayName: string) {
+export function welcomeEmail(displayName: string, cutoffShort: string, ctx: EmailContext) {
   const first = displayName.split(' ')[0] || 'friend';
   const menuUrl = absoluteUrl(siteConfig.routes.menu);
   const accountUrl = absoluteUrl(siteConfig.routes.account);
@@ -260,7 +268,7 @@ export function welcomeEmail(displayName: string) {
       Your account at ${escapeHtml(siteConfig.name)} is set up. Browse today's menu, save your delivery address, and we'll keep your past orders and receipts handy in your account dashboard.
     </p>
     <p style="font-family:${SERIF};font-size:16px;line-height:1.55;color:${COLOURS.walnut};margin:0 0 24px;">
-      We cook from scratch every morning — ${escapeHtml(siteConfig.hours.cutoffShort.toLowerCase())}.
+      We cook from scratch every morning — ${escapeHtml(cutoffShort.toLowerCase())}.
     </p>
     ${ctaButton(menuUrl, "See today's menu →")}
     <p style="font-family:${SERIF};font-style:italic;font-size:13px;color:${COLOURS.inkMuted};margin:28px 0 0;">
@@ -270,7 +278,7 @@ export function welcomeEmail(displayName: string) {
   return {
     subject: `Welcome to ${siteConfig.name}, ${first}`,
     preheader,
-    html: shell({ preheader, title: 'Welcome', body }),
+    html: shell({ preheader, title: 'Welcome', body, ctx }),
     text: `Welcome, ${first}.\n\nYour account at ${siteConfig.name} is ready. Browse today's menu and place an order any time:\n${menuUrl}\n\nManage your account: ${accountUrl}`,
   };
 }

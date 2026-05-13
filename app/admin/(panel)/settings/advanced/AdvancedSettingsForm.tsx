@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import ConfirmModal from '@/components/admin/ConfirmModal';
+import SettingsSidebar from '@/components/admin/SettingsSidebar';
 import { updateSetting } from '@/lib/admin/catalogActions';
 import type { DatasetSummary } from '@/lib/admin/dataExport';
 
@@ -71,22 +72,17 @@ export default function AdvancedSettingsForm({
   }
 
   return (
+    <>
     <div className="settings-layout">
-      <aside className="settings-sidebar">
-        <p className="settings-sidebar__title">Advanced</p>
-        <a href="#email" className="settings-sidebar__link is-active">
-          Transactional email
-        </a>
-        <a href="#account" className="settings-sidebar__link">
-          Admin account
-        </a>
-        <a href="#data" className="settings-sidebar__link">
-          Data &amp; export
-        </a>
-        <a href="#danger" className="settings-sidebar__link" style={{ color: '#8B2A1A' }}>
-          Danger zone
-        </a>
-      </aside>
+      <SettingsSidebar
+        title="Advanced"
+        items={[
+          { href: '#email', sectionId: 'email', label: 'Transactional email' },
+          { href: '#account', sectionId: 'account', label: 'Admin account' },
+          { href: '#data', sectionId: 'data', label: 'Data & export' },
+          { href: '#danger', sectionId: 'danger', label: 'Danger zone', tone: 'danger' },
+        ]}
+      />
 
       <div className="settings-main">
         {/* EMAIL */}
@@ -260,7 +256,7 @@ export default function AdvancedSettingsForm({
             />
             <DangerCard
               title="Transfer admin ownership"
-              body="Make another email the primary admin. Manual process for v1 — message Seyi to action this with confirmation from both addresses."
+              body="Make another email the primary admin. Manual process for v1 — message Seyi(seyispecial17@gmail.com) to action this with confirmation from both addresses."
               cta="Start transfer →"
               onClick={() => setTransferOpen(true)}
             />
@@ -273,13 +269,15 @@ export default function AdvancedSettingsForm({
           </div>
         </section>
       </div>
+    </div>
 
-      {/* Sticky save bar */}
+      {/* Sticky save bar — lives outside .settings-layout so it spans the
+          full width of the admin panel instead of falling into a grid cell. */}
       <div
         className="sticky-save-bar"
         style={dirty ? undefined : { transform: 'translateY(100%)' }}
       >
-        <div className="container sticky-save-bar__inner">
+        <div className="sticky-save-bar__inner">
           <span className="sticky-save-bar__left">
             <span className="unsaved-dot" />
             You have unsaved changes
@@ -329,7 +327,7 @@ export default function AdvancedSettingsForm({
         open={transferOpen}
         onCancel={() => setTransferOpen(false)}
         onConfirm={() => {
-          toast.info('Ownership transfer is a manual process for v1 — message Seyi to action.');
+          toast.info('Ownership transfer is a manual process for v1 — message Seyi(seyispecial17@gmail.com) to action.');
           setTransferOpen(false);
         }}
         eyebrow="Transfer ownership"
@@ -359,7 +357,7 @@ export default function AdvancedSettingsForm({
         }
         confirmLabel="Acknowledged"
       />
-    </div>
+    </>
   );
 }
 

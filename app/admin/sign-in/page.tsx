@@ -46,7 +46,7 @@ export default async function AdminSignInPage({ searchParams }: Props) {
 
         {sp.error === 'not_admin' && (
           <div className="mb-4 rounded-[2px] border border-danger/40 bg-danger/5 px-4 py-3 font-serif text-[13.5px] italic text-danger">
-            That account is signed in but isn't an admin. Sign in with the kitchen account, or message Seyi if you need access.
+            That account is signed in but isn't an admin. Sign in with the kitchen account, or message the engineer if you need access.
           </div>
         )}
 

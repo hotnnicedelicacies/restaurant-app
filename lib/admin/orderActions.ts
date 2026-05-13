@@ -7,6 +7,7 @@ import { getOrderByRef } from '@/lib/data/orders';
 import { sendEmail } from '@/lib/email/send';
 import { statusUpdateEmail, cancellationEmail } from '@/lib/email/templates';
 import { siteConfig } from '@/constants/siteConfig';
+import { getContact } from '@/lib/data/contact';
 import { requireAdmin } from './auth';
 
 type Result<T = void> = { ok: true; data?: T } | { ok: false; error: string };
@@ -59,10 +60,14 @@ export async function updateOrderStatus(args: {
   if (note && visibleToCustomer) {
     const refreshed = await getOrderByRef(args.ref);
     if (refreshed) {
+      const contact = await getContact();
       const email = statusUpdateEmail(refreshed, {
         author: admin.displayName,
         body: note,
         statusLabel: STATUS_LABELS[args.next] ?? args.next,
+      }, {
+        contactEmail: contact.email,
+        contactWhatsapp: contact.whatsapp,
       });
       await sendEmail({
         to: refreshed.customer.email,
@@ -219,7 +224,11 @@ export async function adminCancelOrder(ref: string, reason: string): Promise<Res
   // Email customer
   const refreshed = await getOrderByRef(ref);
   if (refreshed) {
-    const email = cancellationEmail(refreshed, reason);
+    const contact = await getContact();
+    const email = cancellationEmail(refreshed, {
+      contactEmail: contact.email,
+      contactWhatsapp: contact.whatsapp,
+    }, reason);
     await sendEmail({
       to: refreshed.customer.email,
       subject: email.subject,
@@ -257,10 +266,14 @@ export async function addKitchenNote(args: {
   });
 
   if (args.visibleToCustomer) {
+    const contact = await getContact();
     const email = statusUpdateEmail(order, {
       author: admin.displayName,
       body: args.body.trim(),
       statusLabel: STATUS_LABELS[order.status] ?? order.status,
+    }, {
+      contactEmail: contact.email,
+      contactWhatsapp: contact.whatsapp,
     });
     await sendEmail({
       to: order.customer.email,
