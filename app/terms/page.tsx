@@ -18,7 +18,7 @@ export default async function TermsPage() {
     <LegalLayout
       eyebrow="Legal · Terms"
       title={<>Terms of <em>Service</em></>}
-      updatedLine="Last updated: 11 May 2026 · Governed by the laws of England & Wales"
+      updatedLine="Last updated: 13 May 2026 · Governed by the laws of England & Wales"
       tags={[
         { label: 'Template — for lawyer review before publication', warning: true },
         { label: 'Consumer Rights Act 2015' },
@@ -55,6 +55,13 @@ export default async function TermsPage() {
         <li>Tell us promptly if you suspect unauthorised access</li>
       </ul>
       <p>You must be at least 16 years old to create an account.</p>
+      <p><b>Closing your account.</b> You can close your account at any time from the <a href={siteConfig.routes.account}>account page</a>. To protect orders already in progress:</p>
+      <ul>
+        <li>If you have an order that is <i>received, preparing, or out for delivery</i>, you cannot close your account until that order is delivered or cancelled. Our kitchen and driver need your name, phone and delivery address to perform the contract you placed with us. UK GDPR (Art. 6(1)(b)) lets us keep that data for as long as it takes to fulfil the order. If you want to cancel the order first, message us on WhatsApp.</li>
+        <li>Once all your orders are delivered or cancelled, closing your account will: scrub your profile details (name, phone, marketing preferences), delete your saved addresses, anonymise the personal details on your historical orders (name, email, phone and delivery address are replaced), and revoke your sign-in.</li>
+        <li>We keep the <i>line items, amounts and order references</i> on closed accounts for at least six years so we can meet HMRC VAT record-keeping obligations. These records are no longer linked to you personally.</li>
+        <li>Closing your account is not reversible — if you change your mind you'll need to sign up from scratch.</li>
+      </ul>
 
       <h2 id="orders">3. Placing an <em>order</em></h2>
       <p>When you place an order, you're making us an offer to buy the items in your basket. We accept your offer when we send you the order confirmation email — at that point a binding contract is formed between you and us.</p>

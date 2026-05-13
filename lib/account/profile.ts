@@ -67,15 +67,51 @@ export async function changePassword(input: unknown): Promise<Result> {
 }
 
 /**
- * Close the customer's account. Anonymises the profile + nukes their saved
- * addresses; order history is preserved (UK tax record-keeping) but the
- * personally identifiable fields on those orders are anonymised too. Then
- * signs the user out.
+ * Open-order statuses — kitchen / driver still need the PII to fulfil the
+ * contract, so we block closeAccount() while any of these exist. After
+ * delivery or cancellation, the customer is free to close.
+ */
+const OPEN_ORDER_STATUSES = ['received', 'preparing', 'on_its_way'] as const;
+
+export async function hasOpenOrders(userId: string): Promise<boolean> {
+  const svc = getServiceClient();
+  const { data } = await svc
+    .from('orders')
+    .select('id')
+    .eq('profile_id', userId)
+    .in('status', [...OPEN_ORDER_STATUSES])
+    .limit(1);
+  return Boolean(data && data.length > 0);
+}
+
+/**
+ * Close the customer's account.
+ *
+ * UK GDPR allows retention for contract performance — if the customer has
+ * an order still being cooked or delivered, the kitchen / driver need the
+ * name, phone and address to actually fulfil it, so we block the closure
+ * with a clear message rather than corrupting an in-flight delivery.
+ *
+ * Once all orders are delivered / cancelled:
+ *   · Profile PII is scrubbed in place (we can't delete the row — it's the
+ *     FK target for historical orders).
+ *   · Order PII (name / email / phone / address lines) is scrubbed too;
+ *     line items + amounts stay so HMRC's 6-year VAT retention is met.
+ *   · Saved addresses are hard-deleted (no FK dependency).
+ *   · The auth user is deleted, revoking all sessions.
  */
 export async function closeAccount(): Promise<Result> {
   const supabase = await getServerClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: 'You must be signed in.' };
+
+  if (await hasOpenOrders(user.id)) {
+    return {
+      ok: false,
+      error:
+        "You've got an order in progress. We need your delivery details to finish it — please wait until it's delivered, then close your account from here. (Or message us on WhatsApp to cancel the order first.)",
+    };
+  }
 
   const svc = getServiceClient();
 

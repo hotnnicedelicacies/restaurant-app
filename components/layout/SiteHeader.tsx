@@ -10,6 +10,7 @@ import { siteConfig } from '@/constants/siteConfig';
 import { cn } from '@/lib/utils';
 import HeaderCartLink from './HeaderCartLink';
 import HeaderAuthLink from './HeaderAuthLink';
+import { useCart } from '@/lib/cart/store';
 
 type Nav = { label: string; href: string };
 
@@ -37,6 +38,7 @@ export default function SiteHeader({
   const pathname = usePathname();
   const current = activePath ?? pathname;
   const [mobileOpen, setMobileOpen] = useState(false);
+  const count = useCart((s) => s.count());
 
   return (
     <header className="sticky top-0 z-50 border-b border-[rgba(241,229,205,0.22)] bg-walnut text-cream">
@@ -81,17 +83,26 @@ export default function SiteHeader({
 
         <div className="hidden items-center gap-2 md:flex">
           <HeaderAuthLink tone="onDark" />
-          <HeaderCartLink tone="onDark" />
+          {!current.startsWith('/menu') && <HeaderCartLink tone="onDark" />}
           {/* On /menu / /menu/[slug] the customer is already browsing — the
               bronze "Order now" CTA is redundant. Show only the cart there;
               elsewhere the CTA points them at the menu. */}
-          {!current.startsWith('/menu') && (
+          {!current.startsWith('/menu') ? (
             <Link
               href={cta.href}
               className="ml-1 rounded-[2px] bg-bronze px-[18px] py-[10px] font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] transition-colors hover:bg-cream hover:text-walnut"
             >
               {cta.label}
             </Link>
+          ) : (
+            <Link
+              href={siteConfig.routes.cart}
+              className="ml-1 rounded-[2px] bg-bronze px-[18px] py-[10px] font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-walnut [font-variant:small-caps] transition-colors hover:bg-cream hover:text-walnut"
+              style={{ fontVariant: 'small-caps' }}
+            >
+              Cart . {count}
+            </Link>
+
           )}
         </div>
 

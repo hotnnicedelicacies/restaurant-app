@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react';
 import { toast } from 'sonner';
 import { closeAccount } from '@/lib/account/profile';
 
-export default function CloseAccountCard() {
+export default function CloseAccountCard({ hasOpenOrders }: { hasOpenOrders: boolean }) {
   const [pending, start] = useTransition();
   const [confirmText, setConfirmText] = useState('');
   const [open, setOpen] = useState(false);
@@ -41,11 +41,21 @@ export default function CloseAccountCard() {
         This is not reversible. If you change your mind, you&apos;ll need to sign up from scratch.
       </p>
 
+      {hasOpenOrders && (
+        <div
+          className="mb-4 rounded-[2px] border border-danger/40 bg-danger/5 px-4 py-3 font-serif text-[14px] leading-[1.55] text-danger"
+          role="status"
+        >
+          <b className="font-medium">You&apos;ve got an order in progress.</b> We need your delivery details to finish it — once it&apos;s delivered (or you cancel it on the order page), you can close your account here.
+        </div>
+      )}
+
       {!open ? (
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="cursor-pointer rounded-[2px] border border-danger bg-transparent px-5 py-3 font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-danger [font-variant:small-caps] transition-colors hover:bg-danger hover:text-cream"
+          disabled={hasOpenOrders}
+          className="cursor-pointer rounded-[2px] border border-danger bg-transparent px-5 py-3 font-serif text-[13px] font-semibold uppercase tracking-[0.16em] text-danger [font-variant:small-caps] transition-colors hover:bg-danger hover:text-cream disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-transparent disabled:hover:text-danger"
         >
           Close my account
         </button>

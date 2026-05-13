@@ -137,7 +137,11 @@ export default async function AccountPage() {
               </AccountSection>
 
               <AccountSection id="close" title={<>Close <em>account</em></>}>
-                <CloseAccountCard />
+                <CloseAccountCard
+                  hasOpenOrders={orders.some((o) =>
+                    ['received', 'preparing', 'on_its_way'].includes(o.status)
+                  )}
+                />
               </AccountSection>
             </div>
           </div>
