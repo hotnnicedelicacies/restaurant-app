@@ -20,7 +20,7 @@ export default async function CheckoutPage() {
   let defaults: CheckoutDefaults | null = null;
 
   if (user) {
-    const [{ data: profile }, { data: address }] = await Promise.all([
+    const [{ data: profile }, { data: addressRows }] = await Promise.all([
       supabase
         .from('profiles')
         .select('display_name, phone')
@@ -31,20 +31,32 @@ export default async function CheckoutPage() {
         .select('*')
         .eq('profile_id', user.id)
         .order('is_default', { ascending: false })
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle(),
+        .order('created_at', { ascending: false }),
     ]);
     const [first = '', last = ''] = (profile?.display_name ?? '').split(' ', 2);
+    const addresses = (addressRows ?? []).map((a) => ({
+      id: a.id,
+      label: a.label,
+      recipientName: a.recipient_name,
+      line1: a.line1,
+      line2: a.line2,
+      city: a.city,
+      postcode: a.postcode,
+      phone: a.phone,
+      isDefault: a.is_default,
+    }));
+    const defaultAddr = addresses[0] ?? null;
     defaults = {
       firstName: first,
       lastName: last,
       email: user.email ?? '',
       phone: profile?.phone ?? '',
-      address1: address?.line1 ?? '',
-      address2: address?.line2 ?? '',
-      city: address?.city ?? 'Middlesbrough',
-      postcode: address?.postcode ?? '',
+      address1: defaultAddr?.line1 ?? '',
+      address2: defaultAddr?.line2 ?? '',
+      city: defaultAddr?.city ?? 'Middlesbrough',
+      postcode: defaultAddr?.postcode ?? '',
+      savedAddresses: addresses,
+      selectedAddressId: defaultAddr?.id ?? null,
     };
   }
 

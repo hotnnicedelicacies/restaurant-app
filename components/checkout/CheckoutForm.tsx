@@ -37,6 +37,18 @@ interface ZoneResponse {
  *   COD flow:   fill form → "Place order" → server creates order → redirect
  *               to /confirmation/[ref]
  */
+export interface SavedAddress {
+  id: string;
+  label: string | null;
+  recipientName: string;
+  line1: string;
+  line2: string | null;
+  city: string;
+  postcode: string;
+  phone: string | null;
+  isDefault: boolean;
+}
+
 export interface CheckoutDefaults {
   firstName: string;
   lastName: string;
@@ -46,6 +58,10 @@ export interface CheckoutDefaults {
   address2: string;
   city: string;
   postcode: string;
+  /** Full list of the customer's saved addresses — for the picker. */
+  savedAddresses?: SavedAddress[];
+  /** Which one (if any) is initially selected. */
+  selectedAddressId?: string | null;
 }
 
 export default function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults | null }) {
@@ -75,6 +91,30 @@ export default function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults
     deliveryNotes: '',
     paymentMethod: 'card' as 'card' | 'cod',
   });
+
+  // Saved-address picker state. `null` = "use a different address" (manual entry).
+  const savedAddresses = defaults?.savedAddresses ?? [];
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(
+    defaults?.selectedAddressId ?? null
+  );
+
+  function selectSavedAddress(id: string | null) {
+    setSelectedAddressId(id);
+    if (id === null) {
+      // "Use a different address" — clear the address fields for fresh entry.
+      setForm((f) => ({ ...f, address1: '', address2: '', city: 'Middlesbrough', postcode: '' }));
+      return;
+    }
+    const addr = savedAddresses.find((a) => a.id === id);
+    if (!addr) return;
+    setForm((f) => ({
+      ...f,
+      address1: addr.line1,
+      address2: addr.line2 ?? '',
+      city: addr.city,
+      postcode: addr.postcode,
+    }));
+  }
 
   // Zone match state
   const [zone, setZone] = useState<ZoneResponse['zone'] | null>(null);
@@ -258,10 +298,58 @@ export default function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults
             {/* 2. Delivery */}
             <Section num="02" title={<>Where &amp; <em>when</em></>}>
               <div className="flex flex-col gap-4">
-                <Field label="Street address" name="address1" value={form.address1} onChange={(v) => setForm((f) => ({ ...f, address1: v }))} required />
-                <Field label="Flat / unit" sublabel="· optional" name="address2" value={form.address2} onChange={(v) => setForm((f) => ({ ...f, address2: v }))} />
+                {savedAddresses.length > 0 && (
+                  <div>
+                    <div className="mb-2 font-serif text-[13px] font-medium tracking-[0.14em] text-walnut [font-variant:small-caps]">
+                      Deliver to <small className="ml-1 font-serif text-[12px] italic tracking-normal text-ink-muted [font-variant:normal]">· your saved addresses</small>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {savedAddresses.map((a) => {
+                        const isActive = selectedAddressId === a.id;
+                        return (
+                          <button
+                            key={a.id}
+                            type="button"
+                            onClick={() => selectSavedAddress(a.id)}
+                            className={`flex min-w-[180px] flex-1 cursor-pointer flex-col items-start gap-0.5 rounded-[2px] border bg-cream p-3 text-left transition-colors ${
+                              isActive ? 'border-walnut bg-cream-soft' : 'border-rule hover:border-walnut'
+                            }`}
+                          >
+                            <span className="flex w-full items-baseline justify-between gap-2">
+                              <span className="font-serif text-[14px] font-medium text-walnut">
+                                {a.label || 'Address'}
+                              </span>
+                              {a.isDefault && (
+                                <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-bronze-deep">
+                                  Default
+                                </span>
+                              )}
+                            </span>
+                            <span className="font-serif text-[12.5px] italic leading-[1.4] text-ink-muted">
+                              {a.line1}
+                              {a.line2 ? `, ${a.line2}` : ''} · {a.postcode}
+                            </span>
+                          </button>
+                        );
+                      })}
+                      <button
+                        type="button"
+                        onClick={() => selectSavedAddress(null)}
+                        className={`flex min-w-[160px] cursor-pointer items-center justify-center gap-1.5 rounded-[2px] border bg-cream p-3 font-serif text-[13px] italic transition-colors ${
+                          selectedAddressId === null
+                            ? 'border-walnut bg-cream-soft text-walnut'
+                            : 'border-dashed border-rule text-ink-muted hover:border-walnut hover:text-walnut'
+                        }`}
+                      >
+                        + Use a different address
+                      </button>
+                    </div>
+                  </div>
+                )}
+                <Field label="Street address" name="address1" value={form.address1} onChange={(v) => { setForm((f) => ({ ...f, address1: v })); setSelectedAddressId(null); }} required />
+                <Field label="Flat / unit" sublabel="· optional" name="address2" value={form.address2} onChange={(v) => { setForm((f) => ({ ...f, address2: v })); setSelectedAddressId(null); }} />
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <Field label="City / town" name="city" value={form.city} onChange={(v) => setForm((f) => ({ ...f, city: v }))} required />
+                  <Field label="City / town" name="city" value={form.city} onChange={(v) => { setForm((f) => ({ ...f, city: v })); setSelectedAddressId(null); }} required />
                   <div className="flex flex-col gap-1.5">
                     <label className="font-serif text-[13px] font-medium tracking-[0.14em] text-walnut [font-variant:small-caps]">
                       Postcode <small className="ml-1 font-serif text-[12px] italic tracking-normal text-ink-muted [font-variant:normal]">· checks delivery</small>
@@ -269,7 +357,7 @@ export default function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults
                     <input
                       name="postcode"
                       value={form.postcode}
-                      onChange={(e) => setForm((f) => ({ ...f, postcode: e.target.value.toUpperCase() }))}
+                      onChange={(e) => { setForm((f) => ({ ...f, postcode: e.target.value.toUpperCase() })); setSelectedAddressId(null); }}
                       required
                       placeholder="TS1 3AB"
                       className="w-full rounded-[2px] border border-rule bg-transparent px-3.5 py-3 font-serif text-[16px] uppercase text-walnut outline-none transition-colors focus:border-walnut"

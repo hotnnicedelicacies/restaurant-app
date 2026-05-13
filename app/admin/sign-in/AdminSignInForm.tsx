@@ -32,7 +32,7 @@ export default function AdminSignInForm({ next }: { next?: string }) {
           type="email"
           required
           autoComplete="email"
-          placeholder="hotnnicedelicacies@gmail.com"
+          placeholder="admin.email@example.com"
           className="w-full rounded-[2px] border border-rule bg-transparent px-3.5 py-3 font-serif text-[16px] text-walnut outline-none transition-colors focus:border-walnut placeholder:italic placeholder:text-ink-muted"
         />
       </div>
