@@ -289,6 +289,7 @@ export default function SettingsForm({ initial }: { initial: SettingsBlob }) {
               description="Customers can opt to collect from the kitchen (not yet wired)."
               checked={form.pickup_enabled ?? false}
               onChange={(v) => patch({ pickup_enabled: v })}
+              disabled
             />
           </section>
 
@@ -354,11 +355,13 @@ function RowToggle({
   description,
   checked,
   onChange,
+  disabled = false
 }: {
   label: string;
   description: string;
   checked: boolean;
   onChange: (v: boolean) => void;
+  disabled?: boolean;
 }) {
   return (
     <label
@@ -381,7 +384,7 @@ function RowToggle({
         </div>
       </div>
       <span className="switch">
-        <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+        <input type="checkbox" checked={checked} disabled={disabled} onChange={(e) => onChange(e.target.checked)} />
         <span className="switch__track">
           <span className="switch__thumb" />
         </span>

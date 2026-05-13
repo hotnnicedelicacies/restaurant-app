@@ -23,6 +23,13 @@ export interface CartLine {
   specialInstructions?: string;
   /** Either a URL (Supabase Storage) or a static asset path. */
   imageSrc: string;
+  /**
+   * Whether this menu item allows cash-on-delivery. Mirrored from
+   * `menu_items.is_cod_eligible` so the checkout can disable COD as soon
+   * as a non-eligible item is in the basket. Server-side `createOrder`
+   * re-checks against the DB — never trust this field alone.
+   */
+  isCodEligible: boolean;
 }
 
 interface CartState {
@@ -77,11 +84,11 @@ export const useCart = create<CartState>()(
     {
       name: 'hnn_cart',
       storage: createJSONStorage(() => localStorage),
-      // v2: bumped after the menu data source moved from legacy slugs to
-      // Supabase UUIDs. Older persisted carts stored slugs in `menuItemId`,
-      // which broke checkout once the DB went live. Returning undefined
-      // here wipes the stored state so the cart starts empty.
-      version: 2,
+      // v3: added `isCodEligible` on CartLine so checkout can gate cash-on-
+      // delivery per-item against `menu_items.is_cod_eligible`. Stored carts
+      // from v2 don't have the field; returning undefined wipes the state so
+      // every line is re-added with the up-to-date flag.
+      version: 3,
       migrate: () => undefined,
     }
   )

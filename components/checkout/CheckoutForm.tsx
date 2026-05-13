@@ -133,7 +133,13 @@ export default function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults
   const deliveryFee = zone?.baseFeeGbp ?? 0;
   const total = subtotal + deliveryFee;
   const meetsMin = !zone || subtotal >= (zone.minOrderGbp ?? 0);
-  const codAvailable = zone?.allowsCod ?? true;
+  // Per-meal: any line flagged COD-ineligible blocks cash payment for the
+  // whole order. (Stored `isCodEligible !== false` keeps older persisted
+  // carts that pre-date the field permissive — the server still re-checks.)
+  const codIneligibleItems = cartLines.filter((l) => l.isCodEligible === false);
+  const cartCodEligible = codIneligibleItems.length === 0;
+  const zoneCodEligible = zone?.allowsCod ?? true;
+  const codAvailable = cartCodEligible && zoneCodEligible;
 
   // Debounced postcode → zone check
   useEffect(() => {
@@ -162,12 +168,13 @@ export default function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults
     return () => window.clearTimeout(t);
   }, [form.postcode]);
 
-  // If chosen method becomes invalid (COD on a no-COD zone), bounce to card
+  // If chosen method becomes invalid (COD on a no-COD zone, or any cart
+  // line is COD-ineligible), bounce to card
   useEffect(() => {
-    if (form.paymentMethod === 'cod' && zone && !zone.allowsCod) {
+    if (form.paymentMethod === 'cod' && !codAvailable) {
       setForm((f) => ({ ...f, paymentMethod: 'card' }));
     }
-  }, [zone, form.paymentMethod]);
+  }, [codAvailable, form.paymentMethod]);
 
   // --- Submit ---
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -436,7 +443,9 @@ export default function CheckoutForm({ defaults }: { defaults?: CheckoutDefaults
                   description={
                     codAvailable
                       ? 'Pay the driver in cash when your order arrives.'
-                      : `Not available for ${zone?.name ?? 'this zone'}.`
+                      : !cartCodEligible
+                        ? `Not available for: ${codIneligibleItems.map((l) => l.name).join(', ')}. Pay by card to keep this item.`
+                        : `Not available for ${zone?.name ?? 'this zone'}.`
                   }
                   badge={codAvailable ? 'Cash' : 'Unavailable'}
                   disabled={!codAvailable}

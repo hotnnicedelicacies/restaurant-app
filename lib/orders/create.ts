@@ -92,13 +92,40 @@ export async function createOrder(input: CreateOrderInput): Promise<CreateOrderR
   }
   const total = subtotal + zone.baseFeeGbp;
 
-  // 4. COD eligibility check
-  if (data.paymentMethod === 'cod' && !zone.allowsCod) {
-    return {
-      ok: false,
-      field: 'paymentMethod',
-      error: `Cash on delivery is not available for ${zone.name}. Please use card payment.`,
-    };
+  // 4. COD eligibility check — both zone-level (admin settings) and per-meal
+  //    (`menu_items.is_cod_eligible`). Server is authoritative; the client
+  //    has hints in CartLine.isCodEligible but those can be stale or forged.
+  if (data.paymentMethod === 'cod') {
+    if (!zone.allowsCod) {
+      return {
+        ok: false,
+        field: 'paymentMethod',
+        error: `Cash on delivery is not available for ${zone.name}. Please use card payment.`,
+      };
+    }
+
+    const UUID_RE_LOCAL = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    const itemIds = Array.from(
+      new Set(data.lines.map((l) => l.menuItemId).filter((id) => UUID_RE_LOCAL.test(id))),
+    );
+    if (itemIds.length > 0) {
+      const svc = getServiceClient();
+      const { data: codRows, error: codErr } = await svc
+        .from('menu_items')
+        .select('id, name, is_cod_eligible')
+        .in('id', itemIds);
+      if (codErr) {
+        return { ok: false, error: 'Could not verify cash-on-delivery eligibility. Please try again.' };
+      }
+      const ineligible = (codRows ?? []).filter((r) => r.is_cod_eligible === false);
+      if (ineligible.length > 0) {
+        return {
+          ok: false,
+          field: 'paymentMethod',
+          error: `Cash on delivery isn't available for: ${ineligible.map((r) => r.name).join(', ')}. Please pay by card.`,
+        };
+      }
+    }
   }
 
   // 5. Generate ref + insert order via service client

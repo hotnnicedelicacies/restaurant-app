@@ -17,6 +17,7 @@ interface Item {
   variants: VariantsBlob;
   addons: AddonsBlob;
   isAvailable: boolean;
+  isCodEligible: boolean;
 }
 
 /**
@@ -136,6 +137,7 @@ export default function CustomiseForm({ item }: { item: Item }) {
       addonsChosen,
       specialInstructions: notes.trim() || undefined,
       imageSrc: item.image,
+      isCodEligible: item.isCodEligible,
     });
 
     if (editingLineId) {

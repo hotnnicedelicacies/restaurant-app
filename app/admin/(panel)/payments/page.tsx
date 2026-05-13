@@ -43,7 +43,7 @@ export default async function AdminPaymentsPage({
   searchParams: Promise<SearchParams>;
 }) {
   const sp = await searchParams;
-  const range = sp.range ?? 'today';
+  const range = sp.range ?? 'all';
   const tab = sp.tab ?? 'stripe';
   const from = rangeStart(range);
 
@@ -79,7 +79,7 @@ export default async function AdminPaymentsPage({
   const sumCodOutstanding = codUncollected.reduce((s, o) => s + Number(o.total_gbp), 0);
   const sumGross = sumCardGross + sumCodCollected;
 
-  const rangeLabel = RANGES.find((r) => r.value === range)?.label ?? 'Today';
+  const rangeLabel = RANGES.find((r) => r.value === range)?.label ?? 'All time';
   const stripeDashboardUrl = 'https://dashboard.stripe.com/payments';
 
   return (
@@ -180,7 +180,7 @@ export default async function AdminPaymentsPage({
               style={{ marginTop: 16 }}
             >
               <p className="cod-banner__text">
-                <b>{cardPending.length} card payment{cardPending.length === 1 ? '' : 's'}</b> in pending or failed state. Open the order and tap "Sync with Stripe" if the webhook may have been missed.
+                <b>{cardPending.length} card payment{cardPending.length === 1 ? '' : 's'}</b> in pending or failed state. Open the order and tap &quot;Sync with Stripe&quot; if the webhook may have been missed.
               </p>
             </div>
           )}

@@ -8,7 +8,13 @@ import { siteConfig } from '@/constants/siteConfig';
 import { formatGBP } from '@/lib/utils';
 import { useEffect, useState } from 'react';
 
-export default function CartContents() {
+/**
+ * @param minDeliveryFee  Cheapest base fee across the admin-controlled
+ *                        `delivery_zones` table — used for the "from £X"
+ *                        indicator before the customer enters a postcode
+ *                        at checkout.
+ */
+export default function CartContents({ minDeliveryFee }: { minDeliveryFee: number }) {
   // Avoid hydration mismatch: zustand-persist reads from localStorage on mount
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -44,10 +50,12 @@ export default function CartContents() {
     );
   }
 
-  // For now, default to Middlesbrough delivery fee. Phase 4 will swap this
-  // for a real postcode-driven zone lookup at checkout.
-  const deliveryFee = siteConfig.delivery.pricing.middlesbrough;
-  const total = subtotal + deliveryFee;
+  // Pre-checkout, we don't know the customer's postcode yet, so we show a
+  // "from £X" indicator using the cheapest active zone (passed in from the
+  // server component). The exact fee is bound at checkout once the
+  // postcode → zone match runs.
+  const deliveryFeeFrom = minDeliveryFee;
+  const total = subtotal + deliveryFeeFrom;
 
   return (
     <div className="grid items-start gap-[clamp(32px,5vw,64px)] md:grid-cols-[1.4fr_1fr]">
@@ -101,13 +109,16 @@ export default function CartContents() {
             <SummaryRow
               label={
                 <span>
-                  Delivery <em className="italic text-ink-muted">· Middlesbrough</em>
+                  Delivery <em className="italic text-ink-muted">· from</em>
                 </span>
               }
-              value={formatGBP(deliveryFee)}
+              value={formatGBP(deliveryFeeFrom)}
               muted
             />
-            <SummaryRow label="Total" value={formatGBP(total)} grand />
+            <SummaryRow label="Estimated total" value={formatGBP(total)} grand />
+            <p className="m-0 -mt-1 text-right font-serif text-[12px] italic text-ink-muted">
+              Final delivery fee confirmed by postcode at checkout.
+            </p>
           </div>
 
           <Link

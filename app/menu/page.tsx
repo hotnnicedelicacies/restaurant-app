@@ -6,6 +6,7 @@ import CtaBand from '@/components/home/CtaBand';
 import MenuBrowser from '@/components/menu/MenuBrowser';
 import { getCategoriesWithItems } from '@/lib/data/menu';
 import { getHours } from '@/lib/data/hours';
+import { getActiveZones } from '@/lib/data/zones';
 import { siteConfig } from '@/constants/siteConfig';
 import { absoluteUrl, formatGBP } from '@/lib/utils';
 
@@ -29,10 +30,16 @@ const DIETARY_SCHEMA_MAP: Record<string, string> = {
 };
 
 export default async function MenuPage() {
-  const [{ categories, itemsByCategory }, hours] = await Promise.all([
+  const [{ categories, itemsByCategory }, hours, zones] = await Promise.all([
     getCategoriesWithItems(),
     getHours(),
+    getActiveZones(),
   ]);
+  const minDeliveryFee =
+    zones.length > 0
+      ? Math.min(...zones.map((z) => z.baseFeeGbp))
+      : siteConfig.delivery.pricing.middlesbrough;
+  const cheapestZoneName = zones.find((z) => z.baseFeeGbp === minDeliveryFee)?.name ?? 'Middlesbrough';
 
   // JSON-LD: Menu schema (helps Google show the menu in search)
   const menuSchema = {
@@ -71,7 +78,7 @@ export default async function MenuPage() {
         <PageHero
           compact
           eyebrow={`Today's Kitchen · ${hours.displayShort}`}
-          title={<>Today's <em>Menu</em></>}
+          title={<>Today&apos;s <em>Menu</em></>}
           sub={`Cooked this morning · ${hours.cutoffShort} to Teesside.`}
         />
 
@@ -99,8 +106,8 @@ export default async function MenuPage() {
 
         <CtaBand
           eyebrow="Ready when you are"
-          title={<>Tonight's dinner, <em>handled.</em></>}
-          sub={`Delivery from ${formatGBP(siteConfig.delivery.pricing.middlesbrough)} within Middlesbrough. Place your order before ten.`}
+          title={<>Tonight&apos;s dinner, <em>handled.</em></>}
+          sub={`Delivery from ${formatGBP(minDeliveryFee)} within ${cheapestZoneName}. Place your order before ten.`}
           cta={{ label: 'Review your basket', href: siteConfig.routes.cart }}
         />
       </main>

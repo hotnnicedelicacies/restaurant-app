@@ -167,6 +167,7 @@ export default async function ItemDetailPage({ params }: Props) {
                     variants: item.variants,
                     addons: item.addons,
                     isAvailable: item.isAvailable,
+                    isCodEligible: item.isCodEligible,
                   }}
                 />
               </div>

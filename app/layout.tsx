@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Cormorant_Garamond } from 'next/font/google';
 import { siteConfig } from '@/constants/siteConfig';
 import { absoluteUrl } from '@/lib/utils';
 import { getHours } from '@/lib/data/hours';
+import { getActiveZones } from '@/lib/data/zones';
 import { Toaster } from 'sonner';
 import CookieBanner from '@/components/CookieBanner';
 import './globals.css';
@@ -115,7 +116,10 @@ export const metadata: Metadata = {
 };
 
 // --- JSON-LD: FoodEstablishment (rendered once site-wide) ---
-function buildRestaurantSchema(hours: { days: string[]; open: string; close: string }) {
+function buildRestaurantSchema(
+  hours: { days: string[]; open: string; close: string },
+  areaServedNames: string[],
+) {
   return {
   '@context': 'https://schema.org',
   '@type': 'FoodEstablishment',
@@ -138,7 +142,7 @@ function buildRestaurantSchema(hours: { days: string[]; open: string; close: str
     addressRegion: 'North Yorkshire',
     addressCountry: 'GB',
   },
-  areaServed: siteConfig.delivery.areas.map((area) => ({
+  areaServed: areaServedNames.map((area) => ({
     '@type': 'City',
     name: area,
   })),
@@ -163,12 +167,13 @@ function buildRestaurantSchema(hours: { days: string[]; open: string; close: str
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const hours = await getHours();
-  const restaurantSchema = buildRestaurantSchema({
-    days: hours.days,
-    open: hours.open,
-    close: hours.close,
-  });
+  const [hours, zones] = await Promise.all([getHours(), getActiveZones()]);
+  const areaServed: string[] =
+    zones.length > 0 ? zones.map((z) => z.name) : [...siteConfig.delivery.areas];
+  const restaurantSchema = buildRestaurantSchema(
+    { days: hours.days, open: hours.open, close: hours.close },
+    areaServed,
+  );
   return (
     <html
       lang="en-GB"
