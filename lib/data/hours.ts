@@ -40,6 +40,8 @@ export interface HoursView {
   timeLong: string;
   /** "Tue – Sun · 12 – 8pm" */
   displayShort: string;
+  /** "10am" — just the cutoff time, for inline prose. */
+  cutoffTime: string;
   /** "Order by 10am for same-day delivery" */
   cutoffShort: string;
 }
@@ -81,6 +83,7 @@ function buildView(input: {
     timeShort,
     timeLong,
     displayShort: `${daysShort} · ${timeShort}`,
+    cutoffTime: cutoff.long,
     cutoffShort: `Order by ${cutoff.long} for same-day delivery`,
   };
 }

@@ -19,14 +19,17 @@ export interface DeliveryZoneView {
  * Normalise a UK postcode to its area prefix.
  *   "ts1 3AB" → "TS1"
  *   "SW1A 1AA" → "SW1A" then we also try "SW1" as a fallback
+ *   "TS17"    → "TS17" (bare outward, no inward code)
  *
  * Returns an ordered list of candidates to try, most-specific first.
  */
 export function postcodeCandidates(input: string): string[] {
   const clean = input.trim().toUpperCase().replace(/\s+/g, '');
   if (!clean) return [];
-  // Outward code is everything before the inward code (last 3 chars).
-  const outward = clean.length > 3 ? clean.slice(0, -3) : clean;
+  // UK postcodes are 5–7 chars (outward 2–4 + inward exactly 3). Anything
+  // shorter is a bare outward code being typed (e.g. "TS17") — treat the
+  // whole input as the outward. Otherwise strip the trailing 3-char inward.
+  const outward = clean.length >= 5 ? clean.slice(0, -3) : clean;
   // Also strip trailing digits → "TS17" → "TS1" as a fallback
   const lessSpecific = outward.replace(/\d+$/, '');
   const candidates = [outward];

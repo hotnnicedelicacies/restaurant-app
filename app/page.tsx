@@ -13,6 +13,7 @@ import { formatLongDate, absoluteUrl } from '@/lib/utils';
 import { getFeaturedItems, type MenuItemView } from '@/lib/data/menu';
 import { getHours } from '@/lib/data/hours';
 import { getContact } from '@/lib/data/contact';
+import { getOperations } from '@/lib/data/operations';
 import { type FareRowItem } from '@/components/menu/FareRow';
 
 import heroImg from '@/assets/hero-food.png';
@@ -53,10 +54,11 @@ const websiteSchema = {
 };
 
 export default async function HomePage() {
-  const [featuredRaw, hours, contact] = await Promise.all([
+  const [featuredRaw, hours, contact, operations] = await Promise.all([
     getFeaturedItems(6),
     getHours(),
     getContact(),
+    getOperations(),
   ]);
   const featured = featuredRaw.map(toFareRowItem);
   const today = formatLongDate(new Date());
@@ -67,6 +69,20 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
       />
+
+      {!operations.storeOpen && (
+        <div className="border-b border-[rgba(241,229,205,0.22)] bg-[#8B2A1A] text-cream">
+          <div className="container py-3 text-center">
+            <p className="m-0 font-serif text-[15px] italic leading-[1.5]">
+              <b className="mr-2 font-medium not-italic tracking-[0.14em] [font-variant:small-caps]">
+                Kitchen paused
+              </b>
+              {operations.closedMessage?.trim() ||
+                "We're not taking new orders right now — we'll be back shortly. Message us on WhatsApp if it's urgent."}
+            </p>
+          </div>
+        </div>
+      )}
 
       <SiteHeader />
 
@@ -83,7 +99,7 @@ export default async function HomePage() {
               cooked from scratch, <em>delivered hot.</em>
             </>
           }
-          deck="No shortcuts. No frozen meals. A five-star kitchen on its feet from ten o'clock every morning — bringing dinner to your door across Teesside."
+          deck={`No shortcuts. No frozen meals. A five-star kitchen on its feet from ${hours.cutoffTime} every morning — bringing dinner to your door across Teesside.`}
           primaryCta={{ label: "See today's menu", href: siteConfig.routes.menu }}
           secondaryCta={{
             label: 'or message us on WhatsApp',
