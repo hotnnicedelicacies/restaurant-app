@@ -8,6 +8,7 @@ import { sendEmail } from '@/lib/email/send';
 import { cancellationEmail } from '@/lib/email/templates';
 import { siteConfig } from '@/constants/siteConfig';
 import { getContact } from '@/lib/data/contact';
+import { getEmailConfig } from '@/lib/data/emailConfig';
 
 type Result = { ok: true } | { ok: false; error: string };
 
@@ -101,6 +102,27 @@ export async function customerCancelOrder(ref: string): Promise<Result> {
       html: email.html,
       text: email.text,
     });
+    // Notify the kitchen — same pattern as the new-order alerts so the
+    // owner sees a cancellation land in the inbox even if they're not
+    // staring at the admin dashboard.
+    try {
+      const cfg = await getEmailConfig();
+      if (cfg.notificationTo) {
+        const refundLine =
+          refreshed.paymentMethod === 'card'
+            ? ' · refund issued'
+            : refreshed.paymentMethod === 'cod'
+              ? ' · COD (no payment taken)'
+              : '';
+        await sendEmail({
+          to: cfg.notificationTo,
+          subject: `Order cancelled by customer · ${refreshed.ref}${refundLine}`,
+          html: email.html,
+        });
+      }
+    } catch (err) {
+      console.error('[customerCancelOrder] admin notification failed:', err);
+    }
   }
 
   revalidatePath(siteConfig.routes.track(ref));
