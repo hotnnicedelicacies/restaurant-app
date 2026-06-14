@@ -158,7 +158,7 @@ Editable copy that lives outside settings/menu data.
 
 | Key | Field | Used on |
 |---|---|---|
-| `home.hero_eyebrow` | text | Hero: "A Home Kitchen · Middlesbrough · Est. 2019" |
+| `home.hero_eyebrow` | text | Hero: "A Home Kitchen · Middlesbrough · Est. 2026" |
 | `home.hero_headline` | text (rich) | Hero headline with italic span markers |
 | `home.hero_deck` | text | Hero deck paragraph |
 | `home.bill_of_fare_subhead` | text | "Cooked this morning · Delivered hot" |

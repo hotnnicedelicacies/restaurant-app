@@ -40,7 +40,7 @@ export const siteConfig = {
   voice: {
     tagline: 'Made with love, delivered hot to your door.',
     promise: 'No shortcuts. No frozen meals. Just dinner.',
-    kitchenLocation: 'A home kitchen · Middlesbrough · Est. 2019',
+    kitchenLocation: 'A home kitchen · Middlesbrough · Est. 2026',
   },
 
   /** Routes — single source of truth for internal links + sitemap generation. */

@@ -13,7 +13,7 @@ import portraitImg from '@/assets/meals/jollof-rice-with-protein-of-choice-and-p
 
 export const metadata: Metadata = {
   title: 'About',
-  description: `${siteConfig.name} — a family kitchen in Middlesbrough cooking Italian classics and West African home staples from scratch every morning, since 2019.`,
+  description: `${siteConfig.name} — a family kitchen in Middlesbrough cooking Italian classics and West African home staples from scratch every morning, since 2026.`,
   alternates: { canonical: absoluteUrl(siteConfig.routes.about) },
   openGraph: {
     title: `About ${siteConfig.name}`,
@@ -48,7 +48,7 @@ export default async function AboutPage() {
       <SiteHeader />
       <main>
         <PageHero
-          eyebrow="Our Story · Middlesbrough · Est. 2019"
+          eyebrow="Our Story · Middlesbrough · Est. 2026"
           title={<>A home kitchen, <em>cooking honestly.</em></>}
           sub="Italian classics & West African home cooking, made fresh, brought to your door."
         />
@@ -102,7 +102,7 @@ export default async function AboutPage() {
             />
             <article className="mx-auto max-w-[680px] font-serif text-[18px] leading-[1.65] text-walnut [&_em]:italic [&_p]:m-0 [&_p+p]:mt-4 [&_b]:font-medium">
               <p className="[&::first-letter]:float-left [&::first-letter]:pr-2.5 [&::first-letter]:pt-1 [&::first-letter]:text-[3.6em] [&::first-letter]:font-medium [&::first-letter]:leading-[0.9] [&::first-letter]:text-bronze-deep">
-                We started cooking for the neighbours in 2019. One pot of jollof on a Sunday afternoon,
+                We started cooking for the neighbours in 2026. One pot of jollof on a Sunday afternoon,
                 ferried across the street in a tupperware. Then two pots. Then five. Then a friend
                 asked, half-jokingly, whether we could do delivery.
               </p>

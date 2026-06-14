@@ -53,7 +53,7 @@ function shell(args: {
         <td style="padding:32px 32px 16px;text-align:center;">
           <a href="${absoluteUrl()}" style="text-decoration:none;color:${COLOURS.walnut};">
             <strong style="display:block;font-family:${SERIF};font-weight:500;font-size:22px;letter-spacing:-0.005em;color:${COLOURS.walnut};">${escapeHtml(siteConfig.name)}</strong>
-            <span style="display:block;font-family:${MONO};font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:${COLOURS.bronzeDeep};margin-top:6px;">Middlesbrough · Est. 2019</span>
+            <span style="display:block;font-family:${MONO};font-size:9px;letter-spacing:0.22em;text-transform:uppercase;color:${COLOURS.bronzeDeep};margin-top:6px;">Middlesbrough · Est. 2026</span>
           </a>
         </td>
       </tr>
