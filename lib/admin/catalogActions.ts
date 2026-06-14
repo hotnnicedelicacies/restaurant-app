@@ -306,9 +306,7 @@ export async function updateSetting(key: string, value: unknown): Promise<Result
     key === 'cod_enabled' ||
     key === 'pickup_enabled' ||
     key === 'closed_message' ||
-    key === 'global_min_order_gbp' ||
-    key === 'default_prep_time_min' ||
-    key === 'default_prep_time_max'
+    key === 'global_min_order_gbp'
   ) {
     revalidateTag(OPERATIONS_TAG, 'default');
   }

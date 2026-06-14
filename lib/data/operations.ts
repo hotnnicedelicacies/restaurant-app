@@ -24,9 +24,6 @@ export interface OperationsView {
   closedMessage: string | null;
   /** Global floor for every order, in £. ANDed with the zone's `min_order_gbp` (the higher wins). */
   globalMinOrderGbp: number | null;
-  /** Default kitchen prep window in minutes — falls through to a zone's prep time when no zone-specific value is set. */
-  defaultPrepTimeMin: number | null;
-  defaultPrepTimeMax: number | null;
 }
 
 const FALLBACK: OperationsView = {
@@ -38,8 +35,6 @@ const FALLBACK: OperationsView = {
   pickupEnabled: false,
   closedMessage: null,
   globalMinOrderGbp: null,
-  defaultPrepTimeMin: null,
-  defaultPrepTimeMax: null,
 };
 
 function num(v: unknown): number | null {
@@ -60,8 +55,6 @@ async function _getOperations(): Promise<OperationsView> {
         'pickup_enabled',
         'closed_message',
         'global_min_order_gbp',
-        'default_prep_time_min',
-        'default_prep_time_max',
       ]);
     if (error || !data) return FALLBACK;
     const byKey = new Map(data.map((r) => [r.key, r.value]));
@@ -74,8 +67,6 @@ async function _getOperations(): Promise<OperationsView> {
           ? (byKey.get('closed_message') as string)
           : FALLBACK.closedMessage,
       globalMinOrderGbp: num(byKey.get('global_min_order_gbp')),
-      defaultPrepTimeMin: num(byKey.get('default_prep_time_min')),
-      defaultPrepTimeMax: num(byKey.get('default_prep_time_max')),
     };
   } catch (err) {
     console.error('[operations] getOperations threw:', err);

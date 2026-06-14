@@ -23,8 +23,6 @@ interface SettingsBlob {
   closed_message?: string;
   contact_phone?: string;
   contact_email?: string;
-  default_prep_time_min?: number;
-  default_prep_time_max?: number;
   global_min_order_gbp?: number;
   hours?: HoursBlob;
 }
@@ -159,7 +157,7 @@ export default function SettingsForm({ initial }: { initial: SettingsBlob }) {
               })}
             </div>
 
-            <div style={{ marginTop: 24, paddingTop: 20, borderTop: '1px solid var(--color-rule)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+            <div style={{ marginTop: 24, paddingTop: 20, borderTop: '1px solid var(--color-rule)' }}>
               <div className="form-field">
                 <label className="form-field__label" htmlFor="cutoff">
                   Same-day cutoff time
@@ -173,23 +171,6 @@ export default function SettingsForm({ initial }: { initial: SettingsBlob }) {
                 />
                 <span className="form-field__help">
                   Orders after this time are delivered the next available day.
-                </span>
-              </div>
-              <div className="form-field">
-                <label className="form-field__label" htmlFor="prep">
-                  Default prep <small>· minutes</small>
-                </label>
-                <input
-                  id="prep"
-                  className="form-field__input"
-                  type="number"
-                  value={form.default_prep_time_min ?? 60}
-                  onChange={(e) => patch({ default_prep_time_min: Number(e.target.value) })}
-                  min={0}
-                  step={5}
-                />
-                <span className="form-field__help">
-                  Used at checkout when no zone-specific time is set.
                 </span>
               </div>
             </div>
@@ -291,34 +272,20 @@ export default function SettingsForm({ initial }: { initial: SettingsBlob }) {
               <span className="form-section__num">№ 04</span>
             </header>
             <p className="t-body-muted" style={{ margin: '0 0 18px' }}>
-              Defaults used when a zone doesn&apos;t override.
+              Site-wide floor that wins when a zone&apos;s minimum is lower.
             </p>
-            <div className="form-grid">
-              <div className="form-field">
-                <label className="form-field__label" htmlFor="prep-max">
-                  Default prep max <small>· minutes</small>
-                </label>
-                <input
-                  id="prep-max"
-                  className="form-field__input"
-                  type="number"
-                  value={form.default_prep_time_max ?? 90}
-                  onChange={(e) => patch({ default_prep_time_max: Number(e.target.value) })}
-                />
-              </div>
-              <div className="form-field">
-                <label className="form-field__label" htmlFor="min-order">
-                  Global min order <small>· £</small>
-                </label>
-                <input
-                  id="min-order"
-                  className="form-field__input"
-                  type="number"
-                  step={1}
-                  value={form.global_min_order_gbp ?? 10}
-                  onChange={(e) => patch({ global_min_order_gbp: Number(e.target.value) })}
-                />
-              </div>
+            <div className="form-field">
+              <label className="form-field__label" htmlFor="min-order">
+                Global min order <small>· £</small>
+              </label>
+              <input
+                id="min-order"
+                className="form-field__input"
+                type="number"
+                step={1}
+                value={form.global_min_order_gbp ?? 10}
+                onChange={(e) => patch({ global_min_order_gbp: Number(e.target.value) })}
+              />
             </div>
           </section>
 

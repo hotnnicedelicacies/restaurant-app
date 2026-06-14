@@ -17,8 +17,6 @@ interface SettingsBlob {
   closed_message?: string;
   contact_phone?: string;
   contact_email?: string;
-  default_prep_time_min?: number;
-  default_prep_time_max?: number;
   global_min_order_gbp?: number;
   hours?: HoursBlob;
 }
@@ -43,8 +41,6 @@ export default async function AdminSettingsPage() {
       (map.get('contact_phone') as string | undefined) ?? contactFallback.phone,
     contact_email:
       (map.get('contact_email') as string | undefined) ?? contactFallback.email,
-    default_prep_time_min: (map.get('default_prep_time_min') as number | undefined) ?? 60,
-    default_prep_time_max: (map.get('default_prep_time_max') as number | undefined) ?? 90,
     global_min_order_gbp: (map.get('global_min_order_gbp') as number | undefined) ?? 10,
     hours: (map.get('hours') as HoursBlob | undefined) ?? {
       days: [...hoursFallback.days] as WeekDay[],

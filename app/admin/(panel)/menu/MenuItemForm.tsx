@@ -9,6 +9,7 @@ import {
   upsertMenuItem,
   type MenuItemFormData,
 } from '@/lib/admin/catalogActions';
+import { getStorageUrl } from '@/lib/supabase/storage';
 import type { VariantsBlob, AddonsBlob } from '@/lib/supabase/types';
 
 interface Props {
@@ -220,18 +221,23 @@ export default function MenuItemForm({ categories, initial }: Props) {
               <label className="form-field__label" htmlFor="m-image">
                 Primary photo path <small>· Supabase Storage key</small>
               </label>
-              <input
-                id="m-image"
-                className="form-field__input"
-                type="text"
-                value={form.imagePath ?? ''}
-                onChange={(e) => patch({ imagePath: e.target.value || null })}
-                placeholder="menu/jollof.jpg"
-                style={{ fontFamily: 'var(--font-mono)' }}
-              />
-              <p className="form-field__help">
-                Upload via the Supabase dashboard → menu-images bucket, then paste the path here (no leading slash).
-              </p>
+              <div style={{ display: 'grid', gridTemplateColumns: '160px 1fr', gap: 16, alignItems: 'start' }}>
+                <ImagePreview path={form.imagePath} alt={form.name || 'Menu photo preview'} />
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  <input
+                    id="m-image"
+                    className="form-field__input"
+                    type="text"
+                    value={form.imagePath ?? ''}
+                    onChange={(e) => patch({ imagePath: e.target.value || null })}
+                    placeholder="meals/jollof.jpg"
+                    style={{ fontFamily: 'var(--font-mono)' }}
+                  />
+                  <p className="form-field__help" style={{ margin: 0 }}>
+                    Upload via the Supabase dashboard → menu-images bucket, then paste the path here (no leading slash). Preview updates as you type.
+                  </p>
+                </div>
+              </div>
             </div>
             <div className="form-field">
               <label className="form-field__label" htmlFor="m-order">
@@ -747,5 +753,47 @@ function AddonsEditor({
         + Add an add-on
       </button>
     </div>
+  );
+}
+
+function ImagePreview({ path, alt }: { path: string | null | undefined; alt: string }) {
+  const trimmed = path?.trim() ?? '';
+  const url = trimmed ? getStorageUrl(trimmed) : '';
+  const [errored, setErrored] = useState(false);
+  // Reset error when the path changes so the user gets fresh feedback.
+  const key = url || 'empty';
+  const baseStyle: React.CSSProperties = {
+    width: 160,
+    height: 160,
+    borderRadius: 2,
+    border: '1px solid var(--color-rule)',
+    background: 'var(--color-cream)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    textAlign: 'center',
+    fontFamily: 'var(--font-serif)',
+    fontSize: 12,
+    fontStyle: 'italic',
+    color: 'var(--color-ink-muted)',
+    padding: 8,
+  };
+  if (!url) {
+    return <div style={baseStyle}>No image yet</div>;
+  }
+  if (errored) {
+    return <div style={{ ...baseStyle, borderColor: '#8B2A1A', color: '#8B2A1A' }}>Couldn&apos;t load image at this path</div>;
+  }
+  return (
+    // eslint-disable-next-line @next/next/no-img-element
+    <img
+      key={key}
+      src={url}
+      alt={alt}
+      onError={() => setErrored(true)}
+      onLoad={() => setErrored(false)}
+      style={{ width: 160, height: 160, objectFit: 'cover', borderRadius: 2, border: '1px solid var(--color-rule)' }}
+    />
   );
 }
