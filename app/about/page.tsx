@@ -97,7 +97,7 @@ export default async function AboutPage() {
           <div className="container">
             <SectionHead
               eyebrow="How we got here"
-              title={<>Cooked in <em>Lagos.</em> Plated in <em>Middlesbrough.</em></>}
+              title={<>Recipes from <em>Lagos.</em> Cooked in <em>Middlesbrough.</em></>}
               className="mb-10"
             />
             <article className="mx-auto max-w-[680px] font-serif text-[18px] leading-[1.65] text-walnut [&_em]:italic [&_p]:m-0 [&_p+p]:mt-4 [&_b]:font-medium">
