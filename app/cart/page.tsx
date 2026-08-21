@@ -4,6 +4,7 @@ import SiteFooter from '@/components/layout/SiteFooter';
 import CartContents from '@/components/cart/CartContents';
 import { siteConfig } from '@/constants/siteConfig';
 import { getActiveZones } from '@/lib/data/zones';
+import { getHours } from '@/lib/data/hours';
 
 export const metadata: Metadata = {
   title: 'Your basket',
@@ -14,7 +15,7 @@ export default async function CartPage() {
   // Show a "from £X" delivery indicator computed from the cheapest active
   // zone in the admin-controlled `delivery_zones` table — the customer
   // hasn't entered a postcode yet, so we can't bind the exact fee.
-  const zones = await getActiveZones();
+  const [zones, hours] = await Promise.all([getActiveZones(), getHours()]);
   // When zones haven't loaded (cold cache + DB down) we hide the "from"
   // indicator rather than show a stale business value.
   const minDeliveryFee = zones.length > 0 ? Math.min(...zones.map((z) => z.baseFeeGbp)) : null;
@@ -38,7 +39,7 @@ export default async function CartPage() {
         </nav>
 
         <section className="container py-[clamp(32px,5vw,56px)] pb-[clamp(48px,7vw,88px)]">
-          <CartContents minDeliveryFee={minDeliveryFee} />
+          <CartContents minDeliveryFee={minDeliveryFee} cutoffTime={hours.cutoffTime} />
         </section>
       </main>
       <SiteFooter />

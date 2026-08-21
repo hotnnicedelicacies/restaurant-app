@@ -12,6 +12,7 @@ import ProfileForm from '@/components/account/ProfileForm';
 import PasswordForm from '@/components/account/PasswordForm';
 import CloseAccountCard from '@/components/account/CloseAccountCard';
 import OrderHistory, { type OrderHistoryRow } from '@/components/account/OrderHistory';
+import { getHours } from '@/lib/data/hours';
 
 export const metadata: Metadata = {
   title: 'My account',
@@ -79,6 +80,7 @@ export default async function AccountPage() {
   }));
 
   const memberSince = user.created_at ? formatLongDate(user.created_at) : '';
+  const hours = await getHours();
   const [first = '', last = ''] = (profile?.display_name ?? '').split(' ', 2);
   const friendlyFirst = first || 'friend';
 
@@ -109,7 +111,7 @@ export default async function AccountPage() {
                 title={<>Your <em>orders</em></>}
                 count={`${orders.length} order${orders.length === 1 ? '' : 's'}`}
               >
-                <OrderHistory orders={orders} />
+                <OrderHistory orders={orders} cutoffTime={hours.cutoffTime} />
               </AccountSection>
 
               <AccountSection

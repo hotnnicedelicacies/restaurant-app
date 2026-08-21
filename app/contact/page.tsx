@@ -154,7 +154,7 @@ export default async function ContactPage() {
                   <p className="m-0 mt-3 border-t border-rule pt-3 font-serif text-[13.5px] italic text-ink-muted">
                     Order by{' '}
                     <b className="font-medium not-italic tracking-[0.08em] text-walnut [font-variant:small-caps]">
-                      10am
+                      {hours.cutoffTime}
                     </b>{' '}
                     for same-day delivery. Anything later goes onto the next day's list.
                   </p>

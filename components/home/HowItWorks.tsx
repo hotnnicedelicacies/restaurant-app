@@ -27,7 +27,8 @@ export default async function HowItWorks({
   const hours = await getHours();
   const defaultSteps: Step[] = steps ?? [
     {
-      title: 'Order by ten o\'clock',
+      // Cutoff comes from /admin/settings — never hardcode "ten o'clock" here.
+      title: `Order by ${hours.cutoffTime}`,
       body: `Browse today's kitchen and place your order online — ${hours.cutoffShort.toLowerCase()}.`,
     },
     {
@@ -36,7 +37,7 @@ export default async function HowItWorks({
     },
     {
       title: <>Delivered <em className="italic font-normal">hot</em></>,
-      body: `Brought to your door ${hours.timeLong}, ${hours.daysLong.toLowerCase()}.`,
+      body: `Brought to your door ${hours.timeLong}, ${hours.daysLong}.`,
     },
   ];
   return (

@@ -28,7 +28,14 @@ const STATUS_CLASS: Record<OrderHistoryRow['status'], string> = {
   cancelled: 'is-cancelled',
 };
 
-export default function OrderHistory({ orders }: { orders: OrderHistoryRow[] }) {
+export default function OrderHistory({
+  orders,
+  cutoffTime,
+}: {
+  orders: OrderHistoryRow[];
+  /** Same-day cutoff from admin settings ("6pm"), for the empty-state prompt. */
+  cutoffTime: string;
+}) {
   if (orders.length === 0) {
     return (
       <div className="mx-auto max-w-[480px] py-[clamp(48px,8vw,96px)] text-center">
@@ -39,7 +46,7 @@ export default function OrderHistory({ orders }: { orders: OrderHistoryRow[] }) 
           You haven&apos;t ordered <em>yet</em>.
         </h3>
         <p className="m-0 mb-7 font-serif text-[16px] italic leading-[1.5] text-ink-muted">
-          Browse today&apos;s bill of fare — order by 10am for same-day delivery.
+          Browse today&apos;s bill of fare — order by {cutoffTime} for same-day delivery.
         </p>
         <HeritageButton href={siteConfig.routes.menu} variant="primary">
           See today&apos;s menu

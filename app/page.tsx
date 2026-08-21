@@ -100,7 +100,7 @@ export default async function HomePage() {
               cooked from scratch, <em>delivered hot.</em>
             </>
           }
-          deck={`No shortcuts. No frozen meals. A five-star kitchen on its feet from ${hours.cutoffTime} every morning — bringing dinner to your door across Teesside.`}
+          deck="No shortcuts. No frozen meals. A five-star kitchen on its feet every morning — bringing dinner to your door across Teesside."
           primaryCta={{ label: "See today's menu", href: siteConfig.routes.menu }}
           secondaryCta={{
             label: 'or message us on WhatsApp',

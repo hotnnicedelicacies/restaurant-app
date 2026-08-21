@@ -126,7 +126,7 @@ export default async function AboutPage() {
                 We've earned a five-star food hygiene rating from the Food Standards Agency, which we
                 are quietly proud of and very rigorous about. Everything we cook — at home and on the
                 trailer — is halal. We deliver across Teesside,{' '}
-                {hours.daysLong.toLowerCase()}, {hours.timeLong}. {hours.cutoffShort.toLowerCase()},
+                {hours.daysLong}, {hours.timeLong}. {hours.cutoffShort.toLowerCase()},
                 and we'll have it at your door before dinner cools.
               </p>
               <p>That, more or less, is the whole story. The rest is in the pots.</p>
@@ -194,7 +194,7 @@ export default async function AboutPage() {
         <CtaBand
           eyebrow="Come for dinner"
           title={<>See what's <em>cooking today.</em></>}
-          sub="Browse today's bill of fare and place an order before ten for same-day delivery."
+          sub={`Browse today's bill of fare and place an order before ${hours.cutoffTime} for same-day delivery.`}
           cta={{ label: "View today's menu", href: siteConfig.routes.menu }}
           showChannels={false}
         />

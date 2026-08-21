@@ -15,8 +15,16 @@ import { useEffect, useState } from 'react';
  *                        at checkout. Null when zones haven't loaded
  *                        (cold cache + DB down) so we render "—" instead
  *                        of a stale business value.
+ * @param cutoffTime      Same-day cutoff from admin settings ("6pm"), for the
+ *                        empty-basket prompt.
  */
-export default function CartContents({ minDeliveryFee }: { minDeliveryFee: number | null }) {
+export default function CartContents({
+  minDeliveryFee,
+  cutoffTime,
+}: {
+  minDeliveryFee: number | null;
+  cutoffTime: string;
+}) {
   // Avoid hydration mismatch: zustand-persist reads from localStorage on mount
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -43,7 +51,7 @@ export default function CartContents({ minDeliveryFee }: { minDeliveryFee: numbe
           Nothing in your <em className="font-normal italic">basket</em> yet.
         </h2>
         <p className="m-0 mb-7 font-serif text-[16px] italic leading-[1.5] text-ink-muted">
-          Browse today's bill of fare — order by 10am for same-day delivery.
+          Browse today's bill of fare — order by {cutoffTime} for same-day delivery.
         </p>
         <HeritageButton href={siteConfig.routes.menu} variant="primary">
           See today's menu →

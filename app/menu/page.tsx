@@ -11,15 +11,18 @@ import { getContact } from '@/lib/data/contact';
 import { siteConfig } from '@/constants/siteConfig';
 import { absoluteUrl, formatGBP } from '@/lib/utils';
 
-export const metadata: Metadata = {
-  title: "Today's Menu",
-  description: `Today's menu at ${siteConfig.name} — Italian classics & West African home cooking, made fresh and delivered hot across Teesside. Order by 10am for same-day delivery.`,
-  alternates: { canonical: absoluteUrl(siteConfig.routes.menu) },
-  openGraph: {
-    title: `Today's Menu · ${siteConfig.name}`,
-    description: 'Italian & West African home cooking — delivered hot across Teesside.',
-    type: 'website',
-    images: [absoluteUrl('/og-image.jpg')],
+// Async so the cutoff in the description follows /admin/settings, not a hardcoded time.
+export async function generateMetadata(): Promise<Metadata> {
+  const hours = await getHours();
+  return {
+    title: "Today's Menu",
+    description: `Today's menu at ${siteConfig.name} — Italian classics & West African home cooking, made fresh and delivered hot across Teesside. ${hours.cutoffShort}.`,
+    alternates: { canonical: absoluteUrl(siteConfig.routes.menu) },
+    openGraph: {
+      title: `Today's Menu · ${siteConfig.name}`,
+      description: 'Italian & West African home cooking — delivered hot across Teesside.',
+      type: 'website',
+      images: [absoluteUrl('/og-image.jpg')],
   },
 };
 
@@ -110,8 +113,8 @@ export default async function MenuPage() {
           title={<>Tonight&apos;s dinner, <em>handled.</em></>}
           sub={
             minDeliveryFee !== null && cheapestZoneName
-              ? `Delivery from ${formatGBP(minDeliveryFee)} within ${cheapestZoneName}. Place your order before ten.`
-              : 'Place your order before ten.'
+              ? `Delivery from ${formatGBP(minDeliveryFee)} within ${cheapestZoneName}. Place your order before ${hours.cutoffTime}.`
+              : `Place your order before ${hours.cutoffTime}.`
           }
           cta={{ label: 'Review your basket', href: siteConfig.routes.cart }}
         />
