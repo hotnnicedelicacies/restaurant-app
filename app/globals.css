@@ -222,6 +222,9 @@ h1, h2, h3, h4, h5, h6 { font-family: var(--font-display); letter-spacing: -0.00
   transition: border-color 200ms ease, color 200ms ease;
 }
 .link-underline:hover { border-color: var(--color-walnut); }
+/* On walnut bands: cream text, bronze rule, rule brightens to cream on hover. */
+.link-underline--on-dark { color: var(--color-cream); border-color: var(--color-bronze); }
+.link-underline--on-dark:hover { border-color: var(--color-cream); }
 
 /* ============================================================
    HERO GRADIENT OVERLAY (kept for any legacy refs; consumed by hero pattern)

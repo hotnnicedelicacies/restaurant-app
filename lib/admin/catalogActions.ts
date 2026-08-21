@@ -7,6 +7,7 @@ import { HOURS_TAG } from '@/lib/data/hours';
 import { OPERATIONS_TAG } from '@/lib/data/operations';
 import { EMAIL_CONFIG_TAG } from '@/lib/data/emailConfig';
 import { CONTACT_TAG } from '@/lib/data/contact';
+import { TRAILER_TAG } from '@/lib/data/trailer';
 import { getServiceClient } from '@/lib/supabase/server';
 import { requireAdmin } from './auth';
 import type { VariantsBlob, AddonsBlob } from '@/lib/supabase/types';
@@ -321,5 +322,6 @@ export async function updateSetting(key: string, value: unknown): Promise<Result
   if (key === 'contact_email' || key === 'contact_phone') {
     revalidateTag(CONTACT_TAG, 'default');
   }
+  if (key === 'trailer') revalidateTag(TRAILER_TAG, 'default');
   return { ok: true };
 }

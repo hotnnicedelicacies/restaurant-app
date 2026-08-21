@@ -4,6 +4,7 @@ import SiteFooter from '@/components/layout/SiteFooter';
 import PageHero from '@/components/layout/PageHero';
 import DeliveryAreas from '@/components/home/DeliveryAreas';
 import ContactForm from '@/components/contact/ContactForm';
+import TrailerCard from '@/components/trailer/TrailerCard';
 import { siteConfig } from '@/constants/siteConfig';
 import { absoluteUrl } from '@/lib/utils';
 import { getHours, type WeekDay } from '@/lib/data/hours';
@@ -158,6 +159,9 @@ export default async function ContactPage() {
                     for same-day delivery. Anything later goes onto the next day's list.
                   </p>
                 </div>
+
+                {/* THE TRAILER */}
+                <TrailerCard className="mt-6" />
               </div>
 
               {/* RIGHT: form */}

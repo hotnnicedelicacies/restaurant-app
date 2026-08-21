@@ -6,6 +6,7 @@ import BillOfFare from '@/components/menu/BillOfFare';
 import HygieneSection from '@/components/home/HygieneSection';
 import KitchenStory from '@/components/home/KitchenStory';
 import HowItWorks from '@/components/home/HowItWorks';
+import TrailerSection from '@/components/trailer/TrailerSection';
 import DeliveryAreas from '@/components/home/DeliveryAreas';
 import CtaBand from '@/components/home/CtaBand';
 import { siteConfig } from '@/constants/siteConfig';
@@ -129,6 +130,8 @@ export default async function HomePage() {
             </>
           }
         />
+
+        <TrailerSection />
 
         <HowItWorks />
 

@@ -4,12 +4,15 @@ import SiteHeader from '@/components/layout/SiteHeader';
 import SiteFooter from '@/components/layout/SiteFooter';
 import PageHero from '@/components/layout/PageHero';
 import HygieneSection from '@/components/home/HygieneSection';
+import KitchenStory from '@/components/home/KitchenStory';
 import CtaBand from '@/components/home/CtaBand';
 import SectionHead from '@/components/ui/SectionHead';
 import { siteConfig } from '@/constants/siteConfig';
 import { absoluteUrl, romanLower } from '@/lib/utils';
 import { getHours } from '@/lib/data/hours';
+import { getTrailer } from '@/lib/data/trailer';
 import portraitImg from '@/assets/meals/jollof-rice-with-protein-of-choice-and-plantain.jpeg';
+import trailerImg from '@/assets/trailer/trailer-parkway.jpg';
 
 export const metadata: Metadata = {
   title: 'About',
@@ -42,7 +45,7 @@ const PILLARS = [
 ];
 
 export default async function AboutPage() {
-  const hours = await getHours();
+  const [hours, trailer] = await Promise.all([getHours(), getTrailer()]);
   return (
     <>
       <SiteHeader />
@@ -121,7 +124,8 @@ export default async function AboutPage() {
               </p>
               <p>
                 We've earned a five-star food hygiene rating from the Food Standards Agency, which we
-                are quietly proud of and very rigorous about. We deliver across Teesside,{' '}
+                are quietly proud of and very rigorous about. Everything we cook — at home and on the
+                trailer — is halal. We deliver across Teesside,{' '}
                 {hours.daysLong.toLowerCase()}, {hours.timeLong}. {hours.cutoffShort.toLowerCase()},
                 and we'll have it at your door before dinner cools.
               </p>
@@ -129,6 +133,35 @@ export default async function AboutPage() {
             </article>
           </div>
         </section>
+
+        {/* The trailer */}
+        {trailer.enabled && (
+          <KitchenStory
+            reverse
+            image={trailerImg}
+            imageAlt={`The ${siteConfig.shortName} trailer — ${trailer.venue}, ${trailer.area}`}
+            imageAspect="landscape"
+            imageCaption={`${trailer.venue} · ${trailer.postcode}`}
+            eyebrow="And then, a trailer"
+            title={<>The same pots, <em>on wheels.</em></>}
+            body={
+              <>
+                <p>
+                  These days there&apos;s also a trailer — a black box of a kitchen with two hatches and
+                  the same pans we cook from at home, parked up in {trailer.area.split(',')[0]}. Walk
+                  up, order, eat it hot.
+                </p>
+                <p>
+                  <b>Where</b> — {trailer.venue}, {trailer.area} {trailer.postcode}.
+                  <br />
+                  <b>When</b> — {trailer.daysLong}, {trailer.timeLong}.
+                  {trailer.note ? ` ${trailer.note}` : ''}
+                </p>
+              </>
+            }
+            link={{ label: 'Find the trailer on Maps →', href: trailer.mapsHref, external: true }}
+          />
+        )}
 
         {/* Three house rules */}
         <section className="py-[clamp(56px,8vw,96px)]">

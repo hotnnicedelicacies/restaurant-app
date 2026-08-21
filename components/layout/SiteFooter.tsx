@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { siteConfig } from '@/constants/siteConfig';
 import { getHours } from '@/lib/data/hours';
 import { getContact } from '@/lib/data/contact';
+import { getTrailer } from '@/lib/data/trailer';
 
 /**
  * Customer-facing footer. Walnut band, four columns on desktop, stacks on
@@ -10,7 +11,7 @@ import { getContact } from '@/lib/data/contact';
  * practice (always-visible, one click away).
  */
 export default async function SiteFooter() {
-  const [hours, contact] = await Promise.all([getHours(), getContact()]);
+  const [hours, contact, trailer] = await Promise.all([getHours(), getContact(), getTrailer()]);
   return (
     <footer className="border-t border-[rgba(241,229,205,0.22)] bg-walnut pt-14 pb-6 text-cream">
       <div className="container">
@@ -83,6 +84,21 @@ export default async function SiteFooter() {
             <span>{hours.daysLong}</span>
             <span>{hours.timeLong}</span>
             <span>{hours.cutoffShort}</span>
+            {trailer.enabled && (
+              <span className="mt-2 block border-t border-[rgba(241,229,205,0.22)] pt-3 font-medium tracking-[0.16em] text-bronze [font-variant:small-caps]">
+                The trailer
+              </span>
+            )}
+            {trailer.enabled && (
+              <a href={trailer.mapsHref} target="_blank" rel="noopener noreferrer">
+                {trailer.venue}, {trailer.area.split(',')[0]}
+              </a>
+            )}
+            {trailer.enabled && (
+              <span>
+                {trailer.daysShort} · {trailer.timeLong}
+              </span>
+            )}
           </FooterColumn>
         </div>
 
@@ -114,7 +130,7 @@ function FooterColumn({ title, children }: { title: string; children: React.Reac
       </h4>
       <ul className="m-0 flex list-none flex-col gap-2.5 p-0 font-serif text-[15px] text-[#F1E5CDD2] [&_a]:transition-colors [&_a:hover]:text-bronze">
         {Array.isArray(children)
-          ? children.map((child, i) => <li key={i}>{child}</li>)
+          ? children.filter(Boolean).map((child, i) => <li key={i}>{child}</li>)
           : <li>{children}</li>}
       </ul>
     </div>

@@ -2,6 +2,7 @@ import { getServiceClient } from '@/lib/supabase/server';
 import SettingsForm from './SettingsForm';
 import { getHours, type WeekDay } from '@/lib/data/hours';
 import { getContact } from '@/lib/data/contact';
+import { sanitizeTrailer, TRAILER_DEFAULTS, type TrailerBlob } from '@/lib/data/trailer';
 
 interface HoursBlob {
   days: WeekDay[];
@@ -19,6 +20,7 @@ interface SettingsBlob {
   contact_email?: string;
   global_min_order_gbp?: number;
   hours?: HoursBlob;
+  trailer?: TrailerBlob;
 }
 
 export default async function AdminSettingsPage() {
@@ -48,6 +50,7 @@ export default async function AdminSettingsPage() {
       close: hoursFallback.close,
       sameDayCutoff: hoursFallback.sameDayCutoff,
     },
+    trailer: map.has('trailer') ? sanitizeTrailer(map.get('trailer')) : TRAILER_DEFAULTS,
   };
 
   return <SettingsForm initial={initial} />;

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { updateSetting } from '@/lib/admin/catalogActions';
 import SettingsSidebar from '@/components/admin/SettingsSidebar';
+import { TRAILER_DEFAULTS, type TrailerBlob } from '@/lib/data/trailer';
 
 type WeekDay =
   | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday' | 'Sunday';
@@ -25,6 +26,7 @@ interface SettingsBlob {
   contact_email?: string;
   global_min_order_gbp?: number;
   hours?: HoursBlob;
+  trailer?: TrailerBlob;
 }
 
 const ALL_DAYS: WeekDay[] = [
@@ -69,6 +71,20 @@ export default function SettingsForm({ initial }: { initial: SettingsBlob }) {
     patch({ hours: { ...hours, days: ALL_DAYS.filter((d) => next.has(d)) } });
   }
 
+  const trailer: TrailerBlob = form.trailer ?? TRAILER_DEFAULTS;
+  const trailerDays = new Set<WeekDay>(trailer.days);
+
+  function patchTrailer(p: Partial<TrailerBlob>) {
+    patch({ trailer: { ...trailer, ...p } });
+  }
+
+  function toggleTrailerDay(day: WeekDay) {
+    const next = new Set(trailerDays);
+    if (next.has(day)) next.delete(day);
+    else next.add(day);
+    patchTrailer({ days: ALL_DAYS.filter((d) => next.has(d)) });
+  }
+
   return (
     <>
       <div className="admin-page-head">
@@ -99,6 +115,7 @@ export default function SettingsForm({ initial }: { initial: SettingsBlob }) {
             { href: '#contact', sectionId: 'contact', label: 'Contact' },
             { href: '#flags', sectionId: 'flags', label: 'Operational toggles' },
             { href: '#operations', sectionId: 'operations', label: 'Operations' },
+            { href: '#trailer', sectionId: 'trailer', label: 'The trailer' },
             { href: '/admin/settings/advanced', label: 'Advanced & security →', separated: true },
           ]}
         />
@@ -285,6 +302,147 @@ export default function SettingsForm({ initial }: { initial: SettingsBlob }) {
                 step={1}
                 value={form.global_min_order_gbp ?? 10}
                 onChange={(e) => patch({ global_min_order_gbp: Number(e.target.value) })}
+              />
+            </div>
+          </section>
+
+          {/* TRAILER */}
+          <section id="trailer" className="form-section">
+            <header className="form-section__head">
+              <h2 className="form-section__title">
+                The <em>trailer</em>
+              </h2>
+              <span className="form-section__num">№ 05</span>
+            </header>
+            <p className="t-body-muted" style={{ margin: '0 0 18px' }}>
+              Where the trailer parks and when it trades. Shown on the home page, the contact page,
+              About, and the footer — switch it off to hide every mention at once.
+            </p>
+
+            <RowToggle
+              label="Show the trailer on the site"
+              description="Off the road for a while? Turn this off and the trailer disappears everywhere."
+              checked={trailer.enabled}
+              onChange={(v) => patchTrailer({ enabled: v })}
+            />
+
+            <div className="form-grid" style={{ marginTop: 20 }}>
+              <div className="form-field">
+                <label className="form-field__label" htmlFor="trailer-venue">
+                  Venue
+                </label>
+                <input
+                  id="trailer-venue"
+                  className="form-field__input"
+                  type="text"
+                  placeholder="Front of Tesco Extra"
+                  value={trailer.venue}
+                  onChange={(e) => patchTrailer({ venue: e.target.value })}
+                />
+              </div>
+              <div className="form-field">
+                <label className="form-field__label" htmlFor="trailer-area">
+                  Area
+                </label>
+                <input
+                  id="trailer-area"
+                  className="form-field__input"
+                  type="text"
+                  placeholder="Coulby Newham, Middlesbrough"
+                  value={trailer.area}
+                  onChange={(e) => patchTrailer({ area: e.target.value })}
+                />
+              </div>
+              <div className="form-field">
+                <label className="form-field__label" htmlFor="trailer-postcode">
+                  Postcode
+                </label>
+                <input
+                  id="trailer-postcode"
+                  className="form-field__input"
+                  type="text"
+                  placeholder="TS8 0TJ"
+                  value={trailer.postcode}
+                  onChange={(e) => patchTrailer({ postcode: e.target.value.toUpperCase() })}
+                />
+              </div>
+              <div className="form-field">
+                <label className="form-field__label" htmlFor="trailer-maps">
+                  Map link <small>· optional</small>
+                </label>
+                <input
+                  id="trailer-maps"
+                  className="form-field__input"
+                  type="url"
+                  placeholder="https://maps.app.goo.gl/…"
+                  value={trailer.mapsUrl}
+                  onChange={(e) => patchTrailer({ mapsUrl: e.target.value })}
+                />
+                <span className="form-field__help">
+                  Leave empty to link a Google Maps search for the address above.
+                </span>
+              </div>
+            </div>
+
+            <div className="form-field" style={{ marginTop: 20 }}>
+              <span className="form-field__label">Trading days</span>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginTop: 6 }}>
+                {ALL_DAYS.map((day) => {
+                  const on = trailerDays.has(day);
+                  return (
+                    <button
+                      key={day}
+                      type="button"
+                      aria-pressed={on}
+                      onClick={() => toggleTrailerDay(day)}
+                      className={`admin-filter ${on ? 'is-active' : ''}`}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {day.slice(0, 3)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="form-grid" style={{ marginTop: 16 }}>
+              <div className="form-field">
+                <label className="form-field__label" htmlFor="trailer-open">
+                  Opens
+                </label>
+                <input
+                  id="trailer-open"
+                  className="form-field__input"
+                  type="time"
+                  value={trailer.open}
+                  onChange={(e) => patchTrailer({ open: e.target.value })}
+                />
+              </div>
+              <div className="form-field">
+                <label className="form-field__label" htmlFor="trailer-close">
+                  Closes
+                </label>
+                <input
+                  id="trailer-close"
+                  className="form-field__input"
+                  type="time"
+                  value={trailer.close}
+                  onChange={(e) => patchTrailer({ close: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div className="form-field" style={{ marginTop: 16 }}>
+              <label className="form-field__label" htmlFor="trailer-note">
+                Note <small>· optional, one line</small>
+              </label>
+              <input
+                id="trailer-note"
+                className="form-field__input"
+                type="text"
+                placeholder="e.g. Closed bank holidays."
+                value={trailer.note}
+                onChange={(e) => patchTrailer({ note: e.target.value })}
               />
             </div>
           </section>

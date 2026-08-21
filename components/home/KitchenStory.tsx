@@ -10,10 +10,14 @@ interface Props {
   title: React.ReactNode;
   /** Body — can be multiple <p> elements. */
   body: React.ReactNode;
-  /** Optional link below body. */
-  link?: { label: string; href: string };
+  /** Optional link below body. `external` opens in a new tab. */
+  link?: { label: string; href: string; external?: boolean };
   /** Reverse the column order. */
   reverse?: boolean;
+  /** Portrait (4:5, default) suits plated food; landscape (16:10) suits places and vehicles. */
+  imageAspect?: 'portrait' | 'landscape';
+  /** Small mono caption under the image. */
+  imageCaption?: string;
 }
 
 /**
@@ -29,25 +33,34 @@ export default function KitchenStory({
   body,
   link = { label: 'Read our story →', href: siteConfig.routes.about },
   reverse,
+  imageAspect = 'portrait',
+  imageCaption,
 }: Props) {
+  const landscape = imageAspect === 'landscape';
   return (
     <section className="bg-cream-soft py-[clamp(56px,8vw,96px)]">
       <div className="container">
         <div
           className={`mx-auto grid max-w-[1100px] items-center gap-[clamp(40px,6vw,80px)] md:grid-cols-[1.1fr_1fr] ${reverse ? 'md:[&>div:first-child]:order-2' : ''}`}
         >
-          <div className="relative">
+          <div className="relative isolate">
             <Image
               src={image}
               alt={imageAlt}
-              width={900}
-              height={1125}
-              className="aspect-[4/5] w-full rounded-[2px] object-cover"
+              width={landscape ? 1600 : 900}
+              height={landscape ? 1000 : 1125}
+              sizes="(min-width: 768px) 52vw, 100vw"
+              className={`${landscape ? 'aspect-[16/10]' : 'aspect-[4/5]'} w-full rounded-[2px] object-cover`}
             />
             <div
               aria-hidden
               className="pointer-events-none absolute -bottom-4 -right-4 left-4 top-4 -z-10 rounded-[2px] border border-bronze opacity-40"
             />
+            {imageCaption && (
+              <p className="m-0 mt-6 ml-7 font-mono text-[10px] uppercase tracking-[0.2em] text-bronze-deep">
+                {imageCaption}
+              </p>
+            )}
           </div>
           <div className="flex flex-col gap-5">
             {eyebrow && (
@@ -61,11 +74,21 @@ export default function KitchenStory({
             <div className="font-serif text-[17px] leading-[1.6] text-ink-muted [&_b]:font-medium [&_b]:text-walnut [&_em]:italic [&_em]:text-walnut [&_p]:m-0 [&_p+p]:mt-4">
               {body}
             </div>
-            {link && (
-              <Link href={link.href} className="link-underline w-fit">
-                {link.label}
-              </Link>
-            )}
+            {link &&
+              (link.external ? (
+                <a
+                  href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link-underline w-fit"
+                >
+                  {link.label}
+                </a>
+              ) : (
+                <Link href={link.href} className="link-underline w-fit">
+                  {link.label}
+                </Link>
+              ))}
           </div>
         </div>
       </div>

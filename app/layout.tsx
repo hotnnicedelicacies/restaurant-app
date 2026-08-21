@@ -5,6 +5,7 @@ import { absoluteUrl } from '@/lib/utils';
 import { getHours } from '@/lib/data/hours';
 import { getActiveZones } from '@/lib/data/zones';
 import { getContact } from '@/lib/data/contact';
+import { getTrailer } from '@/lib/data/trailer';
 import { Toaster } from 'sonner';
 import CookieBanner from '@/components/CookieBanner';
 import './globals.css';
@@ -121,7 +122,40 @@ function buildRestaurantSchema(
   hours: { days: string[]; open: string; close: string },
   areaServedNames: string[],
   contact: { phone: string; email: string },
+  trailer: {
+    enabled: boolean;
+    venue: string;
+    area: string;
+    postcode: string;
+    mapsHref: string;
+    days: string[];
+    open: string;
+    close: string;
+  },
 ) {
+  // The home kitchen's address stays private; the trailer is the one
+  // public place customers can walk up to, so it carries the street-level
+  // `location` (with its own hours) for search engines.
+  const trailerPlace = trailer.enabled
+    ? {
+        '@type': 'Place',
+        name: `${siteConfig.name} — the trailer`,
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: trailer.venue,
+          addressLocality: trailer.area,
+          postalCode: trailer.postcode,
+          addressCountry: 'GB',
+        },
+        hasMap: trailer.mapsHref,
+        openingHoursSpecification: {
+          '@type': 'OpeningHoursSpecification',
+          dayOfWeek: trailer.days,
+          opens: trailer.open,
+          closes: trailer.close,
+        },
+      }
+    : undefined;
   return {
   '@context': 'https://schema.org',
   '@type': 'FoodEstablishment',
@@ -134,7 +168,8 @@ function buildRestaurantSchema(
   image: absoluteUrl('/og-image.jpg'),
   logo: absoluteUrl('/logo.png'),
   priceRange: '££',
-  servesCuisine: ['Italian', 'West African', 'British', 'International'],
+  servesCuisine: ['Italian', 'West African', 'British', 'International', 'Halal'],
+  location: trailerPlace,
   hasMenu: absoluteUrl('/menu'),
   paymentAccepted: 'Credit Card, Debit Card, Cash',
   currenciesAccepted: 'GBP',
@@ -169,10 +204,11 @@ function buildRestaurantSchema(
 export default async function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
-  const [hours, zones, contact] = await Promise.all([
+  const [hours, zones, contact, trailer] = await Promise.all([
     getHours(),
     getActiveZones(),
     getContact(),
+    getTrailer(),
   ]);
   // Empty list = render no `areaServed`. Schema spec allows omission and a
   // wrong/stale list is worse for SEO than absence.
@@ -181,6 +217,7 @@ export default async function RootLayout({
     { days: hours.days, open: hours.open, close: hours.close },
     areaServed,
     contact,
+    trailer,
   );
   return (
     <html

@@ -46,7 +46,8 @@ export interface HoursView {
   cutoffShort: string;
 }
 
-function formatHour(hhmm: string): { short: string; long: string } {
+/** "12:00" → { short: "12", long: "12pm" }. Shared with `trailer.ts`. */
+export function formatHour(hhmm: string): { short: string; long: string } {
   const [hStr] = hhmm.split(':');
   const h = Number(hStr);
   if (Number.isNaN(h)) return { short: hhmm, long: hhmm };

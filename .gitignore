@@ -44,3 +44,6 @@ next-env.d.ts
 /hotn*
 # Supabase CLI link state (written by `supabase link`)
 supabase/.temp/
+
+# Raw source photos/videos handed over for reference only
+not-commited/
