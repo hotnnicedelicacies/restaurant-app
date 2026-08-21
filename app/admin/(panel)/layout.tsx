@@ -19,6 +19,7 @@ const NAV = [
   { href: '/admin/categories', label: 'Categories' },
   { href: '/admin/zones', label: 'Delivery zones' },
   { href: '/admin/payments', label: 'Payments' },
+  { href: '/admin/feedback', label: 'Feedback' },
   { href: '/admin/settings', label: 'Settings' },
 ];
 
@@ -31,18 +32,30 @@ export default async function AdminPanelLayout({ children }: { children: React.R
   // trading hours. The pill is a notification, not a control — admin
   // pauses the store via /admin/settings (store_open flag).
   const svc = getServiceClient();
-  const [{ data: profile }, { data: storeOpenRow }, { data: liveOrders }, hours] = await Promise.all([
+  const [
+    { data: profile },
+    { data: storeOpenRow },
+    { data: liveOrders },
+    { count: openFeedback },
+    hours,
+  ] = await Promise.all([
     svc.from('profiles').select('display_name').eq('id', user.id).single(),
     svc.from('settings').select('value').eq('key', 'store_open').maybeSingle(),
     svc
       .from('orders')
       .select('status')
       .in('status', ['received', 'preparing', 'on_its_way']),
+    svc.from('feedback').select('id', { count: 'exact', head: true }).eq('handled', false),
     getHours(),
   ]);
 
   const displayName = profile?.display_name ?? user.email ?? 'Admin';
   const liveCount = (liveOrders ?? []).length;
+  // Nav badges — live orders + unhandled private feedback.
+  const navCounts: Record<string, number> = {
+    '/admin/orders': liveCount,
+    '/admin/feedback': openFeedback ?? 0,
+  };
 
   // Compute whether the kitchen is currently within trading hours.
   // (The store_open setting is a hard manual override on top.)
@@ -105,7 +118,7 @@ export default async function AdminPanelLayout({ children }: { children: React.R
                 <AdminNavLink
                   key={n.href}
                   href={n.href}
-                  count={n.href === '/admin/orders' && liveCount > 0 ? liveCount : undefined}
+                  count={(navCounts[n.href] ?? 0) > 0 ? navCounts[n.href] : undefined}
                 >
                   {n.label}
                 </AdminNavLink>
@@ -133,7 +146,7 @@ export default async function AdminPanelLayout({ children }: { children: React.R
         <div className="container">
           {siteConfig.shortName} Admin · v1.0 · Signed in as{' '}
           <b style={{ color: 'rgba(241, 229, 205, 0.85)', fontWeight: 500 }}>{displayName}</b> ·{' '}
-          <a
+          <Link
             href="/"
             style={{
               color: 'rgba(241, 229, 205, 0.7)',
@@ -142,7 +155,7 @@ export default async function AdminPanelLayout({ children }: { children: React.R
             }}
           >
             View customer site →
-          </a>
+          </Link>
         </div>
       </footer>
     </div>

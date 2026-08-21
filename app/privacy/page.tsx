@@ -21,7 +21,7 @@ export default async function PrivacyPage() {
           Privacy <em>Policy</em>
         </>
       }
-      updatedLine="Last updated: 11 May 2026 · UK GDPR · Data Protection Act 2018"
+      updatedLine="Last updated: 21 August 2026 · UK GDPR · Data Protection Act 2018"
       tags={[
         // { label: 'Template — for lawyer review before publication', warning: true },
         { label: 'UK GDPR + Data Protection Act 2018' },
@@ -115,7 +115,29 @@ export default async function PrivacyPage() {
         <li>Order history (linked from orders above)</li>
       </ul>
 
-      <h3>2.3 Technical data (everyone)</h3>
+      <h3>2.3 When you send us feedback from our review page</h3>
+      <ul>
+        <li>
+          <b>Your message</b> — whatever you choose to write
+        </li>
+        <li>
+          <b>Your name and a phone number or email</b> — both optional; we only ask so we can
+          reply about your order
+        </li>
+        <li>
+          <b>Which sticker or link you scanned</b> (e.g. trailer, box, WhatsApp) — so we know
+          where our customers find us. No IP address, device detail or cookie is recorded with it
+        </li>
+      </ul>
+      <p>
+        Choosing to leave a public Google review happens on Google&apos;s site under{' '}
+        <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
+          Google&apos;s privacy policy
+        </a>
+        ; we never see your Google account details, and we never offer rewards for reviews.
+      </p>
+
+      <h3>2.4 Technical data (everyone)</h3>
       <ul>
         <li>IP address (abuse prevention, never sold or shared for advertising)</li>
         <li>Browser type, device type, referring page</li>
@@ -126,7 +148,7 @@ export default async function PrivacyPage() {
       </ul>
 
       <h3>
-        2.4 What we do <em>not</em> collect
+        2.5 What we do <em>not</em> collect
       </h3>
       <ul>
         <li>We do not collect financial data beyond what Stripe handles</li>
@@ -174,6 +196,10 @@ export default async function PrivacyPage() {
           <tr>
             <td>Communicate about your order via phone, WhatsApp, or email</td>
             <td>Contract / legitimate interest</td>
+          </tr>
+          <tr>
+            <td>Read, and where you've left a contact, reply to feedback sent via our review page</td>
+            <td>Legitimate interest (Article 6(1)(f))</td>
           </tr>
         </tbody>
       </table>
@@ -260,6 +286,9 @@ export default async function PrivacyPage() {
         </li>
         <li>
           <b>Marketing preferences:</b> until you opt out
+        </li>
+        <li>
+          <b>Feedback sent via our review page:</b> 12 months, then deleted — sooner if you ask
         </li>
         <li>
           <b>Server logs:</b> 30 days

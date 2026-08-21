@@ -38,6 +38,8 @@ app/
   sign-in, sign-up, forgot-password, auth/(callback,reset-password)
   account/                  — sidebar + sections (orders, addresses, profile). AddressManager handles CRUD.
   privacy, terms, refund-policy, cookie-notice — UK GDPR/PECR templates
+  review/                   — QR-code landing page: Google review card (env-gated) + private feedback form
+    google/route.ts         — logs google_click, 302s to the Google composer (or back to /review if unconfigured)
   api/
     zones/check/            — postcode → zone lookup
     stripe/webhook/         — 4-event handler (PI succeeded/failed, charge refunded/dispute)
@@ -56,6 +58,7 @@ app/
       categories/           — modal CRUD
       zones/                — modal CRUD with chip-input postcodes + monthly orders stat
       payments/             — KPI stats + tabs (Stripe / COD / Refunds) + search/filter
+      feedback/             — private feedback triage (open / handled) + 30-day review-page analytics by source
       settings/             — sidebar layout (hours/contact/flags/operations) + advanced/ page
 
 lib/
@@ -85,6 +88,12 @@ lib/
     orderActions.ts         — updateOrderStatus, markCodCollected, refundOrder, adminCancelOrder, addKitchenNote, syncStripePayment
     catalogActions.ts       — categories/zones/menu/settings CRUD + revalidateTag invalidation
     dataExport.ts           — dataset summaries for /admin/settings/advanced
+    feedbackActions.ts      — setFeedbackHandled (mark handled / reopen)
+  review/
+    source.ts               — `src` whitelist (truck/box/receipt/whatsapp/email/site) + parser + labels
+    events.ts               — logReviewEvent → review_events (cookieless, best-effort)
+    google.ts               — getGoogleReviewUrl() from GOOGLE_REVIEW_URL / GOOGLE_PLACE_ID
+    feedback.ts             — submitFeedback server action (useActionState shape; insert, then email + webhook in after())
   account/
     addresses.ts            — addAddress, deleteAddress (Zod)
   contact/
@@ -171,6 +180,8 @@ Large chunks of `design-explorations/shared/styles.css` are copied into `app/glo
 18. **siteConfig.ts is brand-static only — every business value comes from a DB fetcher.** No `contact.*`, `delivery.*`, `hours.*`, or `email.*` lives in siteConfig anymore. Customer-facing surfaces pull from fetchers in `lib/data/*` (`getContact`, `getHours`, `getActiveZones`, `getEmailConfig`, `getOperations`), each cached with its own tag. The fetchers carry their own deploy-time defaults inline so siteConfig doesn't double as a "fallback business value" file. Customer pages with WhatsApp/phone/email links (`/`, `/menu`, `/contact`, `/checkout`, `/track/[ref]`, `/receipt/[ref]`, `/cookie-notice`, `/privacy`, `/refund-policy`, `/terms`) are async server components calling `getContact()`; the JSON-LD in `app/layout.tsx` does the same. `<SiteFooter>` is async and reads `getHours() + getContact()`. `<CtaBand>` is async and reads `getContact()` for channel links. `<ContactForm>` (client) takes `whatsappNumber` as a prop. `<CheckoutForm>` (client) takes `whatsappNumber` for its "outside delivery area" / "quote-only" WhatsApp escape hatches. The Resend `sendEmail` consumes `getEmailConfig().fromHeader`/`replyTo`; admin email notifications go to `getEmailConfig().notificationTo`. Email templates (`orderConfirmationEmail`, `statusUpdateEmail`, `cancellationEmail`, `welcomeEmail`) take an `EmailContext` `{ contactEmail, contactWhatsapp }` rather than reading siteConfig — every caller is responsible for fetching it. Adding a hardcoded business value to siteConfig will introduce drift the moment the admin updates the equivalent setting — **don't**. Brand-static fields that DO live in siteConfig: `name`, `shortName`, `tagline`, `domain`, `description`, `social`, `foodHygiene`, `voice`, `routes`.
 
 19. **Admin settings sidebars use IntersectionObserver scroll-spy.** `components/admin/SettingsSidebar.tsx` is the shared sidebar used by both `/admin/settings` and `/admin/settings/advanced`. It auto-highlights the section that's currently in view (rootMargin `-20% 0px -55% 0px`). The `.sticky-save-bar` in `AdvancedSettingsForm.tsx` lives **outside** the `.settings-layout` grid — putting it inside the grid as a 3rd child made it fall into a single column. Keep the bar as a sibling of `.settings-layout` (both inside the admin `.container` wrapper).
+
+20. **`/review` is the QR-code landing page (stickers on the trailer, boxes, WhatsApp follow-ups).** Rules: (a) **Never link to `/review/google` with `next/link`** — Link prefetches in-viewport hrefs, which would hit the route handler and log a phantom `google_click` on every page view. Use a plain `<a>`. (b) The Google card is gated at request time on `GOOGLE_REVIEW_URL` / `GOOGLE_PLACE_ID` — the page shipped before the Business Profile existed; the card appears on the first deploy after the env var lands, and until then `/review/google` bounces back to `/review`. (c) `view` / `google_click` / `feedback_submit` events are written inside `after()` so they never delay the response. Link-preview bots (WhatsApp / mail clients unfurling the URL) inflate `view` for those sources — treat scans-per-source as approximate; clicks and submits are the trustworthy numbers. (d) Private feedback goes to the `feedback` table, is emailed to `getEmailConfig().notificationTo` via Resend (same channel as the contact form), and is optionally POSTed to `FEEDBACK_WEBHOOK_URL`. Admin triages it at `/admin/feedback`; the nav badge is the unhandled count. (e) The `src` whitelist lives in `lib/review/source.ts` **and** as CHECK constraints in the migration — add new sources in both. (f) **No sentiment pre-filter, no review incentives, ever** — Google's review policy and the DMCC Act 2024 (in force April 2025) both prohibit it. Both cards are shown to everyone, Google first but visually equal.
 
 ## Confirmation modals
 

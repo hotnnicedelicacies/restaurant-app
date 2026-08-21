@@ -547,3 +547,46 @@ drop policy if exists "menu_images_admin_delete" on storage.objects;
 create policy "menu_images_admin_delete"
   on storage.objects for delete
   using (bucket_id = 'menu-images' and public.is_admin());
+
+-- =====================================================================
+-- Review page · private feedback + cookieless analytics
+-- (mirrors migrations/20260821000004_review_feedback.sql)
+-- =====================================================================
+
+create table if not exists public.feedback (
+  id          uuid primary key default gen_random_uuid(),
+  created_at  timestamptz not null default now(),
+  src         text not null default 'site'
+              check (src in ('truck', 'box', 'receipt', 'whatsapp', 'email', 'site')),
+  message     text not null check (char_length(message) between 1 and 2000),
+  name        text check (name is null or char_length(name) <= 80),
+  contact     text check (contact is null or char_length(contact) <= 120),
+  handled     boolean not null default false,
+  handled_at  timestamptz
+);
+
+create index if not exists idx_feedback_open on public.feedback (created_at desc) where handled = false;
+
+create table if not exists public.review_events (
+  id          uuid primary key default gen_random_uuid(),
+  created_at  timestamptz not null default now(),
+  event       text not null check (event in ('view', 'google_click', 'feedback_submit')),
+  src         text not null default 'site'
+              check (src in ('truck', 'box', 'receipt', 'whatsapp', 'email', 'site'))
+);
+
+create index if not exists idx_review_events_created on public.review_events (created_at desc);
+
+alter table public.feedback      enable row level security;
+alter table public.review_events enable row level security;
+
+drop policy if exists "feedback: admin all" on public.feedback;
+create policy "feedback: admin all"
+  on public.feedback for all
+  using (public.is_admin())
+  with check (public.is_admin());
+
+drop policy if exists "review_events: admin read" on public.review_events;
+create policy "review_events: admin read"
+  on public.review_events for select
+  using (public.is_admin());

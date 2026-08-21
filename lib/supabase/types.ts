@@ -228,6 +228,44 @@ export type Database = {
         Update: Partial<Database['public']['Tables']['kitchen_notes']['Insert']>;
         Relationships: [];
       };
+      /** Private feedback from `/review`. See migration 20260821000004. */
+      feedback: {
+        Row: {
+          id: string;
+          created_at: string;
+          src: ReviewSourceValue;
+          message: string;
+          name: string | null;
+          contact: string | null;
+          handled: boolean;
+          handled_at: string | null;
+        };
+        Insert: {
+          src: ReviewSourceValue;
+          message: string;
+          name?: string | null;
+          contact?: string | null;
+          handled?: boolean;
+          handled_at?: string | null;
+        };
+        Update: Partial<Database['public']['Tables']['feedback']['Insert']>;
+        Relationships: [];
+      };
+      /** Cookieless analytics for `/review` — no IP, no UA, no cookie. */
+      review_events: {
+        Row: {
+          id: string;
+          created_at: string;
+          event: 'view' | 'google_click' | 'feedback_submit';
+          src: ReviewSourceValue;
+        };
+        Insert: {
+          event: 'view' | 'google_click' | 'feedback_submit';
+          src: ReviewSourceValue;
+        };
+        Update: Partial<Database['public']['Tables']['review_events']['Insert']>;
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
     Functions: { [_ in never]: never };
@@ -235,6 +273,9 @@ export type Database = {
     CompositeTypes: { [_ in never]: never };
   };
 };
+
+/** Mirrors the CHECK constraint on feedback.src / review_events.src. Canonical list: lib/review/source.ts */
+export type ReviewSourceValue = 'truck' | 'box' | 'receipt' | 'whatsapp' | 'email' | 'site';
 
 /** Variants editor data shape — see admin-settings.md §4 */
 export interface VariantsBlob {
