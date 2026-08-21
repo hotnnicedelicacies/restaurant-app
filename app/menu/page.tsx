@@ -23,8 +23,9 @@ export async function generateMetadata(): Promise<Metadata> {
       description: 'Italian & West African home cooking — delivered hot across Teesside.',
       type: 'website',
       images: [absoluteUrl('/og-image.jpg')],
-  },
-};
+    },
+  };
+}
 
 const DIETARY_SCHEMA_MAP: Record<string, string> = {
   vegetarian: 'https://schema.org/VegetarianDiet',
