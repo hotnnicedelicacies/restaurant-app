@@ -1,0 +1,108 @@
+# Applies supabase/migrations/*.sql to the production Supabase project.
+#
+# Runs automatically when a migration lands on main, or by hand from the
+# Actions tab. Uses the Supabase CLI, which keeps a ledger of applied
+# migrations in `supabase_migrations.schema_migrations` on the database —
+# only files not yet in that ledger are executed, in filename order.
+#
+# ── ONE-TIME BASELINE (do this before the first real run) ──────────────
+# The first three migrations were applied by pasting setup.sql, so the
+# ledger doesn't know about them. Run this workflow manually once with
+# `mark_applied` set to:
+#
+#     20260511000001 20260511000002 20260511000003
+#
+# That records them as applied WITHOUT executing any SQL, then prints
+# the ledger. A baseline run never pushes; trigger it again (or push a
+# migration to main) to apply what's pending.
+#
+# ── Secrets (repo → Settings → Secrets and variables → Actions) ─────────
+#   SUPABASE_ACCESS_TOKEN  personal access token — supabase.com/dashboard/account/tokens
+#   SUPABASE_PROJECT_ID    project ref — the 20-character id in the dashboard URL
+#   SUPABASE_DB_PASSWORD   database password — Project Settings → Database
+#
+# The job runs in the `production` environment; add required reviewers
+# there if you want a manual approval gate before each apply.
+
+name: Supabase migrations
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'supabase/migrations/**'
+      - 'supabase/config.toml'
+      - '.github/workflows/supabase-migrations.yml'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run — list what would be applied, change nothing'
+        type: boolean
+        default: false
+      mark_applied:
+        description: 'Baseline only: space-separated migration versions to record as already applied (no SQL runs, no push)'
+        type: string
+        default: ''
+
+concurrency:
+  group: supabase-migrations
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    name: Apply to production
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 15
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_PROJECT_ID: ${{ secrets.SUPABASE_PROJECT_ID }}
+      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+      MARK_APPLIED: ${{ github.event_name == 'workflow_dispatch' && inputs.mark_applied || '' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Check secrets are present
+        run: |
+          missing=0
+          for v in SUPABASE_ACCESS_TOKEN SUPABASE_DB_PASSWORD SUPABASE_PROJECT_ID; do
+            if [ -z "${!v}" ]; then
+              echo "::error::Secret $v is not set"
+              missing=1
+            fi
+          done
+          exit $missing
+
+      - name: Link project
+        run: supabase link --project-ref "$SUPABASE_PROJECT_ID"
+
+      - name: Baseline ledger (one-time, manual)
+        if: env.MARK_APPLIED != ''
+        run: |
+          if ! [[ "$MARK_APPLIED" =~ ^[0-9]{14}( [0-9]{14})*$ ]]; then
+            echo "::error::mark_applied must be space-separated 14-digit versions, e.g. 20260511000001 20260511000002"
+            exit 1
+          fi
+          # shellcheck disable=SC2086
+          supabase migration repair --status applied $MARK_APPLIED
+
+      - name: Show migration ledger
+        run: supabase migration list
+
+      - name: Dry run
+        if: env.DRY_RUN == 'true' && env.MARK_APPLIED == ''
+        run: supabase db push --dry-run
+
+      - name: Apply pending migrations
+        if: env.DRY_RUN != 'true' && env.MARK_APPLIED == ''
+        run: supabase db push
+
+      - name: Ledger after apply
+        if: env.DRY_RUN != 'true' && env.MARK_APPLIED == ''
+        run: supabase migration list

@@ -140,7 +140,7 @@ Pre-deploy:
    - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
    - `RESEND_API_KEY`, `ORDER_FROM_EMAIL`, `ORDER_NOTIFICATION_EMAIL`
    - `NEXT_PUBLIC_SITE_URL` (set to live domain so sitemap + emails use absolute URLs)
-2. **Supabase**: ensure all 3 migrations are applied (`supabase/setup.sql` is the combined paste-once version). Confirm RLS is on. Verify `menu-images` storage bucket exists + is public.
+2. **Supabase**: ensure all migrations are applied. Going forward the `Supabase migrations` GitHub Action (`.github/workflows/supabase-migrations.yml`) runs `supabase db push` on merge to `main` — add the three secrets it documents, then dispatch it once with `mark_applied = 20260511000001 20260511000002 20260511000003` to baseline the ledger for the migrations that were pasted by hand. (`supabase/setup.sql` remains the combined paste-once version for a fresh project.) Confirm RLS is on. Verify `menu-images` storage bucket exists + is public.
 3. **Stripe webhook** at `https://hotnnicedelicacies.com/api/stripe/webhook` registered for: `payment_intent.succeeded`, `payment_intent.payment_failed`, `charge.refunded`, `charge.dispute.created`. Capture the signing secret into `STRIPE_WEBHOOK_SECRET`.
 4. **Resend domain** verified for `orders@hotnnicedelicacies.com` (DNS records: SPF, DKIM). Without this, emails go to spam or fail outright.
 5. **Admin user** seeded — `hotnnicedelicacies@gmail.com` is_admin=true (the seed `--create-admin` flag handles this).

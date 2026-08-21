@@ -1,0 +1,5 @@
+# Minimal Supabase CLI config. The CLI needs this file present to `link`
+# a project and `db push` migrations (see .github/workflows/supabase-migrations.yml).
+# Local-stack settings (ports, auth, studio) are intentionally omitted —
+# we develop against the hosted project, not `supabase start`.
+project_id = "hotndelicious"

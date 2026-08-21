@@ -118,7 +118,8 @@ components/
   auth/                     — AuthCard, PasswordInput
 
 supabase/
-  migrations/               — 3 SQL files: initial schema + RLS + storage
+  config.toml               — minimal CLI config (project_id only) so `supabase link` / `db push` work in CI
+  migrations/               — timestamped SQL files: schema, RLS, storage, review/feedback. Applied to prod by GitHub Action (see "Migrations")
   setup.sql                 — combined paste-once version
   seed/                     — data.ts + seed.mjs runner (ws polyfill for Node 20, --create-admin flag)
 
@@ -214,10 +215,19 @@ Don't use native `confirm()` / `alert()` anywhere in admin. Don't use `AlertDial
 5. Wrap destructive server actions in `ConfirmModal`.
 6. If the action mutates cached public data (menu, zones, hours), call `revalidateTag(MENU_TAG, 'default')` etc. inside the server action.
 
+## Migrations
+
+Production migrations are applied by **`.github/workflows/supabase-migrations.yml`** — it runs `supabase db push` on every push to `main` that touches `supabase/migrations/**`, and can be run by hand from the Actions tab (with a dry-run option). The CLI keeps a ledger of applied files in `supabase_migrations.schema_migrations` on the database and only executes files not in it.
+
+- **Adding a migration:** new file `supabase/migrations/<YYYYMMDDHHMMSS>_<slug>.sql` with a timestamp *newer than every existing file* (`db push` skips out-of-order files unless run with `--include-all`). Also: mirror the SQL into `supabase/setup.sql` (fresh-install paste-once script, keep it idempotent with `if not exists` / `drop policy if exists`), and hand-edit `lib/supabase/types.ts`. Then merge to `main` and watch the Action.
+- **Baseline caveat:** the first three migrations were applied by pasting `setup.sql`, so the ledger started empty. Before the first real run, dispatch the workflow once with `mark_applied = 20260511000001 20260511000002 20260511000003` — that records them as applied without executing SQL. A baseline run never pushes; the next push/dispatch applies what's pending.
+- **Secrets:** `SUPABASE_ACCESS_TOKEN`, `SUPABASE_PROJECT_ID`, `SUPABASE_DB_PASSWORD` in the repo's Actions secrets. The job runs in the `production` environment — add required reviewers there for an approval gate.
+- **Never** edit a migration file that has already been applied; add a new one. Don't paste SQL into the dashboard for anything that's also in `migrations/` — the ledger won't know and the next `db push` will fail on "already exists".
+
 ## Launch checklist (live in `HANDOFF.md`)
 
 - Env vars in Vercel: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `SUPABASE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `STRIPE_SECRET_KEY` (must start with `sk_`), `STRIPE_WEBHOOK_SECRET`, `RESEND_API_KEY`, `ORDER_FROM_EMAIL`, `ORDER_NOTIFICATION_EMAIL`, `NEXT_PUBLIC_SITE_URL`.
-- Supabase: all 3 migrations applied (`supabase/setup.sql`), `menu-images` bucket public, RLS on.
+- Supabase: all migrations applied (baseline the ledger once, then the `Supabase migrations` Action handles the rest — see "Migrations"), `menu-images` bucket public, RLS on.
 - Stripe webhook registered for the 4 events at the live URL.
 - Resend DNS verified (SPF / DKIM / DMARC).
 - Admin user seeded with `is_admin = true`.
