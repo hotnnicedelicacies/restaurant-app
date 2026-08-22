@@ -55,6 +55,8 @@ app/
       page.tsx              — redirects /admin → /admin/orders
       orders/               — list + [ref] detail (status controls, kitchen notes, payment controls)
       menu/                 — list + new + [id] edit (variants/addons editor matches design)
+        sheet/              — printable A4 menu sheet: preview page with Items (today/all) + Descriptions toggles, "Download PNG"
+          image/route.tsx   — the PNG itself via next/og (?scope&desc&download&scale). Admin-only (requireAdmin)
       categories/           — modal CRUD
       zones/                — modal CRUD with chip-input postcodes + monthly orders stat
       payments/             — KPI stats + tabs (Stripe / COD / Refunds) + search/filter
@@ -95,6 +97,12 @@ lib/
     events.ts               — logReviewEvent → review_events (cookieless, best-effort)
     google.ts               — getGoogleReviewUrl() from GOOGLE_REVIEW_URL / GOOGLE_PLACE_ID
     feedback.ts             — submitFeedback server action (useActionState shape; insert, then email + webhook in after())
+  menu-sheet/
+    layout.ts               — pure one-page packer: picks a type tier (L/ML/M/S/XS), balances two columns, truncates honestly. `layout.test.ts` runs with `npx tsx`
+    data.ts                 — buildSheetData(scope): menu + hours + contact + trailer → categories + footer copy
+    MenuSheet.tsx           — Satori JSX (flexbox only, inline styles, px × scale — never a CSS transform)
+    fonts.ts                — fetches Cormorant Garamond + Geist Mono TTFs from Google at render time (cached 30d); no font files in the repo by owner's decision
+    render.tsx              — renderMenuSheet(options, { download, scale }) → ImageResponse
   account/
     addresses.ts            — addAddress, deleteAddress (Zod)
   contact/
@@ -185,6 +193,8 @@ Large chunks of `design-explorations/shared/styles.css` are copied into `app/glo
 19. **Admin settings sidebars use IntersectionObserver scroll-spy.** `components/admin/SettingsSidebar.tsx` is the shared sidebar used by both `/admin/settings` and `/admin/settings/advanced`. It auto-highlights the section that's currently in view (rootMargin `-20% 0px -55% 0px`). The `.sticky-save-bar` in `AdvancedSettingsForm.tsx` lives **outside** the `.settings-layout` grid — putting it inside the grid as a 3rd child made it fall into a single column. Keep the bar as a sibling of `.settings-layout` (both inside the admin `.container` wrapper).
 
 20. **`/review` is the QR-code landing page (stickers on the trailer, boxes, WhatsApp follow-ups).** Rules: (a) **Never link to `/review/google` with `next/link`** — Link prefetches in-viewport hrefs, which would hit the route handler and log a phantom `google_click` on every page view. Use a plain `<a>`. (b) The Google card is gated at request time on `GOOGLE_REVIEW_URL` / `GOOGLE_PLACE_ID` — the page shipped before the Business Profile existed; the card appears on the first deploy after the env var lands, and until then `/review/google` bounces back to `/review`. (c) `view` / `google_click` / `feedback_submit` events are written inside `after()` so they never delay the response. Link-preview bots (WhatsApp / mail clients unfurling the URL) inflate `view` for those sources — treat scans-per-source as approximate; clicks and submits are the trustworthy numbers. (d) Private feedback goes to the `feedback` table, is emailed to `getEmailConfig().notificationTo` via Resend (same channel as the contact form), and is optionally POSTed to `FEEDBACK_WEBHOOK_URL`. Admin triages it at `/admin/feedback`; the nav badge is the unhandled count. (e) The `src` whitelist lives in `lib/review/source.ts` **and** as CHECK constraints in the migration — add new sources in both. (f) **No sentiment pre-filter, no review incentives, ever** — Google's review policy and the DMCC Act 2024 (in force April 2025) both prohibit it. Both cards are shown to everyone, Google first but visually equal.
+
+21. **The printable menu sheet (`/admin/menu/sheet`) is rendered server-side with `next/og`.** Satori, not a browser: every multi-child element needs `display: flex`, no grid, no Tailwind classes, font families must match the names passed to `ImageResponse`. Fonts are fetched from Google Fonts at render time with a non-browser user-agent (that's what makes Google serve TTF instead of WOFF2, which Satori cannot read) — the owner does not want font files committed. Don't use a root `transform: scale()` to produce smaller outputs: Satori drops thin borders under it; `MenuSheet` multiplies every px by `scale` instead. The preview `<img>` requests `scale=0.5` (~2–3 s); downloads are always full 300 dpi (~5–8 s, hence `maxDuration = 60` on the route). Glyphs outside Cormorant/Geist (★ etc.) make Satori try to fetch a fallback font and fail — draw them as SVG. One page is enforced by `layoutSheet`'s estimate-and-pack; its glyph-width constants are deliberately pessimistic because an under-estimate overflows the page silently.
 
 ## Confirmation modals
 

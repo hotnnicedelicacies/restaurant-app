@@ -62,6 +62,13 @@ export default async function AdminMenuPage({
         </div>
         <div className="admin-page-head__actions">
           <Link
+            href="/admin/menu/sheet"
+            className="receipt-btn"
+            style={{ textDecoration: 'none', cursor: 'pointer' }}
+          >
+            Export menu sheet
+          </Link>
+          <Link
             href="/admin/categories"
             className="receipt-btn"
             style={{ textDecoration: 'none', cursor: 'pointer' }}

@@ -11,6 +11,11 @@ const supabaseHost = (() => {
 })();
 
 const nextConfig: NextConfig = {
+  // The menu-sheet PNG route reads the small logo from disk at runtime;
+  // make sure it ships with the serverless bundle.
+  outputFileTracingIncludes: {
+    '/admin/menu/sheet/image': ['./assets/logo-sheet.png'],
+  },
   images: {
     // 24h on Vercel's image cache. Menu images change infrequently, and
     // every Next/Image hit re-runs through Supabase Storage otherwise.
