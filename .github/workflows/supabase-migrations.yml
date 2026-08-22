@@ -95,21 +95,27 @@ jobs:
       - name: Show migration ledger
         run: supabase migration list
 
-      # Guard against the hand-applied-schema trap: if the remote ledger is
-      # empty while the repo already holds several migrations, `db push`
-      # would try to re-create existing tables ("relation already exists").
-      # Fail here with the fix instead of half-way through a push.
-      - name: Check the ledger is baselined
+      # Self-heal the hand-applied-schema trap: the first three migrations
+      # were applied by pasting setup.sql, so a fresh ledger knows nothing
+      # about them and `db push` would re-run them into "relation already
+      # exists". If the ledger is COMPLETELY empty, record exactly those
+      # known versions as applied (repair writes ledger rows, executes no
+      # SQL) and carry on to push what is pending. Anything newer is never
+      # auto-marked, and a ledger with even one row is left alone.
+      - name: Baseline the ledger if empty
         if: env.MARK_APPLIED == ''
+        env:
+          HAND_APPLIED_VERSIONS: '20260511000001 20260511000002 20260511000003'
         run: |
           list="$(supabase migration list 2>&1 || true)"
-          local_count=$(ls supabase/migrations/*.sql 2>/dev/null | wc -l | tr -d ' ')
           # Rows look like:  20260511000001 │ 20260511000001 │ 2026-05-11 ...  (LOCAL │ REMOTE │ TIME)
           remote_count=$(printf '%s\n' "$list" | awk -F'│' 'NF >= 2 && $2 ~ /[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]/ { c++ } END { print c + 0 }')
-          echo "local migrations: $local_count · applied on remote per ledger: $remote_count"
-          if [ "$remote_count" = "0" ] && [ "$local_count" -gt 1 ]; then
-            echo "::error title=Migration ledger not baselined::The database has no record of any applied migration, but this repo holds $local_count. The early ones were applied by pasting setup.sql, so 'db push' would re-run them and fail on 'relation already exists'. Fix (once): Actions → Supabase migrations → Run workflow, set mark_applied to the versions already on the database — for this project: 20260511000001 20260511000002 20260511000003 — then run the workflow again (or push) to apply what is pending."
-            exit 1
+          echo "applied on remote per ledger: $remote_count"
+          if [ "$remote_count" = "0" ]; then
+            echo "::notice::Ledger is empty — recording the hand-applied schema migrations as applied (no SQL runs): $HAND_APPLIED_VERSIONS"
+            # shellcheck disable=SC2086
+            supabase migration repair --status applied $HAND_APPLIED_VERSIONS
+            supabase migration list
           fi
 
       - name: Baseline complete — what next
